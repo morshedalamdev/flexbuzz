@@ -97,7 +97,7 @@ users ─────── posts ─────── post_hashtags ───�
 ### **Phase 1: Backend Development**
 
 ### Milestone 1: Backend Setup & Configuration
-- [ ] Initialize Nest.js backend project with TypeScript
+- [x] Initialize Nest.js backend project with TypeScript
 - [ ] Set up PostgreSQL database and TypeORM configuration
 - [ ] Set up environment variables (`.env`) for backend
 - [ ] Create initial backend folder structure
