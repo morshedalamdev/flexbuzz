@@ -284,9 +284,10 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 
 ## Author
-
 **Morshed Alam**
 - GitHub: [@morshedalamdev](https://github.com/morshedalamdev)
+- LinkedIn: [@morshedalamdev](https://linkedin.com/in/morshedalamdev)
+- Portfolio: [morshedalamdev.dev](https://morshedalam.dev/)
 
 
 
