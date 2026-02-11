@@ -105,14 +105,14 @@ users ─────── posts ─────── post_hashtags ───�
 - [ ] Configure CORS for frontend integration
 
 ### Milestone 2: Authentication API
-- [ ] Create `users` table/entity with TypeORM
+- [x] Create `users` table/entity with TypeORM
 - [ ] Implement user registration endpoint (`POST /auth/register`)
 - [ ] Implement user login endpoint (`POST /auth/login`)
-- [ ] Set up JWT-based authentication with Passport.js
+- [x] Set up JWT-based authentication with Bcrypt
 - [ ] Implement auth guards for protected routes
 - [ ] Implement refresh token mechanism
-- [ ] Add password hashing with bcrypt
-- [ ] Add email validation
+- [x] Add password hashing with bcrypt
+- [x] Add email validation
 - [ ] Test authentication endpoints with Postman/Insomnia
 
 ### Milestone 3: User Profile API
