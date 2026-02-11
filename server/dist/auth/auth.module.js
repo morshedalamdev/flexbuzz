@@ -10,13 +10,22 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
+const bcrypt_provider_1 = require("./provider/bcrypt.provider");
+const hashing_provider_1 = require("./provider/hashing.provider");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService]
+        providers: [
+            auth_service_1.AuthService,
+            {
+                provide: hashing_provider_1.HashingProvider,
+                useClass: bcrypt_provider_1.BcryptProvider,
+            },
+        ],
+        exports: [auth_service_1.AuthService, hashing_provider_1.HashingProvider],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

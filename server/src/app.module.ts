@@ -3,11 +3,12 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
-import { UsersModule } from "./users/users.module";
-import { PostsModule } from "./posts/posts.module";
-import { HashtagsModule } from "./hashtags/hashtags.module";
-import { CommentsModule } from "./comments/comments.module";
-import { LikesModule } from "./likes/likes.module";
+import { UserModule } from "./user/user.module";
+import { HashtagModule } from "./hashtag/hashtag.module";
+import { CommentModule } from "./comment/comment.module";
+import { LikeModule } from "./like/like.module";
+import { NoteModule } from './note/note.module';
+import { ProfileModule } from './profile/profile.module';
 import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import envValidation from "./config/env.validation";
@@ -18,11 +19,10 @@ const ENV = process.env.NODE_ENV;
 @Module({
   imports: [
     AuthModule,
-    UsersModule,
-    PostsModule,
-    HashtagsModule,
-    CommentsModule,
-    LikesModule,
+    UserModule,
+    HashtagModule,
+    CommentModule,
+    LikeModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !ENV ? ".env" : `.env.${ENV}`,
@@ -42,6 +42,8 @@ const ENV = process.env.NODE_ENV;
         database: configService.get<string>("database.name"),
       }),
     }),
+    NoteModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

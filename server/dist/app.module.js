@@ -15,11 +15,12 @@ const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
-const users_module_1 = require("./users/users.module");
-const posts_module_1 = require("./posts/posts.module");
-const hashtags_module_1 = require("./hashtags/hashtags.module");
-const comments_module_1 = require("./comments/comments.module");
-const likes_module_1 = require("./likes/likes.module");
+const user_module_1 = require("./user/user.module");
+const hashtag_module_1 = require("./hashtag/hashtag.module");
+const comment_module_1 = require("./comment/comment.module");
+const like_module_1 = require("./like/like.module");
+const note_module_1 = require("./note/note.module");
+const profile_module_1 = require("./profile/profile.module");
 const app_config_1 = __importDefault(require("./config/app.config"));
 const database_config_1 = __importDefault(require("./config/database.config"));
 const env_validation_1 = __importDefault(require("./config/env.validation"));
@@ -32,11 +33,10 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             auth_module_1.AuthModule,
-            users_module_1.UsersModule,
-            posts_module_1.PostsModule,
-            hashtags_module_1.HashtagsModule,
-            comments_module_1.CommentsModule,
-            likes_module_1.LikesModule,
+            user_module_1.UserModule,
+            hashtag_module_1.HashtagModule,
+            comment_module_1.CommentModule,
+            like_module_1.LikeModule,
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 envFilePath: !ENV ? ".env" : `.env.${ENV}`,
@@ -56,6 +56,8 @@ exports.AppModule = AppModule = __decorate([
                     database: configService.get("database.name"),
                 }),
             }),
+            note_module_1.NoteModule,
+            profile_module_1.ProfileModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
