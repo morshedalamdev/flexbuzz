@@ -16,8 +16,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  public CreateUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  public CreateUser(@Body() createDto: CreateUserDto) {
+    return this.userService.create(createDto);
   }
 
   @Get()
@@ -36,8 +36,8 @@ export class UserController {
   }
 
   @Patch("/me")
-  public UpdateUser(@Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(updateUserDto);
+  public UpdateUser(@Body() updateDto: UpdateUserDto) {
+    return this.userService.update(updateDto);
   }
 
   @Delete("/me")

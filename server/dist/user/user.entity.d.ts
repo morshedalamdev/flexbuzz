@@ -1,3 +1,4 @@
+import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
 export declare class User {
     id: string;
@@ -8,4 +9,5 @@ export declare class User {
     updatedAt: Date;
     deletedAt: Date;
     profile?: Profile;
+    notes: Note[];
 }

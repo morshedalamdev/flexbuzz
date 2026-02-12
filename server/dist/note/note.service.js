@@ -9,6 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoteService = void 0;
 const common_1 = require("@nestjs/common");
 let NoteService = class NoteService {
+    async create(noteDto) {
+        return "Note created successfully";
+    }
 };
 exports.NoteService = NoteService;
 exports.NoteService = NoteService = __decorate([

@@ -1,9 +1,11 @@
+import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -47,4 +49,7 @@ export class User {
 
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile?: Profile;
+
+  @OneToMany(() => Note, (note) => note.user)
+  notes: Note[];
 }

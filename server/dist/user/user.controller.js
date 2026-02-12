@@ -22,8 +22,8 @@ let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
-    CreateUser(createUserDto) {
-        return this.userService.create(createUserDto);
+    CreateUser(createDto) {
+        return this.userService.create(createDto);
     }
     GetUsers() {
         return this.userService.getAll();
@@ -34,8 +34,8 @@ let UserController = class UserController {
     GetCurrentUser() {
         return this.userService.getCurrent();
     }
-    UpdateUser(updateUserDto) {
-        return this.userService.update(updateUserDto);
+    UpdateUser(updateDto) {
+        return this.userService.update(updateDto);
     }
     DeleteUser() {
         return this.userService.delete();

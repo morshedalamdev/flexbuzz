@@ -10,13 +10,19 @@ exports.NoteModule = void 0;
 const common_1 = require("@nestjs/common");
 const note_controller_1 = require("./note.controller");
 const note_service_1 = require("./note.service");
+const hashtag_module_1 = require("../hashtag/hashtag.module");
+const user_module_1 = require("../user/user.module");
+const note_entity_1 = require("./note.entity");
+const typeorm_1 = require("@nestjs/typeorm");
 let NoteModule = class NoteModule {
 };
 exports.NoteModule = NoteModule;
 exports.NoteModule = NoteModule = __decorate([
     (0, common_1.Module)({
         controllers: [note_controller_1.NoteController],
-        providers: [note_service_1.NoteService]
+        providers: [note_service_1.NoteService],
+        imports: [user_module_1.UserModule, hashtag_module_1.HashtagModule, typeorm_1.TypeOrmModule.forFeature([note_entity_1.Note])],
+        exports: [note_service_1.NoteService],
     })
 ], NoteModule);
 //# sourceMappingURL=note.module.js.map

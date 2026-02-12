@@ -27,6 +27,34 @@ let UserService = class UserService {
         this.hashingProvider = hashingProvider;
         this.userRepository = userRepository;
     }
+    async create(userDto) {
+        const isUsernameExist = await this.userRepository.findOne({
+            where: { username: userDto.username },
+            withDeleted: true,
+        });
+        if (isUsernameExist) {
+            throw new user_exists_exception_1.UserExistsException("username", userDto.username);
+        }
+        const isEmailExist = await this.userRepository.findOne({
+            where: { email: userDto.email },
+            withDeleted: true,
+        });
+        if (isEmailExist) {
+            throw new user_exists_exception_1.UserExistsException("email", userDto.email);
+        }
+        try {
+            const newUser = this.userRepository.create({
+                ...userDto,
+                password: await this.hashingProvider.hashPassword(userDto.password),
+                profile: {},
+            });
+            return await this.userRepository.save(newUser);
+        }
+        catch (error) {
+            console.error("Error @user-create:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
     async getAll() {
         try {
             return this.userRepository.find({ relations: ["profile"] });
@@ -62,34 +90,6 @@ let UserService = class UserService {
         return user;
     }
     async getCurrent() { }
-    async create(userDto) {
-        const isUsernameExist = await this.userRepository.findOne({
-            where: { username: userDto.username },
-            withDeleted: true,
-        });
-        if (isUsernameExist) {
-            throw new user_exists_exception_1.UserExistsException("username", userDto.username);
-        }
-        const isEmailExist = await this.userRepository.findOne({
-            where: { email: userDto.email },
-            withDeleted: true,
-        });
-        if (isEmailExist) {
-            throw new user_exists_exception_1.UserExistsException("email", userDto.email);
-        }
-        try {
-            const newUser = this.userRepository.create({
-                ...userDto,
-                password: await this.hashingProvider.hashPassword(userDto.password),
-                profile: {},
-            });
-            return await this.userRepository.save(newUser);
-        }
-        catch (error) {
-            console.error("Error @user-create:", error);
-            throw new common_1.RequestTimeoutException();
-        }
-    }
     async update(updateUser) {
         try {
         }
