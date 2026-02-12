@@ -5,13 +5,77 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoteController = void 0;
 const common_1 = require("@nestjs/common");
+const note_service_1 = require("./note.service");
+const create_note_dto_1 = require("./dto/create-note.dto");
+const update_note_dto_1 = require("./dto/update-note.dto");
 let NoteController = class NoteController {
+    noteService;
+    constructor(noteService) {
+        this.noteService = noteService;
+    }
+    CreateNote(createDto) {
+        return this.noteService.create(createDto);
+    }
+    GetNotes(query) {
+        return this.noteService.getAll(query.user);
+    }
+    GetById(id) {
+        return this.noteService.getById(id);
+    }
+    UpdateNote(updateDto) {
+        return this.noteService.update(updateDto);
+    }
+    DeleteNote(id) {
+        return this.noteService.delete(id);
+    }
 };
 exports.NoteController = NoteController;
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_note_dto_1.CreateNoteDto]),
+    __metadata("design:returntype", void 0)
+], NoteController.prototype, "CreateNote", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], NoteController.prototype, "GetNotes", null);
+__decorate([
+    (0, common_1.Get)(":id"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], NoteController.prototype, "GetById", null);
+__decorate([
+    (0, common_1.Patch)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [update_note_dto_1.UpdateNoteDto]),
+    __metadata("design:returntype", void 0)
+], NoteController.prototype, "UpdateNote", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], NoteController.prototype, "DeleteNote", null);
 exports.NoteController = NoteController = __decorate([
-    (0, common_1.Controller)('note')
+    (0, common_1.Controller)("note"),
+    __metadata("design:paramtypes", [note_service_1.NoteService])
 ], NoteController);
 //# sourceMappingURL=note.controller.js.map

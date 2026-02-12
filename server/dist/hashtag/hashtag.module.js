@@ -10,13 +10,17 @@ exports.HashtagModule = void 0;
 const common_1 = require("@nestjs/common");
 const hashtag_controller_1 = require("./hashtag.controller");
 const hashtag_service_1 = require("./hashtag.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const hashtag_entity_1 = require("./hashtag.entity");
 let HashtagModule = class HashtagModule {
 };
 exports.HashtagModule = HashtagModule;
 exports.HashtagModule = HashtagModule = __decorate([
     (0, common_1.Module)({
         controllers: [hashtag_controller_1.HashtagController],
-        providers: [hashtag_service_1.HashtagService]
+        providers: [hashtag_service_1.HashtagService],
+        exports: [hashtag_service_1.HashtagService],
+        imports: [typeorm_1.TypeOrmModule.forFeature([hashtag_entity_1.Hashtags])],
     })
 ], HashtagModule);
 //# sourceMappingURL=hashtag.module.js.map

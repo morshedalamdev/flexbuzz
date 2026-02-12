@@ -4,11 +4,11 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
-    CreateUser(createUserDto: CreateUserDto): Promise<import("./user.entity").User>;
+    CreateUser(createDto: CreateUserDto): Promise<import("./user.entity").User>;
     GetUsers(): Promise<import("./user.entity").User[]>;
     GetUserById(id: string): Promise<import("./user.entity").User>;
-    GetCurrentUser(): Promise<void>;
-    UpdateUser(updateUserDto: UpdateUserDto): Promise<void>;
+    GetCurrentUser(): Promise<import("./user.entity").User>;
+    UpdateUser(updateDto: UpdateUserDto): Promise<import("./user.entity").User>;
     DeleteUser(): Promise<{
         deleted: boolean;
     }>;

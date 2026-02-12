@@ -1,15 +1,19 @@
+import { Notes } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity("users")
+@Unique(["username", "email"])
 export class User {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
@@ -18,7 +22,6 @@ export class User {
     type: "varchar",
     nullable: false,
     length: 24,
-    unique: true,
   })
   username: string;
 
@@ -26,7 +29,6 @@ export class User {
     type: "varchar",
     nullable: false,
     length: 100,
-    unique: true,
   })
   email: string;
 
@@ -47,4 +49,7 @@ export class User {
 
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile?: Profile;
+
+  @OneToMany(() => Notes, (note) => note.user)
+  notes: Notes[];
 }

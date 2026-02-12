@@ -13,6 +13,7 @@ import { UserExistsException } from "src/common/customException/user-exists.exce
 import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { isUUID } from "class-validator";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { USER_ID } from "src/constants/constants";
 
 @Injectable()
 export class UserService {
@@ -24,6 +25,37 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
+
+  public async create(userDto: CreateUserDto) {
+    // username & email validation
+    const isUsernameExist = await this.userRepository.findOne({
+      where: { username: userDto.username },
+      withDeleted: true,
+    });
+    if (isUsernameExist) {
+      throw new UserExistsException("username", userDto.username);
+    }
+    const isEmailExist = await this.userRepository.findOne({
+      where: { email: userDto.email },
+      withDeleted: true,
+    });
+    if (isEmailExist) {
+      throw new UserExistsException("email", userDto.email);
+    }
+    try {
+      // create user
+      const newUser = this.userRepository.create({
+        ...userDto,
+        password: await this.hashingProvider.hashPassword(userDto.password),
+        profile: {},
+      });
+      // save user to database
+      return await this.userRepository.save(newUser);
+    } catch (error) {
+      console.error("Error @user-create:", error);
+      throw new RequestTimeoutException();
+    }
+  }
 
   public async getAll() {
     try {
@@ -59,60 +91,35 @@ export class UserService {
     return user;
   }
 
-  public async getCurrent() {}
-
-  public async create(userDto: CreateUserDto) {
-    // username & email validation
-    const isUsernameExist = await this.userRepository.findOne({
-      where: { username: userDto.username },
-      withDeleted: true,
-    });
-    if (isUsernameExist) {
-      throw new UserExistsException("username", userDto.username);
-    }
-    const isEmailExist = await this.userRepository.findOne({
-      where: { email: userDto.email },
-      withDeleted: true,
-    });
-    if (isEmailExist) {
-      throw new UserExistsException("email", userDto.email);
-    }
-    try {
-      // create user
-      const newUser = this.userRepository.create({
-        ...userDto,
-        password: await this.hashingProvider.hashPassword(userDto.password),
-        profile: {},
-      });
-      // save user to database
-      return await this.userRepository.save(newUser);
-    } catch (error) {
-      console.error("Error @user-create:", error);
-      throw new RequestTimeoutException();
-    }
+  public async getCurrent() {
+    return this.getBy(USER_ID);
   }
 
-  public async update(updateUser: UpdateUserDto) {
+  public async update(userDto: UpdateUserDto) {
     try {
-      // const user = await this.userRepository.findOne({
-      //   where: { id: userId },
-      //   relations: ["profile"],
-      // });
-
-      // user.username = updateUser.username ?? user.username;
-      // user.email = updateUser.email ?? user.email;
-      // user.profile.firstName =
-      //   updateUser.profile?.firstName ?? user.profile.firstName;
-      // user.profile.lastName =
-      //   updateUser.profile?.lastName ?? user.profile.lastName;
-      // user.profile.gender = updateUser.profile?.gender ?? user.profile.gender;
-      // user.profile.dob = updateUser.profile?.dob
-      //   ? new Date(updateUser.profile.dob)
-      //   : user.profile.dob;
-      // user.profile.bio = updateUser.profile?.bio ?? user.profile.bio;
-
-      // return await this.userRepository.save(user);
+      const user = await this.userRepository.findOne({
+        where: { id: USER_ID },
+        relations: ["profile"],
+      });
+      if (!user || !user.profile) {
+        throw new NotFoundException("User not found");
+      }
+      user.username = userDto.username ?? user.username;
+      user.email = userDto.email ?? user.email;
+      user.profile.firstName =
+        userDto.profile?.firstName ?? user.profile.firstName;
+      user.profile.lastName =
+        userDto.profile?.lastName ?? user.profile.lastName;
+      user.profile.gender = userDto.profile?.gender ?? user.profile.gender;
+      user.profile.dob = userDto.profile?.dob
+        ? new Date(userDto.profile.dob)
+        : user.profile.dob;
+      user.profile.bio = userDto.profile?.bio ?? user.profile.bio;
+      return await this.userRepository.save(user);
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       console.error("Error @user-update:", error);
       throw new RequestTimeoutException();
     }
@@ -120,7 +127,7 @@ export class UserService {
 
   public async delete() {
     try {
-      await this.userRepository.softDelete("id");
+      await this.userRepository.softDelete(USER_ID);
       return { deleted: true };
     } catch (error) {
       console.error("Error @user-delete:", error);

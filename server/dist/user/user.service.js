@@ -20,12 +20,41 @@ const typeorm_2 = require("typeorm");
 const user_exists_exception_1 = require("../common/customException/user-exists.exception");
 const hashing_provider_1 = require("../auth/provider/hashing.provider");
 const class_validator_1 = require("class-validator");
+const constants_1 = require("../constants/constants");
 let UserService = class UserService {
     hashingProvider;
     userRepository;
     constructor(hashingProvider, userRepository) {
         this.hashingProvider = hashingProvider;
         this.userRepository = userRepository;
+    }
+    async create(userDto) {
+        const isUsernameExist = await this.userRepository.findOne({
+            where: { username: userDto.username },
+            withDeleted: true,
+        });
+        if (isUsernameExist) {
+            throw new user_exists_exception_1.UserExistsException("username", userDto.username);
+        }
+        const isEmailExist = await this.userRepository.findOne({
+            where: { email: userDto.email },
+            withDeleted: true,
+        });
+        if (isEmailExist) {
+            throw new user_exists_exception_1.UserExistsException("email", userDto.email);
+        }
+        try {
+            const newUser = this.userRepository.create({
+                ...userDto,
+                password: await this.hashingProvider.hashPassword(userDto.password),
+                profile: {},
+            });
+            return await this.userRepository.save(newUser);
+        }
+        catch (error) {
+            console.error("Error @user-create:", error);
+            throw new common_1.RequestTimeoutException();
+        }
     }
     async getAll() {
         try {
@@ -61,46 +90,42 @@ let UserService = class UserService {
         }
         return user;
     }
-    async getCurrent() { }
-    async create(userDto) {
-        const isUsernameExist = await this.userRepository.findOne({
-            where: { username: userDto.username },
-            withDeleted: true,
-        });
-        if (isUsernameExist) {
-            throw new user_exists_exception_1.UserExistsException("username", userDto.username);
-        }
-        const isEmailExist = await this.userRepository.findOne({
-            where: { email: userDto.email },
-            withDeleted: true,
-        });
-        if (isEmailExist) {
-            throw new user_exists_exception_1.UserExistsException("email", userDto.email);
-        }
-        try {
-            const newUser = this.userRepository.create({
-                ...userDto,
-                password: await this.hashingProvider.hashPassword(userDto.password),
-                profile: {},
-            });
-            return await this.userRepository.save(newUser);
-        }
-        catch (error) {
-            console.error("Error @user-create:", error);
-            throw new common_1.RequestTimeoutException();
-        }
+    async getCurrent() {
+        return this.getBy(constants_1.USER_ID);
     }
-    async update(updateUser) {
+    async update(userDto) {
         try {
+            const user = await this.userRepository.findOne({
+                where: { id: constants_1.USER_ID },
+                relations: ["profile"],
+            });
+            if (!user || !user.profile) {
+                throw new common_1.NotFoundException("User not found");
+            }
+            user.username = userDto.username ?? user.username;
+            user.email = userDto.email ?? user.email;
+            user.profile.firstName =
+                userDto.profile?.firstName ?? user.profile.firstName;
+            user.profile.lastName =
+                userDto.profile?.lastName ?? user.profile.lastName;
+            user.profile.gender = userDto.profile?.gender ?? user.profile.gender;
+            user.profile.dob = userDto.profile?.dob
+                ? new Date(userDto.profile.dob)
+                : user.profile.dob;
+            user.profile.bio = userDto.profile?.bio ?? user.profile.bio;
+            return await this.userRepository.save(user);
         }
         catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
             console.error("Error @user-update:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
     async delete() {
         try {
-            await this.userRepository.softDelete("id");
+            await this.userRepository.softDelete(constants_1.USER_ID);
             return { deleted: true };
         }
         catch (error) {
