@@ -13,5 +13,7 @@ export declare class NoteService {
     getAll(user?: string): Promise<Notes[]>;
     getById(id: string): Promise<Notes | null>;
     update(noteDto: UpdateNoteDto): Promise<Notes>;
-    delete(id: string): Promise<void>;
+    delete(id: string): Promise<{
+        deleted: boolean;
+    }>;
 }

@@ -10,5 +10,7 @@ export declare class NoteController {
     }): Promise<import("./note.entity").Notes[]>;
     GetById(id: string): Promise<import("./note.entity").Notes | null>;
     UpdateNote(updateDto: UpdateNoteDto): Promise<import("./note.entity").Notes>;
-    DeleteNote(id: string): Promise<void>;
+    DeleteNote(id: string): Promise<{
+        deleted: boolean;
+    }>;
 }

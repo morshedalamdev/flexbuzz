@@ -114,10 +114,12 @@ export class NoteService {
   }
 
   public async delete(id: string) {
-     try {
-          
-     } catch (error) {
-          
-     }
+    try {
+      await this.noteRepository.delete(id);
+      return { deleted: true };
+    } catch (error) {
+      console.error("Error @note-delete:", error);
+      throw new RequestTimeoutException();
+    }
   }
 }

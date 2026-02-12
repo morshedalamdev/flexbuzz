@@ -110,7 +110,16 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async delete(id) { }
+    async delete(id) {
+        try {
+            await this.noteRepository.delete(id);
+            return { deleted: true };
+        }
+        catch (error) {
+            console.error("Error @note-delete:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.NoteService = NoteService;
 exports.NoteService = NoteService = __decorate([
