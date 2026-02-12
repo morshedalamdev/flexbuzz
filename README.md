@@ -85,11 +85,11 @@ flexbuzz/
 ### Entity Relationships
 
 ```
-users ─────── posts ─────── post_hashtags ─────── hashtags
-                │
-                ├──── likes
-                │
-                └──── comments
+users ────────── posts ─────── post_hashtags ─────── hashtags
+  │                │
+  ├──── likes ─────│
+  │                │
+  └──── comments ──└
 ```
 
 
