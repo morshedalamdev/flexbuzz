@@ -9,8 +9,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
-import { Profile } from "src/profile/profile.entity";
-import { UserExistsException } from "src/common/customeException/user-exists.exception";
+import { UserExistsException } from "src/common/customException/user-exists.exception";
 import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { isUUID } from "class-validator";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -24,8 +23,6 @@ export class UserService {
     // TypeORM repositories for User and Profile entities
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>,
   ) {}
 
   public async getAll() {
@@ -62,6 +59,8 @@ export class UserService {
     return user;
   }
 
+  public async getCurrent() {}
+
   public async create(userDto: CreateUserDto) {
     // username & email validation
     const isUsernameExist = await this.userRepository.findOne({
@@ -94,39 +93,34 @@ export class UserService {
   }
 
   public async update(updateUser: UpdateUserDto) {
-    const user = await this.userRepository.findOne({
-      where: { id: updateUser.id },
-      relations: ["profile"],
-    });
-    if (!user) {
-      throw new NotFoundException(`User with id '${updateUser.id}' not found.`);
-    }
-    if (!user.profile) {
-      throw new NotFoundException(`Profile for user with id '${updateUser.id}' not found.`);
-    }
     try {
-      user.username = updateUser.username ?? user.username;
-      user.email = updateUser.email ?? user.email;
-      user.profile.firstName = updateUser.profile?.firstName ?? user.profile.firstName;
-      user.profile.lastName = updateUser.profile?.lastName ?? user.profile.lastName;
-      user.profile.gender = updateUser.profile?.gender ?? user.profile.gender;
-      user.profile.dob = updateUser.profile?.dob ? new Date(updateUser.profile.dob) : user.profile.dob;
-      user.profile.bio = updateUser.profile?.bio ?? user.profile.bio;
+      // const user = await this.userRepository.findOne({
+      //   where: { id: userId },
+      //   relations: ["profile"],
+      // });
 
-      return await this.userRepository.save(user);
+      // user.username = updateUser.username ?? user.username;
+      // user.email = updateUser.email ?? user.email;
+      // user.profile.firstName =
+      //   updateUser.profile?.firstName ?? user.profile.firstName;
+      // user.profile.lastName =
+      //   updateUser.profile?.lastName ?? user.profile.lastName;
+      // user.profile.gender = updateUser.profile?.gender ?? user.profile.gender;
+      // user.profile.dob = updateUser.profile?.dob
+      //   ? new Date(updateUser.profile.dob)
+      //   : user.profile.dob;
+      // user.profile.bio = updateUser.profile?.bio ?? user.profile.bio;
+
+      // return await this.userRepository.save(user);
     } catch (error) {
       console.error("Error @user-update:", error);
       throw new RequestTimeoutException();
     }
   }
 
-  public async delete(id: string) {
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with '${id}' not found.`);
-    }
+  public async delete() {
     try {
-      await this.userRepository.softDelete(id);
+      await this.userRepository.softDelete("id");
       return { deleted: true };
     } catch (error) {
       console.error("Error @user-delete:", error);

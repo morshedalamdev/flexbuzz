@@ -1,19 +1,18 @@
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
-import { Profile } from "src/profile/profile.entity";
 import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { UpdateUserDto } from "./dto/update-user.dto";
 export declare class UserService {
     private readonly hashingProvider;
     private userRepository;
-    private profileRepository;
-    constructor(hashingProvider: HashingProvider, userRepository: Repository<User>, profileRepository: Repository<Profile>);
+    constructor(hashingProvider: HashingProvider, userRepository: Repository<User>);
     getAll(): Promise<User[]>;
     getBy(identifier: string): Promise<User>;
+    getCurrent(): Promise<void>;
     create(userDto: CreateUserDto): Promise<User>;
-    update(updateUser: UpdateUserDto): Promise<User>;
-    delete(id: string): Promise<{
+    update(updateUser: UpdateUserDto): Promise<void>;
+    delete(): Promise<{
         deleted: boolean;
     }>;
 }

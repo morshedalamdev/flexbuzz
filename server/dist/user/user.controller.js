@@ -22,23 +22,33 @@ let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
+    CreateUser(createUserDto) {
+        return this.userService.create(createUserDto);
+    }
     GetUsers() {
         return this.userService.getAll();
     }
     GetUserById(id) {
         return this.userService.getBy(id);
     }
-    CreateUser(createUserDto) {
-        return this.userService.create(createUserDto);
+    GetCurrentUser() {
+        return this.userService.getCurrent();
     }
     UpdateUser(updateUserDto) {
         return this.userService.update(updateUserDto);
     }
-    DeleteUser(id) {
-        return this.userService.delete(id);
+    DeleteUser() {
+        return this.userService.delete();
     }
 };
 exports.UserController = UserController;
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "CreateUser", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -53,24 +63,22 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserById", null);
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Get)("/me"),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], UserController.prototype, "CreateUser", null);
+], UserController.prototype, "GetCurrentUser", null);
 __decorate([
-    (0, common_1.Patch)(),
+    (0, common_1.Patch)("/me"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [update_user_dto_1.UpdateUserDto]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "UpdateUser", null);
 __decorate([
-    (0, common_1.Delete)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Delete)("/me"),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "DeleteUser", null);
 exports.UserController = UserController = __decorate([

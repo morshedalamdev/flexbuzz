@@ -17,18 +17,15 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./user.entity");
 const typeorm_2 = require("typeorm");
-const profile_entity_1 = require("../profile/profile.entity");
-const user_exists_exception_1 = require("../common/customeException/user-exists.exception");
+const user_exists_exception_1 = require("../common/customException/user-exists.exception");
 const hashing_provider_1 = require("../auth/provider/hashing.provider");
 const class_validator_1 = require("class-validator");
 let UserService = class UserService {
     hashingProvider;
     userRepository;
-    profileRepository;
-    constructor(hashingProvider, userRepository, profileRepository) {
+    constructor(hashingProvider, userRepository) {
         this.hashingProvider = hashingProvider;
         this.userRepository = userRepository;
-        this.profileRepository = profileRepository;
     }
     async getAll() {
         try {
@@ -64,6 +61,7 @@ let UserService = class UserService {
         }
         return user;
     }
+    async getCurrent() { }
     async create(userDto) {
         const isUsernameExist = await this.userRepository.findOne({
             where: { username: userDto.username },
@@ -93,38 +91,16 @@ let UserService = class UserService {
         }
     }
     async update(updateUser) {
-        const user = await this.userRepository.findOne({
-            where: { id: updateUser.id },
-            relations: ["profile"],
-        });
-        if (!user) {
-            throw new common_1.NotFoundException(`User with id '${updateUser.id}' not found.`);
-        }
-        if (!user.profile) {
-            throw new common_1.NotFoundException(`Profile for user with id '${updateUser.id}' not found.`);
-        }
         try {
-            user.username = updateUser.username ?? user.username;
-            user.email = updateUser.email ?? user.email;
-            user.profile.firstName = updateUser.profile?.firstName ?? user.profile.firstName;
-            user.profile.lastName = updateUser.profile?.lastName ?? user.profile.lastName;
-            user.profile.gender = updateUser.profile?.gender ?? user.profile.gender;
-            user.profile.dob = updateUser.profile?.dob ? new Date(updateUser.profile.dob) : user.profile.dob;
-            user.profile.bio = updateUser.profile?.bio ?? user.profile.bio;
-            return await this.userRepository.save(user);
         }
         catch (error) {
             console.error("Error @user-update:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
-    async delete(id) {
-        const user = await this.userRepository.findOne({ where: { id } });
-        if (!user) {
-            throw new common_1.NotFoundException(`User with '${id}' not found.`);
-        }
+    async delete() {
         try {
-            await this.userRepository.softDelete(id);
+            await this.userRepository.softDelete("id");
             return { deleted: true };
         }
         catch (error) {
@@ -138,9 +114,7 @@ exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)((0, common_1.forwardRef)(() => hashing_provider_1.HashingProvider))),
     __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(2, (0, typeorm_1.InjectRepository)(profile_entity_1.Profile)),
     __metadata("design:paramtypes", [hashing_provider_1.HashingProvider,
-        typeorm_2.Repository,
         typeorm_2.Repository])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

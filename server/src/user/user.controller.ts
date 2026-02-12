@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -6,6 +14,11 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post()
+  public CreateUser(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
+  }
 
   @Get()
   public GetUsers() {
@@ -17,18 +30,18 @@ export class UserController {
     return this.userService.getBy(id);
   }
 
-  @Post()
-  public CreateUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Get("/me")
+  public GetCurrentUser() {
+    return this.userService.getCurrent();
   }
 
-  @Patch()
+  @Patch("/me")
   public UpdateUser(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto);
   }
 
-  @Delete(":id")
-  public DeleteUser(@Param("id") id: string) {
-    return this.userService.delete(id);
+  @Delete("/me")
+  public DeleteUser() {
+    return this.userService.delete();
   }
 }

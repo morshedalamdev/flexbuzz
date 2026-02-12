@@ -16,15 +16,9 @@ const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const update_profile_dto_1 = require("../../profile/dto/update-profile.dto");
 class UpdateUserDto extends (0, mapped_types_1.PartialType)(create_user_dto_1.CreateUserDto) {
-    id;
     profile;
 }
 exports.UpdateUserDto = UpdateUserDto;
-__decorate([
-    (0, class_validator_1.IsUUID)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "id", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateNested)(),
