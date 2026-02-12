@@ -21,7 +21,7 @@ let HashtagController = class HashtagController {
     constructor(hashtagService) {
         this.hashtagService = hashtagService;
     }
-    async Create(createDto) {
+    async CreateHashtag(createDto) {
         return this.hashtagService.create(createDto);
     }
     async GetHashtags(query) {
@@ -35,7 +35,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_hashtag_dto_1.CreateHashtagDto]),
     __metadata("design:returntype", Promise)
-], HashtagController.prototype, "Create", null);
+], HashtagController.prototype, "CreateHashtag", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),

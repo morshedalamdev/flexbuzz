@@ -63,6 +63,17 @@ let HashtagService = class HashtagService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async getByIds(hashtags) {
+        try {
+            return await this.hashtagRepository.find({
+                where: { id: (0, typeorm_1.In)(hashtags) },
+            });
+        }
+        catch (error) {
+            console.error("Error @getByIds:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.HashtagService = HashtagService;
 exports.HashtagService = HashtagService = __decorate([

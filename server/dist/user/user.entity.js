@@ -34,7 +34,6 @@ __decorate([
         type: "varchar",
         nullable: false,
         length: 24,
-        unique: true,
     }),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
@@ -43,7 +42,6 @@ __decorate([
         type: "varchar",
         nullable: false,
         length: 100,
-        unique: true,
     }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
@@ -75,6 +73,7 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "notes", void 0);
 exports.User = User = __decorate([
-    (0, typeorm_1.Entity)("users")
+    (0, typeorm_1.Entity)("users"),
+    (0, typeorm_1.Unique)(["username", "email"])
 ], User);
 //# sourceMappingURL=user.entity.js.map

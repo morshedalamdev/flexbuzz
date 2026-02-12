@@ -6,4 +6,5 @@ export declare class HashtagService {
     constructor(hashtagRepository: Repository<Hashtags>);
     create(hashtagDto: CreateHashtagDto): Promise<Hashtags>;
     getHashtags(search?: string): Promise<Hashtags | Hashtags[]>;
+    getByIds(hashtags: string[]): Promise<Hashtags[]>;
 }

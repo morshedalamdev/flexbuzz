@@ -4,7 +4,7 @@ export declare class Notes {
     id: string;
     text: string;
     user: User;
+    hashtags: Hashtags[];
     createdAt: Date;
     updatedAt: Date;
-    hashtags: Hashtags[];
 }

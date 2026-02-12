@@ -10,8 +10,8 @@ export declare class UserService {
     create(userDto: CreateUserDto): Promise<User>;
     getAll(): Promise<User[]>;
     getBy(identifier: string): Promise<User>;
-    getCurrent(): Promise<void>;
-    update(updateUser: UpdateUserDto): Promise<void>;
+    getCurrent(): Promise<User>;
+    update(userDto: UpdateUserDto): Promise<User>;
     delete(): Promise<{
         deleted: boolean;
     }>;

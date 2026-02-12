@@ -17,13 +17,13 @@ export class Notes {
   @ManyToOne(()=> User, (user)=> user.notes, { eager: true })
   user: User;
 
+  @ManyToMany(()=> Hashtags, (hashtag)=> hashtag.notes, { eager: true })
+  @JoinTable({name: "notes_hashtags"})
+  hashtags: Hashtags[];
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;  
-
-  @ManyToMany(()=> Hashtags, (hashtag)=> hashtag.notes, { eager: true })
-  @JoinTable({name: "notes_hashtags"})
-  hashtags: Hashtags[];
+  updatedAt: Date;
 }

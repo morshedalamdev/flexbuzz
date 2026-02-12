@@ -5,7 +5,7 @@ import {
   RequestTimeoutException,
 } from "@nestjs/common";
 import { CreateHashtagDto } from "./dto/create-hashtag.dto";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Hashtags } from "./hashtag.entity";
 
@@ -48,13 +48,24 @@ export class HashtagService {
       if (response.length === 0) {
         throw new NotFoundException("Hashtag not found");
       }
-      
+
       return response;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
       console.error("Error @getHashtags:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async getByIds(hashtags: string[]) {
+    try {
+      return await this.hashtagRepository.find({
+        where: { id: In(hashtags) },
+      });
+    } catch (error) {
+      console.error("Error @getByIds:", error);
       throw new RequestTimeoutException();
     }
   }

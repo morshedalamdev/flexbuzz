@@ -17,9 +17,9 @@ let Notes = class Notes {
     id;
     text;
     user;
+    hashtags;
     createdAt;
     updatedAt;
-    hashtags;
 };
 exports.Notes = Notes;
 __decorate([
@@ -38,6 +38,11 @@ __decorate([
     __metadata("design:type", user_entity_1.User)
 ], Notes.prototype, "user", void 0);
 __decorate([
+    (0, typeorm_1.ManyToMany)(() => hashtag_entity_1.Hashtags, (hashtag) => hashtag.notes, { eager: true }),
+    (0, typeorm_1.JoinTable)({ name: "notes_hashtags" }),
+    __metadata("design:type", Array)
+], Notes.prototype, "hashtags", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Notes.prototype, "createdAt", void 0);
@@ -45,11 +50,6 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], Notes.prototype, "updatedAt", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => hashtag_entity_1.Hashtags, (hashtag) => hashtag.notes, { eager: true }),
-    (0, typeorm_1.JoinTable)({ name: "notes_hashtags" }),
-    __metadata("design:type", Array)
-], Notes.prototype, "hashtags", void 0);
 exports.Notes = Notes = __decorate([
     (0, typeorm_1.Entity)()
 ], Notes);

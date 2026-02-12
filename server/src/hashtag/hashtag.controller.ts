@@ -7,7 +7,7 @@ export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}
 
   @Post()
-  async Create(@Body() createDto: CreateHashtagDto) {
+  async CreateHashtag(@Body() createDto: CreateHashtagDto) {
     return this.hashtagService.create(createDto);
   }
 
