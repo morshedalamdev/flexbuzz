@@ -21,7 +21,7 @@ exports.NoteModule = NoteModule = __decorate([
     (0, common_1.Module)({
         controllers: [note_controller_1.NoteController],
         providers: [note_service_1.NoteService],
-        imports: [user_module_1.UserModule, hashtag_module_1.HashtagModule, typeorm_1.TypeOrmModule.forFeature([note_entity_1.Note])],
+        imports: [user_module_1.UserModule, hashtag_module_1.HashtagModule, typeorm_1.TypeOrmModule.forFeature([note_entity_1.Notes])],
         exports: [note_service_1.NoteService],
     })
 ], NoteModule);

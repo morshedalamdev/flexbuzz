@@ -1,8 +1,9 @@
+import { Hashtags } from "src/hashtag/hashtag.entity";
 import { User } from "src/user/user.entity";
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
-export class Note {
+export class Notes {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
 
@@ -16,13 +17,13 @@ export class Note {
   @ManyToOne(()=> User, (user)=> user.notes, { eager: true })
   user: User;
 
-//   @ManyToMany(()=> Hashtag, (hashtag)=> hashtag.notes, { eager: true })
-//   @JoinTable()
-//   hashtags: Hashtag[];
-
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;  
+
+  @ManyToMany(()=> Hashtags, (hashtag)=> hashtag.notes, { eager: true })
+  @JoinTable({name: "notes_hashtags"})
+  hashtags: Hashtags[];
 }

@@ -71,7 +71,7 @@ __decorate([
     __metadata("design:type", profile_entity_1.Profile)
 ], User.prototype, "profile", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => note_entity_1.Note, (note) => note.user),
+    (0, typeorm_1.OneToMany)(() => note_entity_1.Notes, (note) => note.user),
     __metadata("design:type", Array)
 ], User.prototype, "notes", void 0);
 exports.User = User = __decorate([

@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Notes } from "src/note/note.entity";
+import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Hashtag {
+export class Hashtags {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
 
@@ -14,4 +15,7 @@ export class Hashtag {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToMany(() => Notes, (note) => note.hashtags)
+  notes: Notes[];
 }

@@ -9,41 +9,48 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Note = void 0;
+exports.Notes = void 0;
+const hashtag_entity_1 = require("../hashtag/hashtag.entity");
 const user_entity_1 = require("../user/user.entity");
 const typeorm_1 = require("typeorm");
-let Note = class Note {
+let Notes = class Notes {
     id;
     text;
     user;
     createdAt;
     updatedAt;
+    hashtags;
 };
-exports.Note = Note;
+exports.Notes = Notes;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "_id" }),
     __metadata("design:type", String)
-], Note.prototype, "id", void 0);
+], Notes.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: "text",
         nullable: false,
     }),
     __metadata("design:type", String)
-], Note.prototype, "text", void 0);
+], Notes.prototype, "text", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.notes, { eager: true }),
     __metadata("design:type", user_entity_1.User)
-], Note.prototype, "user", void 0);
+], Notes.prototype, "user", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
-], Note.prototype, "createdAt", void 0);
+], Notes.prototype, "createdAt", void 0);
 __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
-], Note.prototype, "updatedAt", void 0);
-exports.Note = Note = __decorate([
+], Notes.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => hashtag_entity_1.Hashtags, (hashtag) => hashtag.notes, { eager: true }),
+    (0, typeorm_1.JoinTable)({ name: "notes_hashtags" }),
+    __metadata("design:type", Array)
+], Notes.prototype, "hashtags", void 0);
+exports.Notes = Notes = __decorate([
     (0, typeorm_1.Entity)()
-], Note);
+], Notes);
 //# sourceMappingURL=note.entity.js.map

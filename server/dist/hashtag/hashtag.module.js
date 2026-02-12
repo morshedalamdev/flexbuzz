@@ -19,7 +19,8 @@ exports.HashtagModule = HashtagModule = __decorate([
     (0, common_1.Module)({
         controllers: [hashtag_controller_1.HashtagController],
         providers: [hashtag_service_1.HashtagService],
-        imports: [typeorm_1.TypeOrmModule.forFeature([hashtag_entity_1.Hashtag])],
+        exports: [hashtag_service_1.HashtagService],
+        imports: [typeorm_1.TypeOrmModule.forFeature([hashtag_entity_1.Hashtags])],
     })
 ], HashtagModule);
 //# sourceMappingURL=hashtag.module.js.map

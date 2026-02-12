@@ -1,18 +1,19 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   RequestTimeoutException,
 } from "@nestjs/common";
 import { CreateHashtagDto } from "./dto/create-hashtag.dto";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Hashtag } from "./hashtag.entity";
+import { Hashtags } from "./hashtag.entity";
 
 @Injectable()
 export class HashtagService {
   constructor(
-    @InjectRepository(Hashtag)
-    private readonly hashtagRepository: Repository<Hashtag>,
+    @InjectRepository(Hashtags)
+    private readonly hashtagRepository: Repository<Hashtags>,
   ) {}
 
   public async create(hashtagDto: CreateHashtagDto) {
@@ -34,12 +35,25 @@ export class HashtagService {
   public async getHashtags(search?: string) {
     try {
       if (search) {
-        return await this.hashtagRepository.findOne({
+        const response = await this.hashtagRepository.findOne({
           where: { name: search },
         });
+        if (!response) {
+          throw new NotFoundException("Hashtag not found");
+        }
+
+        return response;
       }
-      return await this.hashtagRepository.find();
+      const response = await this.hashtagRepository.find();
+      if (response.length === 0) {
+        throw new NotFoundException("Hashtag not found");
+      }
+      
+      return response;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       console.error("Error @getHashtags:", error);
       throw new RequestTimeoutException();
     }

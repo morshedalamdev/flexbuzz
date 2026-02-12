@@ -9,18 +9,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Hashtag = void 0;
+exports.Hashtags = void 0;
+const note_entity_1 = require("../note/note.entity");
 const typeorm_1 = require("typeorm");
-let Hashtag = class Hashtag {
+let Hashtags = class Hashtags {
     id;
     name;
     createdAt;
+    notes;
 };
-exports.Hashtag = Hashtag;
+exports.Hashtags = Hashtags;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "_id" }),
     __metadata("design:type", String)
-], Hashtag.prototype, "id", void 0);
+], Hashtags.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: "varchar",
@@ -28,12 +30,16 @@ __decorate([
         unique: true,
     }),
     __metadata("design:type", String)
-], Hashtag.prototype, "name", void 0);
+], Hashtags.prototype, "name", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
-], Hashtag.prototype, "createdAt", void 0);
-exports.Hashtag = Hashtag = __decorate([
+], Hashtags.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => note_entity_1.Notes, (note) => note.hashtags),
+    __metadata("design:type", Array)
+], Hashtags.prototype, "notes", void 0);
+exports.Hashtags = Hashtags = __decorate([
     (0, typeorm_1.Entity)()
-], Hashtag);
+], Hashtags);
 //# sourceMappingURL=hashtag.entity.js.map

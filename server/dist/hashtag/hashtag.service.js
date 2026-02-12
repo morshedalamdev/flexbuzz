@@ -41,13 +41,24 @@ let HashtagService = class HashtagService {
     async getHashtags(search) {
         try {
             if (search) {
-                return await this.hashtagRepository.findOne({
+                const response = await this.hashtagRepository.findOne({
                     where: { name: search },
                 });
+                if (!response) {
+                    throw new common_1.NotFoundException("Hashtag not found");
+                }
+                return response;
             }
-            return await this.hashtagRepository.find();
+            const response = await this.hashtagRepository.find();
+            if (response.length === 0) {
+                throw new common_1.NotFoundException("Hashtag not found");
+            }
+            return response;
         }
         catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
             console.error("Error @getHashtags:", error);
             throw new common_1.RequestTimeoutException();
         }
@@ -56,7 +67,7 @@ let HashtagService = class HashtagService {
 exports.HashtagService = HashtagService;
 exports.HashtagService = HashtagService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_2.InjectRepository)(hashtag_entity_1.Hashtag)),
+    __param(0, (0, typeorm_2.InjectRepository)(hashtag_entity_1.Hashtags)),
     __metadata("design:paramtypes", [typeorm_1.Repository])
 ], HashtagService);
 //# sourceMappingURL=hashtag.service.js.map
