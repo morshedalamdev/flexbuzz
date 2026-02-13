@@ -140,9 +140,9 @@ users ────────── posts ─────── post_hashtags �
 - [x] Implement `POST /posts/:id/like` — like a post
 - [x] Implement `DELETE /posts/:id/like` — unlike a post
 - [ ] Implement `GET /posts/:id/likes` — get users who liked a post
-- [ ] Implement `POST /posts/:id/comments` — add comment
+- [x] Implement `POST /posts/:id/comments` — add comment
 - [ ] Implement `GET /posts/:id/comments` — list comments on a post (paginated)
-- [ ] Implement `DELETE /comments/:id` — delete own comment
+- [x] Implement `DELETE /comments/:id` — delete own comment
 - [ ] Add like count to post response
 - [ ] Add comment count to post response
 - [ ] Test like and comment endpoints
