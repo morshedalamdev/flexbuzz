@@ -1,10 +1,10 @@
 import { CreateHashtagDto } from "./dto/create-hashtag.dto";
 import { Repository } from "typeorm";
-import { Hashtags } from "./hashtag.entity";
+import { Hashtag } from "./hashtag.entity";
 export declare class HashtagService {
     private readonly hashtagRepository;
-    constructor(hashtagRepository: Repository<Hashtags>);
-    create(hashtagDto: CreateHashtagDto): Promise<Hashtags>;
-    getHashtags(search?: string): Promise<Hashtags | Hashtags[]>;
-    getByIds(hashtags: string[]): Promise<Hashtags[]>;
+    constructor(hashtagRepository: Repository<Hashtag>);
+    create(hashtagDto: CreateHashtagDto): Promise<Hashtag>;
+    getHashtags(search?: string): Promise<Hashtag | Hashtag[]>;
+    getByIds(hashtags: string[]): Promise<Hashtag[]>;
 }

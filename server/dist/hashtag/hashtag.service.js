@@ -78,7 +78,7 @@ let HashtagService = class HashtagService {
 exports.HashtagService = HashtagService;
 exports.HashtagService = HashtagService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_2.InjectRepository)(hashtag_entity_1.Hashtags)),
+    __param(0, (0, typeorm_2.InjectRepository)(hashtag_entity_1.Hashtag)),
     __metadata("design:paramtypes", [typeorm_1.Repository])
 ], HashtagService);
 //# sourceMappingURL=hashtag.service.js.map

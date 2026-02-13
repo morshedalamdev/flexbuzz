@@ -1,4 +1,5 @@
-import { Notes } from "src/note/note.entity";
+import { Like } from "src/like/like.entity";
+import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
 export declare class User {
     id: string;
@@ -9,5 +10,6 @@ export declare class User {
     updatedAt: Date;
     deletedAt: Date;
     profile?: Profile;
-    notes: Notes[];
+    note: Note[];
+    like: Like[];
 }

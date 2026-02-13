@@ -10,13 +10,16 @@ exports.LikeModule = void 0;
 const common_1 = require("@nestjs/common");
 const like_controller_1 = require("./like.controller");
 const like_service_1 = require("./like.service");
+const like_entity_1 = require("./like.entity");
+const typeorm_1 = require("@nestjs/typeorm");
 let LikeModule = class LikeModule {
 };
 exports.LikeModule = LikeModule;
 exports.LikeModule = LikeModule = __decorate([
     (0, common_1.Module)({
         controllers: [like_controller_1.LikeController],
-        providers: [like_service_1.LikeService]
+        providers: [like_service_1.LikeService],
+        imports: [typeorm_1.TypeOrmModule.forFeature([like_entity_1.Like])],
     })
 ], LikeModule);
 //# sourceMappingURL=like.module.js.map

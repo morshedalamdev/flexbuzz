@@ -1,7 +1,7 @@
-import { Notes } from "src/note/note.entity";
-export declare class Hashtags {
+import { Note } from "src/note/note.entity";
+export declare class Hashtag {
     id: string;
     name: string;
     createdAt: Date;
-    notes: Notes[];
+    note: Note[];
 }

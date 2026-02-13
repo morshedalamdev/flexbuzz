@@ -6,7 +6,7 @@ import {
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Notes } from "./note.entity";
+import { Note } from "./note.entity";
 import { UserService } from "src/user/user.service";
 import { HashtagService } from "src/hashtag/hashtag.service";
 import { USER_ID } from "src/constants/constants";
@@ -17,8 +17,8 @@ export class NoteService {
   constructor(
     private readonly userService: UserService,
     private readonly hashtagService: HashtagService,
-    @InjectRepository(Notes)
-    private readonly noteRepository: Repository<Notes>,
+    @InjectRepository(Note)
+    private readonly noteRepository: Repository<Note>,
   ) {}
 
   public async create(noteDto: CreateNoteDto) {
@@ -31,7 +31,7 @@ export class NoteService {
       const newNote = this.noteRepository.create({
         ...noteDto,
         user,
-        hashtags,
+        hashtag: hashtags,
       });
       return await this.noteRepository.save(newNote);
     } catch (error) {
@@ -41,7 +41,7 @@ export class NoteService {
   }
 
   public async getAll(user?: string) {
-    let notes: Notes[] | null = null;
+    let notes: Note[] | null = null;
     try {
       if (user) {
         const userEntity = await this.userService.getBy(user);
@@ -101,7 +101,7 @@ export class NoteService {
         noteDto.hashtags || [],
       );
       note.text = noteDto.text || note.text;
-      note.hashtags = hashtags.length > 0 ? hashtags : note.hashtags;
+      note.hashtag = hashtags.length > 0 ? hashtags : note.hashtag;
 
       return await this.noteRepository.save(note);
     } catch (error) {

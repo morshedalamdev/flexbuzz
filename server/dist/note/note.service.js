@@ -36,7 +36,7 @@ let NoteService = class NoteService {
             const newNote = this.noteRepository.create({
                 ...noteDto,
                 user,
-                hashtags,
+                hashtag: hashtags,
             });
             return await this.noteRepository.save(newNote);
         }
@@ -99,7 +99,7 @@ let NoteService = class NoteService {
             }
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
             note.text = noteDto.text || note.text;
-            note.hashtags = hashtags.length > 0 ? hashtags : note.hashtags;
+            note.hashtag = hashtags.length > 0 ? hashtags : note.hashtag;
             return await this.noteRepository.save(note);
         }
         catch (error) {
@@ -124,7 +124,7 @@ let NoteService = class NoteService {
 exports.NoteService = NoteService;
 exports.NoteService = NoteService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, typeorm_2.InjectRepository)(note_entity_1.Notes)),
+    __param(2, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         hashtag_service_1.HashtagService,
         typeorm_1.Repository])

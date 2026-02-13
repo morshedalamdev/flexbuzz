@@ -1,4 +1,5 @@
-import { Notes } from "src/note/note.entity";
+import { Like } from "src/like/like.entity";
+import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
 import {
   Column,
@@ -50,6 +51,9 @@ export class User {
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile?: Profile;
 
-  @OneToMany(() => Notes, (note) => note.user)
-  notes: Notes[];
+  @OneToMany(() => Note, (note) => note.user)
+  note: Note[];
+
+  @OneToMany(()=> Like, (like) => like.user)
+  like: Like[];
 }

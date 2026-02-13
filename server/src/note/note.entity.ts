@@ -1,12 +1,22 @@
-import { Hashtags } from "src/hashtag/hashtag.entity";
+import { Hashtag } from "src/hashtag/hashtag.entity";
+import { Like } from "src/like/like.entity";
 import { User } from "src/user/user.entity";
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity()
-export class Notes {
+@Entity("notes")
+export class Note {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
-
 
   @Column({
     type: "text",
@@ -14,16 +24,19 @@ export class Notes {
   })
   text: string;
 
-  @ManyToOne(()=> User, (user)=> user.notes, { eager: true })
+  @ManyToOne(() => User, (user) => user.note, { eager: true })
   user: User;
 
-  @ManyToMany(()=> Hashtags, (hashtag)=> hashtag.notes, { eager: true })
-  @JoinTable({name: "notes_hashtags"})
-  hashtags: Hashtags[];
+  @ManyToMany(() => Hashtag, (hashtag) => hashtag.note, { eager: true })
+  @JoinTable({ name: "notes_hashtag" })
+  hashtag: Hashtag[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
+
+  @OneToMany(() => Like, (like) => like.note)
+  like: Like[];
 }

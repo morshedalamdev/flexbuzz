@@ -1,10 +1,12 @@
-import { Hashtags } from "src/hashtag/hashtag.entity";
+import { Hashtag } from "src/hashtag/hashtag.entity";
+import { Like } from "src/like/like.entity";
 import { User } from "src/user/user.entity";
-export declare class Notes {
+export declare class Note {
     id: string;
     text: string;
     user: User;
-    hashtags: Hashtags[];
+    hashtag: Hashtag[];
     createdAt: Date;
     updatedAt: Date;
+    like: Like[];
 }
