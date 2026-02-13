@@ -12,4 +12,5 @@ export declare class Profile {
     dob?: Date;
     bio?: string;
     user: User;
+    userRelation: User;
 }

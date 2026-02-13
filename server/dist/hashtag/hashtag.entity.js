@@ -16,7 +16,7 @@ let Hashtag = class Hashtag {
     id;
     name;
     createdAt;
-    note;
+    noteRelation;
 };
 exports.Hashtag = Hashtag;
 __decorate([
@@ -24,11 +24,7 @@ __decorate([
     __metadata("design:type", String)
 ], Hashtag.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({
-        type: "varchar",
-        length: 100,
-        unique: true,
-    }),
+    (0, typeorm_1.Column)({ type: "varchar", length: 100, unique: true }),
     __metadata("design:type", String)
 ], Hashtag.prototype, "name", void 0);
 __decorate([
@@ -36,9 +32,9 @@ __decorate([
     __metadata("design:type", Date)
 ], Hashtag.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => note_entity_1.Note, (note) => note.hashtag),
+    (0, typeorm_1.ManyToMany)(() => note_entity_1.Note, (note) => note.hashtagRelation),
     __metadata("design:type", Array)
-], Hashtag.prototype, "note", void 0);
+], Hashtag.prototype, "noteRelation", void 0);
 exports.Hashtag = Hashtag = __decorate([
     (0, typeorm_1.Entity)("hashtags")
 ], Hashtag);

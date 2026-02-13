@@ -12,16 +12,13 @@ export class Hashtag {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
 
-  @Column({
-    type: "varchar",
-    length: 100,
-    unique: true,
-  })
+  @Column({ type: "varchar", length: 100, unique: true })
   name: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @ManyToMany(() => Note, (note) => note.hashtag)
-  note: Note[];
+  // Relations
+  @ManyToMany(() => Note, (note) => note.hashtagRelation)
+  noteRelation: Note[];
 }

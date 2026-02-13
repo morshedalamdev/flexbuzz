@@ -98,7 +98,7 @@ let NoteService = class NoteService {
                 throw new common_1.NotFoundException("Note not found");
             }
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
-            note.text = noteDto.text || note.text;
+            note.content = noteDto.content || note.content;
             note.hashtag = hashtags.length > 0 ? hashtags : note.hashtag;
             return await this.noteRepository.save(note);
         }

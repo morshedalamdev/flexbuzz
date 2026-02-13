@@ -1,3 +1,4 @@
+import { Comment } from "src/comment/comment.entity";
 import { Like } from "src/like/like.entity";
 import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
@@ -48,12 +49,16 @@ export class User {
   @DeleteDateColumn({ name: "deleted_at" })
   deletedAt: Date;
 
-  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
-  profile?: Profile;
+  // Relations
+  @OneToOne(() => Profile, (profile) => profile.userRelation, { cascade: true })
+  profileRelation: Profile;
 
-  @OneToMany(() => Note, (note) => note.user)
-  note: Note[];
+  @OneToMany(() => Note, (note) => note.userRelation)
+  noteRelation: Note[];
 
-  @OneToMany(()=> Like, (like) => like.user)
-  like: Like[];
+  @OneToMany(() => Like, (like) => like.userRelation)
+  likeRelation: Like[];
+
+  @OneToMany(() => Comment, (comment) => comment.userRelation)
+  commentRelation: Comment[];
 }

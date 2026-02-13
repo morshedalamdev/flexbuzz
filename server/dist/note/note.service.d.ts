@@ -9,7 +9,7 @@ export declare class NoteService {
     private readonly hashtagService;
     private readonly noteRepository;
     constructor(userService: UserService, hashtagService: HashtagService, noteRepository: Repository<Note>);
-    create(noteDto: CreateNoteDto): Promise<Note>;
+    create(noteDto: CreateNoteDto): Promise<Note[]>;
     getAll(user?: string): Promise<Note[]>;
     getById(id: string): Promise<Note | null>;
     update(noteDto: UpdateNoteDto): Promise<Note>;

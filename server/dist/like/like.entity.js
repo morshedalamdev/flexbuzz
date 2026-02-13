@@ -18,28 +18,38 @@ let Like = class Like {
     user;
     note;
     createdAt;
+    userRelation;
+    noteRelation;
 };
 exports.Like = Like;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
 ], Like.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.like, { onDelete: 'CASCADE' }),
-    (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
-    __metadata("design:type", user_entity_1.User)
+    (0, typeorm_1.Column)({ name: "user_id", type: "uuid" }),
+    __metadata("design:type", String)
 ], Like.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => note_entity_1.Note, (note) => note.like, { onDelete: 'CASCADE' }),
-    (0, typeorm_1.JoinColumn)({ name: 'note_id' }),
-    __metadata("design:type", note_entity_1.Note)
+    (0, typeorm_1.Column)({ name: "note_id", type: "uuid" }),
+    __metadata("design:type", String)
 ], Like.prototype, "note", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: "created_at" }),
     __metadata("design:type", Date)
 ], Like.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.likeRelation, { onDelete: "CASCADE" }),
+    (0, typeorm_1.JoinColumn)({ name: "user_id" }),
+    __metadata("design:type", user_entity_1.User)
+], Like.prototype, "userRelation", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => note_entity_1.Note, (note) => note.likeRelation, { onDelete: "CASCADE" }),
+    (0, typeorm_1.JoinColumn)({ name: "note_id" }),
+    __metadata("design:type", note_entity_1.Note)
+], Like.prototype, "noteRelation", void 0);
 exports.Like = Like = __decorate([
-    (0, typeorm_1.Entity)('likes'),
-    (0, typeorm_1.Unique)(['user', 'note'])
+    (0, typeorm_1.Entity)("likes"),
+    (0, typeorm_1.Unique)(["user", "note"])
 ], Like);
 //# sourceMappingURL=like.entity.js.map

@@ -33,7 +33,11 @@ export class Profile {
   @Column({ name: "bio", type: "text", nullable: true })
   bio?: string;
 
-  @OneToOne(() => User, (user) => user.profile, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "user_id" })
+  @Column({ name: "user_id", type: "uuid" })
   user: User;
+
+  // Relations
+  @OneToOne(() => User, (user) => user.profileRelation, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "user_id" })
+  userRelation: User;
 }

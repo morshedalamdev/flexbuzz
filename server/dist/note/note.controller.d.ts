@@ -4,7 +4,7 @@ import { UpdateNoteDto } from "./dto/update-note.dto";
 export declare class NoteController {
     private readonly noteService;
     constructor(noteService: NoteService);
-    CreateNote(createDto: CreateNoteDto): Promise<import("./note.entity").Note>;
+    CreateNote(createDto: CreateNoteDto): Promise<import("./note.entity").Note[]>;
     GetNotes(query: {
         user?: string;
     }): Promise<import("./note.entity").Note[]>;

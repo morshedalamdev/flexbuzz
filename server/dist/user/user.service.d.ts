@@ -7,7 +7,7 @@ export declare class UserService {
     private readonly hashingProvider;
     private userRepository;
     constructor(hashingProvider: HashingProvider, userRepository: Repository<User>);
-    create(userDto: CreateUserDto): Promise<User>;
+    create(userDto: CreateUserDto): Promise<User[]>;
     getAll(): Promise<User[]>;
     getBy(identifier: string): Promise<User>;
     getCurrent(): Promise<User>;

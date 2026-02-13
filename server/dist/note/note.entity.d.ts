@@ -1,12 +1,15 @@
+import { Comment } from "src/comment/comment.entity";
 import { Hashtag } from "src/hashtag/hashtag.entity";
 import { Like } from "src/like/like.entity";
 import { User } from "src/user/user.entity";
 export declare class Note {
     id: string;
-    text: string;
+    content: string;
     user: User;
-    hashtag: Hashtag[];
     createdAt: Date;
     updatedAt: Date;
-    like: Like[];
+    userRelation: User;
+    hashtagRelation: Hashtag[];
+    likeRelation: Like[];
+    commentRelation: Comment[];
 }
