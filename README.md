@@ -101,7 +101,7 @@ users ────────── posts ─────── post_hashtags �
 - [x] Set up PostgreSQL database and TypeORM configuration
 - [x] Set up environment variables (`.env`) for backend
 - [x] Create initial backend folder structure
-- [ ] Set up logging and error handling middleware
+- [x] Set up logging and error handling middleware
 - [ ] Configure CORS for frontend integration
 
 ### Milestone 2: Authentication API
@@ -116,29 +116,29 @@ users ────────── posts ─────── post_hashtags �
 - [ ] Test authentication endpoints with Postman/Insomnia
 
 ### Milestone 3: User Profile API
-- [ ] Implement `GET /users/:username` — view user profile
-- [ ] Implement `GET /users/me` — get current user
-- [ ] Implement `PATCH /users/me` — update own profile (bio, display name)
-- [ ] Add validation for profile fields
+- [x] Implement `GET /users/:username` — view user profile
+- [x] Implement `GET /users/me` — get current user
+- [x] Implement `PATCH /users/me` — update own profile (bio, display name)
+- [x] Add validation for profile fields
 - [ ] Implement user search endpoint (`GET /users/search?q=`)
 - [ ] Test user endpoints
 
 ### Milestone 4: Posts & Hashtags API
-- [ ] Create `posts`, `hashtags`, and `post_hashtags` tables/entities
-- [ ] Implement `POST /posts` — create a new post (extract hashtags automatically)
+- [x] Create `posts`, `hashtags`, and `post_hashtags` tables/entities
+- [x] Implement `POST /posts` — create a new post (extract hashtags automatically)
 - [ ] Implement hashtag extraction logic (parse `#word` patterns from post text)
 - [ ] Implement `GET /posts` — fetch posts feed (paginated)
-- [ ] Implement `GET /posts/:id` — fetch single post
+- [x] Implement `GET /posts/:id` — fetch single post
 - [ ] Implement `GET /posts/user/:username` — fetch user's posts
-- [ ] Implement `DELETE /posts/:id` — delete own post
-- [ ] Implement `PATCH /posts/:id` — edit own post (optional)
-- [ ] Add post character limit validation
+- [x] Implement `DELETE /posts/:id` — delete own post
+- [x] Implement `PATCH /posts/:id` — edit own post (optional)
+- [x] Add post character limit validation
 - [ ] Test post endpoints
 
 ### Milestone 5: Likes & Comments API
-- [ ] Create `likes` and `comments` tables/entities
-- [ ] Implement `POST /posts/:id/like` — like a post
-- [ ] Implement `DELETE /posts/:id/like` — unlike a post
+- [x] Create `likes` and `comments` tables/entities
+- [x] Implement `POST /posts/:id/like` — like a post
+- [x] Implement `DELETE /posts/:id/like` — unlike a post
 - [ ] Implement `GET /posts/:id/likes` — get users who liked a post
 - [ ] Implement `POST /posts/:id/comments` — add comment
 - [ ] Implement `GET /posts/:id/comments` — list comments on a post (paginated)
