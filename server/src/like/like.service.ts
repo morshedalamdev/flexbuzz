@@ -8,7 +8,6 @@ import { Like } from "./like.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { NoteService } from "src/note/note.service";
-import { LikeDto } from "./dto/like.dto";
 import { USER_ID } from "src/constants/constants";
 import { UserService } from "src/user/user.service";
 
@@ -21,11 +20,11 @@ export class LikeService {
     private readonly likeRepository: Repository<Like>,
   ) {}
 
-  async create(likeDto: LikeDto) {
+  async create(id: string) {
     try {
-      const note = await this.noteService.getById(likeDto.noteId);
+      const note = await this.noteService.getById(id);
       const user = await this.userService.getBy(USER_ID);
-      if (!note) {
+      if (!note || !user) {
         throw new NotFoundException();
       }
       const like = this.likeRepository.create({
