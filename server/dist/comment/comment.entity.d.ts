@@ -3,8 +3,8 @@ import { User } from "src/user/user.entity";
 export declare class Comment {
     id: string;
     content: string;
-    user: string;
-    note: string;
+    userId: User;
+    noteId: Note;
     createdAt: Date;
     updatedAt: Date;
     userRelation: User;

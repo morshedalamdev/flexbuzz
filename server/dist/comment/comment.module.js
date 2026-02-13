@@ -10,13 +10,16 @@ exports.CommentModule = void 0;
 const common_1 = require("@nestjs/common");
 const comment_controller_1 = require("./comment.controller");
 const comment_service_1 = require("./comment.service");
+const comment_entity_1 = require("./comment.entity");
+const typeorm_1 = require("@nestjs/typeorm");
 let CommentModule = class CommentModule {
 };
 exports.CommentModule = CommentModule;
 exports.CommentModule = CommentModule = __decorate([
     (0, common_1.Module)({
         controllers: [comment_controller_1.CommentController],
-        providers: [comment_service_1.CommentService]
+        providers: [comment_service_1.CommentService],
+        imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment])],
     })
 ], CommentModule);
 //# sourceMappingURL=comment.module.js.map

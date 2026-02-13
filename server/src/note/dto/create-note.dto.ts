@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateNoteDto {
   @IsNotEmpty()
@@ -6,7 +6,7 @@ export class CreateNoteDto {
   content: string;
 
   @IsOptional()
-  @IsString({ each: true })
+  @IsUUID("4", { each: true })
   @IsArray()
   hashtags?: string[];
 }

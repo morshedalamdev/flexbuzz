@@ -34,26 +34,15 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({
-        type: "varchar",
-        nullable: false,
-        length: 24,
-    }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: false, length: 24 }),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
-    (0, typeorm_1.Column)({
-        type: "varchar",
-        nullable: false,
-        length: 100,
-    }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: false, length: 100 }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({
-        type: "text",
-        nullable: false,
-    }),
+    (0, typeorm_1.Column)({ type: "text", nullable: false }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([

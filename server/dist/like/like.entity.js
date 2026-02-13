@@ -15,8 +15,8 @@ const user_entity_1 = require("../user/user.entity");
 const typeorm_1 = require("typeorm");
 let Like = class Like {
     id;
-    user;
-    note;
+    userId;
+    noteId;
     createdAt;
     userRelation;
     noteRelation;
@@ -28,12 +28,12 @@ __decorate([
 ], Like.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: "user_id", type: "uuid" }),
-    __metadata("design:type", String)
-], Like.prototype, "user", void 0);
+    __metadata("design:type", user_entity_1.User)
+], Like.prototype, "userId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: "note_id", type: "uuid" }),
-    __metadata("design:type", String)
-], Like.prototype, "note", void 0);
+    __metadata("design:type", note_entity_1.Note)
+], Like.prototype, "noteId", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: "created_at" }),
     __metadata("design:type", Date)
@@ -50,6 +50,6 @@ __decorate([
 ], Like.prototype, "noteRelation", void 0);
 exports.Like = Like = __decorate([
     (0, typeorm_1.Entity)("likes"),
-    (0, typeorm_1.Unique)(["user", "note"])
+    (0, typeorm_1.Unique)(["userId", "noteId"])
 ], Like);
 //# sourceMappingURL=like.entity.js.map

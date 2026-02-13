@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -23,7 +24,7 @@ export class Note {
   content: string;
 
   @Column({ name: "user_id", type: "uuid" })
-  user: User;
+  userId: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
@@ -33,6 +34,7 @@ export class Note {
 
   // Relations
   @ManyToOne(() => User, (user) => user.noteRelation, { eager: true })
+  @JoinColumn({ name: "user_id" })
   userRelation: User;
 
   @ManyToMany(() => Hashtag, (hashtag) => hashtag.noteRelation, { eager: true })

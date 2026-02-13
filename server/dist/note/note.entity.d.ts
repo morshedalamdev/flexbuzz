@@ -5,7 +5,7 @@ import { User } from "src/user/user.entity";
 export declare class Note {
     id: string;
     content: string;
-    user: User;
+    userId: string;
     createdAt: Date;
     updatedAt: Date;
     userRelation: User;

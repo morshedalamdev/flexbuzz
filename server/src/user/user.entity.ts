@@ -20,24 +20,13 @@ export class User {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
 
-  @Column({
-    type: "varchar",
-    nullable: false,
-    length: 24,
-  })
+  @Column({ type: "varchar", nullable: false, length: 24 })
   username: string;
 
-  @Column({
-    type: "varchar",
-    nullable: false,
-    length: 100,
-  })
+  @Column({ type: "varchar", nullable: false, length: 100 })
   email: string;
 
-  @Column({
-    type: "text",
-    nullable: false,
-  })
+  @Column({ type: "text", nullable: false })
   password: string;
 
   @CreateDateColumn({ name: "created_at" })

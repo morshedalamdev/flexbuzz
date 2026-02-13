@@ -18,7 +18,7 @@ const typeorm_1 = require("typeorm");
 let Note = class Note {
     id;
     content;
-    user;
+    userId;
     createdAt;
     updatedAt;
     userRelation;
@@ -37,8 +37,8 @@ __decorate([
 ], Note.prototype, "content", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: "user_id", type: "uuid" }),
-    __metadata("design:type", user_entity_1.User)
-], Note.prototype, "user", void 0);
+    __metadata("design:type", String)
+], Note.prototype, "userId", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: "created_at" }),
     __metadata("design:type", Date)
@@ -49,6 +49,7 @@ __decorate([
 ], Note.prototype, "updatedAt", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.noteRelation, { eager: true }),
+    (0, typeorm_1.JoinColumn)({ name: "user_id" }),
     __metadata("design:type", user_entity_1.User)
 ], Note.prototype, "userRelation", void 0);
 __decorate([

@@ -16,8 +16,8 @@ const typeorm_1 = require("typeorm");
 let Comment = class Comment {
     id;
     content;
-    user;
-    note;
+    userId;
+    noteId;
     createdAt;
     updatedAt;
     userRelation;
@@ -34,12 +34,12 @@ __decorate([
 ], Comment.prototype, "content", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: "user_id", type: "uuid" }),
-    __metadata("design:type", String)
-], Comment.prototype, "user", void 0);
+    __metadata("design:type", user_entity_1.User)
+], Comment.prototype, "userId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: "note_id", type: "uuid" }),
-    __metadata("design:type", String)
-], Comment.prototype, "note", void 0);
+    __metadata("design:type", note_entity_1.Note)
+], Comment.prototype, "noteId", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: "created_at" }),
     __metadata("design:type", Date)

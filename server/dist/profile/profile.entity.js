@@ -25,7 +25,7 @@ let Profile = class Profile {
     gender;
     dob;
     bio;
-    user;
+    userId;
     userRelation;
 };
 exports.Profile = Profile;
@@ -55,14 +55,15 @@ __decorate([
 ], Profile.prototype, "bio", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: "user_id", type: "uuid" }),
-    __metadata("design:type", user_entity_1.User)
-], Profile.prototype, "user", void 0);
+    __metadata("design:type", String)
+], Profile.prototype, "userId", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => user_entity_1.User, (user) => user.profileRelation, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: "user_id" }),
     __metadata("design:type", user_entity_1.User)
 ], Profile.prototype, "userRelation", void 0);
 exports.Profile = Profile = __decorate([
-    (0, typeorm_1.Entity)("profiles")
+    (0, typeorm_1.Entity)("profiles"),
+    (0, typeorm_1.Unique)(["userId"])
 ], Profile);
 //# sourceMappingURL=profile.entity.js.map

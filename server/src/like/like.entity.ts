@@ -11,16 +11,16 @@ import {
 } from "typeorm";
 
 @Entity("likes")
-@Unique(["user", "note"])
+@Unique(["userId", "noteId"])
 export class Like {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ name: "user_id", type: "uuid" })
-  user: string;
+  userId: User;
 
   @Column({ name: "note_id", type: "uuid" })
-  note: string;
+  noteId: Note;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

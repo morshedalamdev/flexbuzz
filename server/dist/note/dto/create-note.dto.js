@@ -23,7 +23,7 @@ __decorate([
 ], CreateNoteDto.prototype, "content", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsUUID)("4", { each: true }),
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
 ], CreateNoteDto.prototype, "hashtags", void 0);

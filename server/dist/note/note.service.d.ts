@@ -9,9 +9,19 @@ export declare class NoteService {
     private readonly hashtagService;
     private readonly noteRepository;
     constructor(userService: UserService, hashtagService: HashtagService, noteRepository: Repository<Note>);
-    create(noteDto: CreateNoteDto): Promise<Note[]>;
+    create(noteDto: CreateNoteDto): Promise<Note>;
     getAll(user?: string): Promise<Note[]>;
-    getById(id: string): Promise<Note | null>;
+    getById(id: string): Promise<{
+        userRelation: import("../user/user.entity").User;
+        id: string;
+        content: string;
+        userId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        hashtagRelation: import("../hashtag/hashtag.entity").Hashtag[];
+        likeRelation: import("../like/like.entity").Like[];
+        commentRelation: import("../comment/comment.entity").Comment[];
+    }>;
     update(noteDto: UpdateNoteDto): Promise<Note>;
     delete(id: string): Promise<{
         deleted: boolean;

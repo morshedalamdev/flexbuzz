@@ -16,7 +16,6 @@ exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const user_service_1 = require("./user.service");
-const update_user_dto_1 = require("./dto/update-user.dto");
 let UserController = class UserController {
     userService;
     constructor(userService) {
@@ -30,15 +29,6 @@ let UserController = class UserController {
     }
     GetUserById(id) {
         return this.userService.getBy(id);
-    }
-    GetCurrentUser() {
-        return this.userService.getCurrent();
-    }
-    UpdateUser(updateDto) {
-        return this.userService.update(updateDto);
-    }
-    DeleteUser() {
-        return this.userService.delete();
     }
 };
 exports.UserController = UserController;
@@ -62,25 +52,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserById", null);
-__decorate([
-    (0, common_1.Get)("/me"),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "GetCurrentUser", null);
-__decorate([
-    (0, common_1.Patch)("/me"),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [update_user_dto_1.UpdateUserDto]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "UpdateUser", null);
-__decorate([
-    (0, common_1.Delete)("/me"),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "DeleteUser", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)("user"),
     __metadata("design:paramtypes", [user_service_1.UserService])

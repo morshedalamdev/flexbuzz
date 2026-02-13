@@ -5,6 +5,7 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from "typeorm";
 
 export enum Gender {
@@ -14,6 +15,7 @@ export enum Gender {
 }
 
 @Entity("profiles")
+@Unique(["userId"])
 export class Profile {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
@@ -34,7 +36,7 @@ export class Profile {
   bio?: string;
 
   @Column({ name: "user_id", type: "uuid" })
-  user: User;
+  userId: string;
 
   // Relations
   @OneToOne(() => User, (user) => user.profileRelation, { onDelete: "CASCADE" })
