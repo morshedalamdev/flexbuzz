@@ -1,4 +1,6 @@
-import { Notes } from "src/note/note.entity";
+import { Comment } from "src/comment/comment.entity";
+import { Like } from "src/like/like.entity";
+import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
 import {
   Column,
@@ -18,24 +20,13 @@ export class User {
   @PrimaryGeneratedColumn("uuid", { name: "_id" })
   id: string;
 
-  @Column({
-    type: "varchar",
-    nullable: false,
-    length: 24,
-  })
+  @Column({ type: "varchar", nullable: false, length: 24 })
   username: string;
 
-  @Column({
-    type: "varchar",
-    nullable: false,
-    length: 100,
-  })
+  @Column({ type: "varchar", nullable: false, length: 100 })
   email: string;
 
-  @Column({
-    type: "text",
-    nullable: false,
-  })
+  @Column({ type: "text", nullable: false })
   password: string;
 
   @CreateDateColumn({ name: "created_at" })
@@ -47,9 +38,16 @@ export class User {
   @DeleteDateColumn({ name: "deleted_at" })
   deletedAt: Date;
 
-  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
-  profile?: Profile;
+  // Relations
+  @OneToOne(() => Profile, (profile) => profile.userRelation, { cascade: true })
+  profileRelation: Profile;
 
-  @OneToMany(() => Notes, (note) => note.user)
-  notes: Notes[];
+  @OneToMany(() => Note, (note) => note.userRelation)
+  noteRelation: Note[];
+
+  @OneToMany(() => Like, (like) => like.userRelation)
+  likeRelation: Like[];
+
+  @OneToMany(() => Comment, (comment) => comment.userRelation)
+  commentRelation: Comment[];
 }

@@ -6,7 +6,7 @@ import {
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Notes } from "./note.entity";
+import { Note } from "./note.entity";
 import { UserService } from "src/user/user.service";
 import { HashtagService } from "src/hashtag/hashtag.service";
 import { USER_ID } from "src/constants/constants";
@@ -17,8 +17,8 @@ export class NoteService {
   constructor(
     private readonly userService: UserService,
     private readonly hashtagService: HashtagService,
-    @InjectRepository(Notes)
-    private readonly noteRepository: Repository<Notes>,
+    @InjectRepository(Note)
+    private readonly noteRepository: Repository<Note>,
   ) {}
 
   public async create(noteDto: CreateNoteDto) {
@@ -30,8 +30,8 @@ export class NoteService {
 
       const newNote = this.noteRepository.create({
         ...noteDto,
-        user,
-        hashtags,
+        userRelation: user,
+        hashtagRelation: hashtags,
       });
       return await this.noteRepository.save(newNote);
     } catch (error) {
@@ -41,25 +41,28 @@ export class NoteService {
   }
 
   public async getAll(user?: string) {
-    let notes: Notes[] | null = null;
+    let notes: Note[] | null = null;
     try {
       if (user) {
         const userEntity = await this.userService.getBy(user);
         const noteEntity = await this.noteRepository.find({
-          where: { user: { id: userEntity.id } },
-          relations: ["hashtags"],
-        });
-        notes = await Promise.all(
-          noteEntity.map(async (note) => ({ ...note, user: userEntity })),
-        );
-      } else {
-        const noteEntity = await this.noteRepository.find({
-          relations: ["hashtags"],
+          where: { userId: userEntity.id },
+          relations: ["hashtagRelation"],
         });
         notes = await Promise.all(
           noteEntity.map(async (note) => ({
             ...note,
-            user: await this.userService.getBy(note.user.id),
+            userRelation: userEntity,
+          })),
+        );
+      } else {
+        const noteEntity = await this.noteRepository.find({
+          relations: ["hashtagRelation"],
+        });
+        notes = await Promise.all(
+          noteEntity.map(async (note) => ({
+            ...note,
+            userRelation: await this.userService.getBy(note.userId),
           })),
         );
       }
@@ -76,9 +79,16 @@ export class NoteService {
 
   public async getById(id: string) {
     try {
-      return await this.noteRepository.findOne({
+      const note = await this.noteRepository.findOne({
         where: { id },
+        relations: ["hashtagRelation"],
       });
+      if (!note) {
+        throw new NotFoundException("Note not found");
+      }
+      const user = await this.userService.getBy(note.userId);
+
+      return { ...note, userRelation: user };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -100,8 +110,9 @@ export class NoteService {
       const hashtags = await this.hashtagService.getByIds(
         noteDto.hashtags || [],
       );
-      note.text = noteDto.text || note.text;
-      note.hashtags = hashtags.length > 0 ? hashtags : note.hashtags;
+      note.content = noteDto.content || note.content;
+      note.hashtagRelation =
+        hashtags.length > 0 ? hashtags : note.hashtagRelation;
 
       return await this.noteRepository.save(note);
     } catch (error) {

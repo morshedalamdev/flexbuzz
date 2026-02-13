@@ -11,5 +11,6 @@ export declare class Profile {
     gender?: Gender;
     dob?: Date;
     bio?: string;
-    user: User;
+    userId: string;
+    userRelation: User;
 }

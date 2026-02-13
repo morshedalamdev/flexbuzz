@@ -7,13 +7,13 @@ import {
 import { CreateHashtagDto } from "./dto/create-hashtag.dto";
 import { In, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Hashtags } from "./hashtag.entity";
+import { Hashtag } from "./hashtag.entity";
 
 @Injectable()
 export class HashtagService {
   constructor(
-    @InjectRepository(Hashtags)
-    private readonly hashtagRepository: Repository<Hashtags>,
+    @InjectRepository(Hashtag)
+    private readonly hashtagRepository: Repository<Hashtag>,
   ) {}
 
   public async create(hashtagDto: CreateHashtagDto) {

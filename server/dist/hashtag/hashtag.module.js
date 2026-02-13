@@ -20,7 +20,7 @@ exports.HashtagModule = HashtagModule = __decorate([
         controllers: [hashtag_controller_1.HashtagController],
         providers: [hashtag_service_1.HashtagService],
         exports: [hashtag_service_1.HashtagService],
-        imports: [typeorm_1.TypeOrmModule.forFeature([hashtag_entity_1.Hashtags])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([hashtag_entity_1.Hashtag])],
     })
 ], HashtagModule);
 //# sourceMappingURL=hashtag.module.js.map

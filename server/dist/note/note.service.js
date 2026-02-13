@@ -35,8 +35,8 @@ let NoteService = class NoteService {
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
             const newNote = this.noteRepository.create({
                 ...noteDto,
-                user,
-                hashtags,
+                userRelation: user,
+                hashtagRelation: hashtags,
             });
             return await this.noteRepository.save(newNote);
         }
@@ -51,18 +51,21 @@ let NoteService = class NoteService {
             if (user) {
                 const userEntity = await this.userService.getBy(user);
                 const noteEntity = await this.noteRepository.find({
-                    where: { user: { id: userEntity.id } },
-                    relations: ["hashtags"],
-                });
-                notes = await Promise.all(noteEntity.map(async (note) => ({ ...note, user: userEntity })));
-            }
-            else {
-                const noteEntity = await this.noteRepository.find({
-                    relations: ["hashtags"],
+                    where: { userId: userEntity.id },
+                    relations: ["hashtagRelation"],
                 });
                 notes = await Promise.all(noteEntity.map(async (note) => ({
                     ...note,
-                    user: await this.userService.getBy(note.user.id),
+                    userRelation: userEntity,
+                })));
+            }
+            else {
+                const noteEntity = await this.noteRepository.find({
+                    relations: ["hashtagRelation"],
+                });
+                notes = await Promise.all(noteEntity.map(async (note) => ({
+                    ...note,
+                    userRelation: await this.userService.getBy(note.userId),
                 })));
             }
         }
@@ -77,9 +80,15 @@ let NoteService = class NoteService {
     }
     async getById(id) {
         try {
-            return await this.noteRepository.findOne({
+            const note = await this.noteRepository.findOne({
                 where: { id },
+                relations: ["hashtagRelation"],
             });
+            if (!note) {
+                throw new common_1.NotFoundException("Note not found");
+            }
+            const user = await this.userService.getBy(note.userId);
+            return { ...note, userRelation: user };
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
@@ -98,8 +107,9 @@ let NoteService = class NoteService {
                 throw new common_1.NotFoundException("Note not found");
             }
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
-            note.text = noteDto.text || note.text;
-            note.hashtags = hashtags.length > 0 ? hashtags : note.hashtags;
+            note.content = noteDto.content || note.content;
+            note.hashtagRelation =
+                hashtags.length > 0 ? hashtags : note.hashtagRelation;
             return await this.noteRepository.save(note);
         }
         catch (error) {
@@ -124,7 +134,7 @@ let NoteService = class NoteService {
 exports.NoteService = NoteService;
 exports.NoteService = NoteService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, typeorm_2.InjectRepository)(note_entity_1.Notes)),
+    __param(2, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         hashtag_service_1.HashtagService,
         typeorm_1.Repository])

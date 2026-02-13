@@ -25,6 +25,7 @@ const app_config_1 = __importDefault(require("./config/app.config"));
 const database_config_1 = __importDefault(require("./config/database.config"));
 const env_validation_1 = __importDefault(require("./config/env.validation"));
 const typeorm_1 = require("@nestjs/typeorm");
+const me_module_1 = require("./me/me.module");
 const ENV = process.env.NODE_ENV;
 let AppModule = class AppModule {
 };
@@ -58,6 +59,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             note_module_1.NoteModule,
             profile_module_1.ProfileModule,
+            me_module_1.MeModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

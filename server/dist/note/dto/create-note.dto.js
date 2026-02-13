@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateNoteDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateNoteDto {
-    text;
+    content;
     hashtags;
 }
 exports.CreateNoteDto = CreateNoteDto;
@@ -20,10 +20,10 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateNoteDto.prototype, "text", void 0);
+], CreateNoteDto.prototype, "content", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsUUID)("4", { each: true }),
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
 ], CreateNoteDto.prototype, "hashtags", void 0);

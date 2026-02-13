@@ -1,4 +1,4 @@
 export declare class CreateNoteDto {
-    text: string;
+    content: string;
     hashtags?: string[];
 }

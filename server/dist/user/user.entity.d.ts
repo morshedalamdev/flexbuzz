@@ -1,4 +1,6 @@
-import { Notes } from "src/note/note.entity";
+import { Comment } from "src/comment/comment.entity";
+import { Like } from "src/like/like.entity";
+import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
 export declare class User {
     id: string;
@@ -8,6 +10,8 @@ export declare class User {
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
-    profile?: Profile;
-    notes: Notes[];
+    profileRelation: Profile;
+    noteRelation: Note[];
+    likeRelation: Like[];
+    commentRelation: Comment[];
 }

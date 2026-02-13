@@ -13,6 +13,7 @@ import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import envValidation from "./config/env.validation";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { MeModule } from './me/me.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -44,6 +45,7 @@ const ENV = process.env.NODE_ENV;
     }),
     NoteModule,
     ProfileModule,
+    MeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

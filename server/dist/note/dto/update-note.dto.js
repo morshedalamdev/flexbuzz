@@ -18,7 +18,7 @@ class UpdateNoteDto extends (0, mapped_types_1.PartialType)(create_note_dto_1.Cr
 }
 exports.UpdateNoteDto = UpdateNoteDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUUID)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], UpdateNoteDto.prototype, "id", void 0);
