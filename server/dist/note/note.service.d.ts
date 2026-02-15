@@ -5,12 +5,15 @@ import { UserService } from "src/user/user.service";
 import { HashtagService } from "src/hashtag/hashtag.service";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { LikeService } from "src/like/like.service";
+import { CommentDto } from "src/comment/dto/comment.dto";
+import { CommentService } from "src/comment/comment.service";
 export declare class NoteService {
     private readonly userService;
     private readonly hashtagService;
     private readonly likeService;
+    private readonly commentService;
     private readonly noteRepository;
-    constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, noteRepository: Repository<Note>);
+    constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, commentService: CommentService, noteRepository: Repository<Note>);
     create(noteDto: CreateNoteDto): Promise<Note>;
     getAll(user?: string): Promise<Note[]>;
     getById(id: string): Promise<{
@@ -31,6 +34,13 @@ export declare class NoteService {
     }>;
     like(id: string): Promise<import("../like/like.entity").Like>;
     dislike(id: string): Promise<{
+        deleted: boolean;
+    }>;
+    addComment(commentDto: CommentDto): Promise<import("../comment/comment.entity").Comment>;
+    updateComment(commentDto: CommentDto): Promise<{
+        success: boolean;
+    }>;
+    deleteComment(id: string): Promise<{
         deleted: boolean;
     }>;
 }

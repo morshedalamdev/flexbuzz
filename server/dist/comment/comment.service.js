@@ -16,37 +16,22 @@ exports.CommentService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const note_service_1 = require("../note/note.service");
-const constants_1 = require("../constants/constants");
-const user_service_1 = require("../user/user.service");
 const comment_entity_1 = require("./comment.entity");
 let CommentService = class CommentService {
-    userService;
-    noteService;
     commentRepository;
-    constructor(userService, noteService, commentRepository) {
-        this.userService = userService;
-        this.noteService = noteService;
+    constructor(commentRepository) {
         this.commentRepository = commentRepository;
     }
-    async create(commentDto) {
+    async create(props) {
         try {
-            const note = await this.noteService.getById(commentDto.id);
-            const user = await this.userService.findBy(constants_1.USER_ID);
-            if (!note || !user) {
-                throw new common_1.NotFoundException();
-            }
             const comment = this.commentRepository.create({
-                content: commentDto.content,
-                user,
-                note,
+                content: props.content,
+                user: props.user,
+                note: props.note,
             });
             return await this.commentRepository.save(comment);
         }
         catch (error) {
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
             console.error("Error @comment-create:", error);
             throw new common_1.RequestTimeoutException();
         }
@@ -80,9 +65,7 @@ let CommentService = class CommentService {
 exports.CommentService = CommentService;
 exports.CommentService = CommentService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, typeorm_1.InjectRepository)(comment_entity_1.Comment)),
-    __metadata("design:paramtypes", [user_service_1.UserService,
-        note_service_1.NoteService,
-        typeorm_2.Repository])
+    __param(0, (0, typeorm_1.InjectRepository)(comment_entity_1.Comment)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], CommentService);
 //# sourceMappingURL=comment.service.js.map

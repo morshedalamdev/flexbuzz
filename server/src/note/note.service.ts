@@ -12,6 +12,8 @@ import { HashtagService } from "src/hashtag/hashtag.service";
 import { USER_ID } from "src/constants/constants";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { LikeService } from "src/like/like.service";
+import { CommentDto } from "src/comment/dto/comment.dto";
+import { CommentService } from "src/comment/comment.service";
 
 @Injectable()
 export class NoteService {
@@ -19,6 +21,7 @@ export class NoteService {
     private readonly userService: UserService,
     private readonly hashtagService: HashtagService,
     private readonly likeService: LikeService,
+    private readonly commentService: CommentService,
     @InjectRepository(Note)
     private readonly noteRepository: Repository<Note>,
   ) {}
@@ -157,6 +160,45 @@ export class NoteService {
       return await this.likeService.delete(id);
     } catch (error) {
       console.error("Error @note-dislike:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async addComment(commentDto: CommentDto) {
+    try {
+      const note = await this.getById(commentDto.id);
+      const user = await this.userService.findBy(USER_ID);
+      if (!note || !user) {
+        throw new NotFoundException();
+      }
+      return await this.commentService.create({
+        content: commentDto.content,
+        note,
+        user,
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error("Error @note-addComment:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async updateComment(commentDto: CommentDto) {
+    try {
+      return await this.commentService.update(commentDto);
+    } catch (error) {
+      console.error("Error @note-updateComment:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async deleteComment(id: string) {
+    try {
+      return await this.commentService.delete(id);
+    } catch (error) {
+      console.error("Error @note-deleteComment:", error);
       throw new RequestTimeoutException();
     }
   }

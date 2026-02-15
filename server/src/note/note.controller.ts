@@ -11,6 +11,7 @@ import {
 import { NoteService } from "./note.service";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
+import { CommentDto } from "src/comment/dto/comment.dto";
 @Controller("note")
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
@@ -49,5 +50,21 @@ export class NoteController {
   @Delete(":id/dislike")
   async RemoveLike(@Param("id") id: string) {
     return this.noteService.dislike(id);
+  }
+
+  // COMMENTS
+  @Post("/comment")
+  async AddComment(@Body() createDto: CommentDto) {
+    return this.noteService.addComment({ ...createDto });
+  }
+
+  @Patch("/comment")
+  async EditComment(@Body() updateDto: CommentDto) {
+    return this.noteService.updateComment({ ...updateDto });
+  }
+
+  @Delete("/comment")
+  async DeleteComment(@Param("id") id: string) {
+    return this.noteService.deleteComment(id);
   }
 }

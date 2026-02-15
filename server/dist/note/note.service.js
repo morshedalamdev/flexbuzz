@@ -21,15 +21,18 @@ const user_service_1 = require("../user/user.service");
 const hashtag_service_1 = require("../hashtag/hashtag.service");
 const constants_1 = require("../constants/constants");
 const like_service_1 = require("../like/like.service");
+const comment_service_1 = require("../comment/comment.service");
 let NoteService = class NoteService {
     userService;
     hashtagService;
     likeService;
+    commentService;
     noteRepository;
-    constructor(userService, hashtagService, likeService, noteRepository) {
+    constructor(userService, hashtagService, likeService, commentService, noteRepository) {
         this.userService = userService;
         this.hashtagService = hashtagService;
         this.likeService = likeService;
+        this.commentService = commentService;
         this.noteRepository = noteRepository;
     }
     async create(noteDto) {
@@ -158,14 +161,54 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async addComment(commentDto) {
+        try {
+            const note = await this.getById(commentDto.id);
+            const user = await this.userService.findBy(constants_1.USER_ID);
+            if (!note || !user) {
+                throw new common_1.NotFoundException();
+            }
+            return await this.commentService.create({
+                content: commentDto.content,
+                note,
+                user,
+            });
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            console.error("Error @note-addComment:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async updateComment(commentDto) {
+        try {
+            return await this.commentService.update(commentDto);
+        }
+        catch (error) {
+            console.error("Error @note-updateComment:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async deleteComment(id) {
+        try {
+            return await this.commentService.delete(id);
+        }
+        catch (error) {
+            console.error("Error @note-deleteComment:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.NoteService = NoteService;
 exports.NoteService = NoteService = __decorate([
     (0, common_1.Injectable)(),
-    __param(3, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
+    __param(4, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         hashtag_service_1.HashtagService,
         like_service_1.LikeService,
+        comment_service_1.CommentService,
         typeorm_1.Repository])
 ], NoteService);
 //# sourceMappingURL=note.service.js.map

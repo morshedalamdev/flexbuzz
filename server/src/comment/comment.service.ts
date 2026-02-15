@@ -5,38 +5,33 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { NoteService } from "src/note/note.service";
-import { USER_ID } from "src/constants/constants";
-import { UserService } from "src/user/user.service";
 import { Comment } from "./comment.entity";
 import { CommentDto } from "./dto/comment.dto";
+import { User } from "src/user/user.entity";
+import { Note } from "src/note/note.entity";
+
+type CreateType = {
+  content: string;
+  user: User;
+  note: Note;
+};
 
 @Injectable()
 export class CommentService {
   constructor(
-    private readonly userService: UserService,
-    private readonly noteService: NoteService,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
   ) {}
 
-  async create(commentDto: CommentDto) {
+  async create(props: CreateType) {
     try {
-      const note = await this.noteService.getById(commentDto.id);
-      const user = await this.userService.findBy(USER_ID);
-      if (!note || !user) {
-        throw new NotFoundException();
-      }
       const comment = this.commentRepository.create({
-        content: commentDto.content,
-        user,
-        note,
+        content: props.content,
+        user: props.user,
+        note: props.note,
       });
       return await this.commentRepository.save(comment);
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
       console.error("Error @comment-create:", error);
       throw new RequestTimeoutException();
     }
@@ -47,7 +42,7 @@ export class CommentService {
       await this.commentRepository.update(updateDto.id, {
         content: updateDto.content,
       });
-      return {success: true};
+      return { success: true };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

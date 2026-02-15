@@ -1,6 +1,7 @@
 import { NoteService } from "./note.service";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
+import { CommentDto } from "src/comment/dto/comment.dto";
 export declare class NoteController {
     private readonly noteService;
     constructor(noteService: NoteService);
@@ -26,6 +27,13 @@ export declare class NoteController {
     }>;
     GiveLike(id: string): Promise<import("../like/like.entity").Like>;
     RemoveLike(id: string): Promise<{
+        deleted: boolean;
+    }>;
+    AddComment(createDto: CommentDto): Promise<import("../comment/comment.entity").Comment>;
+    EditComment(updateDto: CommentDto): Promise<{
+        success: boolean;
+    }>;
+    DeleteComment(id: string): Promise<{
         deleted: boolean;
     }>;
 }
