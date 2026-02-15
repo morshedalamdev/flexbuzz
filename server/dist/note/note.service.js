@@ -20,13 +20,16 @@ const note_entity_1 = require("./note.entity");
 const user_service_1 = require("../user/user.service");
 const hashtag_service_1 = require("../hashtag/hashtag.service");
 const constants_1 = require("../constants/constants");
+const like_service_1 = require("../like/like.service");
 let NoteService = class NoteService {
     userService;
     hashtagService;
+    likeService;
     noteRepository;
-    constructor(userService, hashtagService, noteRepository) {
+    constructor(userService, hashtagService, likeService, noteRepository) {
         this.userService = userService;
         this.hashtagService = hashtagService;
+        this.likeService = likeService;
         this.noteRepository = noteRepository;
     }
     async create(noteDto) {
@@ -61,7 +64,7 @@ let NoteService = class NoteService {
             }
             else {
                 const noteEntity = await this.noteRepository.find({
-                    relations: ["hashtagRelation"],
+                    relations: ["hashtags"],
                 });
                 notes = await Promise.all(noteEntity.map(async (note) => ({
                     ...note,
@@ -82,7 +85,7 @@ let NoteService = class NoteService {
         try {
             const note = await this.noteRepository.findOne({
                 where: { id },
-                relations: ["hashtagRelation"],
+                relations: ["hashtags"],
             });
             if (!note) {
                 throw new common_1.NotFoundException("Note not found");
@@ -108,8 +111,7 @@ let NoteService = class NoteService {
             }
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
             note.content = noteDto.content || note.content;
-            note.hashtags =
-                hashtags.length > 0 ? hashtags : note.hashtags;
+            note.hashtags = hashtags.length > 0 ? hashtags : note.hashtags;
             return await this.noteRepository.save(note);
         }
         catch (error) {
@@ -130,13 +132,40 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async like(id) {
+        try {
+            const note = await this.getById(id);
+            const user = await this.userService.findBy(constants_1.USER_ID);
+            if (!note || !user) {
+                throw new common_1.NotFoundException();
+            }
+            return await this.likeService.create(note, user);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            console.error("Error @note-like:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async dislike(id) {
+        try {
+            return await this.likeService.delete(id);
+        }
+        catch (error) {
+            console.error("Error @note-dislike:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.NoteService = NoteService;
 exports.NoteService = NoteService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
+    __param(3, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         hashtag_service_1.HashtagService,
+        like_service_1.LikeService,
         typeorm_1.Repository])
 ], NoteService);
 //# sourceMappingURL=note.service.js.map

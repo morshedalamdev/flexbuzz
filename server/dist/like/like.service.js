@@ -17,25 +17,13 @@ const common_1 = require("@nestjs/common");
 const like_entity_1 = require("./like.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const note_service_1 = require("../note/note.service");
-const constants_1 = require("../constants/constants");
-const user_service_1 = require("../user/user.service");
 let LikeService = class LikeService {
-    userService;
-    noteService;
     likeRepository;
-    constructor(userService, noteService, likeRepository) {
-        this.userService = userService;
-        this.noteService = noteService;
+    constructor(likeRepository) {
         this.likeRepository = likeRepository;
     }
-    async create(id) {
+    async create(note, user) {
         try {
-            const note = await this.noteService.getById(id);
-            const user = await this.userService.findBy(constants_1.USER_ID);
-            if (!note || !user) {
-                throw new common_1.NotFoundException();
-            }
             const like = this.likeRepository.create({
                 user,
                 note,
@@ -43,9 +31,6 @@ let LikeService = class LikeService {
             return await this.likeRepository.save(like);
         }
         catch (error) {
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
             if (error.code === "23505") {
                 throw new common_1.ConflictException();
             }
@@ -53,9 +38,9 @@ let LikeService = class LikeService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async delete(id) {
+    async delete(noteId) {
         try {
-            await this.likeRepository.delete(id);
+            await this.likeRepository.delete({ noteId });
             return { deleted: true };
         }
         catch (error) {
@@ -67,9 +52,7 @@ let LikeService = class LikeService {
 exports.LikeService = LikeService;
 exports.LikeService = LikeService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, typeorm_1.InjectRepository)(like_entity_1.Like)),
-    __metadata("design:paramtypes", [user_service_1.UserService,
-        note_service_1.NoteService,
-        typeorm_2.Repository])
+    __param(0, (0, typeorm_1.InjectRepository)(like_entity_1.Like)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], LikeService);
 //# sourceMappingURL=like.service.js.map

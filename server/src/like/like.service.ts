@@ -1,41 +1,29 @@
 import {
-     ConflictException,
+  ConflictException,
   Injectable,
-  NotFoundException,
   RequestTimeoutException,
 } from "@nestjs/common";
 import { Like } from "./like.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { NoteService } from "src/note/note.service";
-import { USER_ID } from "src/constants/constants";
-import { UserService } from "src/user/user.service";
+import { Note } from "src/note/note.entity";
+import { User } from "src/user/user.entity";
 
 @Injectable()
 export class LikeService {
   constructor(
-    private readonly userService: UserService,
-    private readonly noteService: NoteService,
     @InjectRepository(Like)
     private readonly likeRepository: Repository<Like>,
   ) {}
 
-  async create(id: string) {
+  async create(note: Note, user: User) {
     try {
-      const note = await this.noteService.getById(id);
-      const user = await this.userService.findBy(USER_ID);
-      if (!note || !user) {
-        throw new NotFoundException();
-      }
       const like = this.likeRepository.create({
         user,
         note,
       });
       return await this.likeRepository.save(like);
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
       if(error.code === "23505") {
           throw new ConflictException();
       }
@@ -44,9 +32,9 @@ export class LikeService {
     }
   }
 
-  public async delete(id: string) {
+  public async delete(noteId: string) {
     try {
-      await this.likeRepository.delete(id);
+      await this.likeRepository.delete({ noteId });
       return { deleted: true };
     } catch (error) {
       console.error("Error @like-delete:", error);

@@ -24,4 +24,8 @@ export declare class NoteController {
     DeleteNote(id: string): Promise<{
         deleted: boolean;
     }>;
+    GiveLike(id: string): Promise<import("../like/like.entity").Like>;
+    RemoveLike(id: string): Promise<{
+        deleted: boolean;
+    }>;
 }

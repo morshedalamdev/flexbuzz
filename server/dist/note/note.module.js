@@ -14,6 +14,7 @@ const hashtag_module_1 = require("../hashtag/hashtag.module");
 const user_module_1 = require("../user/user.module");
 const note_entity_1 = require("./note.entity");
 const typeorm_1 = require("@nestjs/typeorm");
+const like_module_1 = require("../like/like.module");
 let NoteModule = class NoteModule {
 };
 exports.NoteModule = NoteModule;
@@ -21,8 +22,8 @@ exports.NoteModule = NoteModule = __decorate([
     (0, common_1.Module)({
         controllers: [note_controller_1.NoteController],
         providers: [note_service_1.NoteService],
-        imports: [user_module_1.UserModule, hashtag_module_1.HashtagModule, typeorm_1.TypeOrmModule.forFeature([note_entity_1.Note])],
         exports: [note_service_1.NoteService],
+        imports: [user_module_1.UserModule, hashtag_module_1.HashtagModule, like_module_1.LikeModule, typeorm_1.TypeOrmModule.forFeature([note_entity_1.Note])],
     })
 ], NoteModule);
 //# sourceMappingURL=note.module.js.map

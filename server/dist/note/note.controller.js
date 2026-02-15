@@ -37,6 +37,12 @@ let NoteController = class NoteController {
     DeleteNote(id) {
         return this.noteService.delete(id);
     }
+    async GiveLike(id) {
+        return this.noteService.like(id);
+    }
+    async RemoveLike(id) {
+        return this.noteService.dislike(id);
+    }
 };
 exports.NoteController = NoteController;
 __decorate([
@@ -74,6 +80,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], NoteController.prototype, "DeleteNote", null);
+__decorate([
+    (0, common_1.Post)(":id/like"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "GiveLike", null);
+__decorate([
+    (0, common_1.Delete)(":id/dislike"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "RemoveLike", null);
 exports.NoteController = NoteController = __decorate([
     (0, common_1.Controller)("note"),
     __metadata("design:paramtypes", [note_service_1.NoteService])

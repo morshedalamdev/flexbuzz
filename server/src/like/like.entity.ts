@@ -12,7 +12,7 @@ import {
 @Entity("likes")
 @Unique(["userId", "noteId"])
 export class Like {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn("uuid", { name: "user_id" })
   userId: string;
 
   @PrimaryGeneratedColumn("uuid", { name: "note_id" })
