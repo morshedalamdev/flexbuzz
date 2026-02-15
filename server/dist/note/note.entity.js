@@ -21,14 +21,14 @@ let Note = class Note {
     userId;
     createdAt;
     updatedAt;
-    userRelation;
-    hashtagRelation;
-    likeRelation;
-    commentRelation;
+    user;
+    hashtags;
+    likes;
+    comments;
 };
 exports.Note = Note;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "_id" }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
 ], Note.prototype, "id", void 0);
 __decorate([
@@ -48,23 +48,23 @@ __decorate([
     __metadata("design:type", Date)
 ], Note.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.noteRelation, { eager: true }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.notes, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: "user_id" }),
     __metadata("design:type", user_entity_1.User)
-], Note.prototype, "userRelation", void 0);
+], Note.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => hashtag_entity_1.Hashtag, (hashtag) => hashtag.noteRelation, { eager: true }),
+    (0, typeorm_1.ManyToMany)(() => hashtag_entity_1.Hashtag, (hashtag) => hashtag.notes, { eager: true }),
     (0, typeorm_1.JoinTable)({ name: "note_hashtag" }),
     __metadata("design:type", Array)
-], Note.prototype, "hashtagRelation", void 0);
+], Note.prototype, "hashtags", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => like_entity_1.Like, (like) => like.noteRelation),
+    (0, typeorm_1.OneToMany)(() => like_entity_1.Like, (like) => like.note),
     __metadata("design:type", Array)
-], Note.prototype, "likeRelation", void 0);
+], Note.prototype, "likes", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.noteRelation),
+    (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.note),
     __metadata("design:type", Array)
-], Note.prototype, "commentRelation", void 0);
+], Note.prototype, "comments", void 0);
 exports.Note = Note = __decorate([
     (0, typeorm_1.Entity)("notes")
 ], Note);

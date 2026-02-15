@@ -18,10 +18,8 @@ import { USER_ID } from "src/constants/constants";
 @Injectable()
 export class UserService {
   constructor(
-    // HashingProvider for password hashing
     @Inject(forwardRef(() => HashingProvider))
     private readonly hashingProvider: HashingProvider,
-    // TypeORM repositories for User and Profile entities
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
@@ -42,14 +40,13 @@ export class UserService {
     if (isEmailExist) {
       throw new UserExistsException("email", userDto.email);
     }
+    // create & save user
     try {
-      // create user
       const newUser = this.userRepository.create({
         ...userDto,
         password: await this.hashingProvider.hashPassword(userDto.password),
-        profileRelation: {},
+        profile: {},
       });
-      // save user to database
       return await this.userRepository.save(newUser);
     } catch (error) {
       console.error("Error @user-create:", error);
@@ -57,27 +54,27 @@ export class UserService {
     }
   }
 
-  public async getAll() {
+  public async findAll() {
     try {
-      return this.userRepository.find({ relations: ["profileRelation"] });
+      return this.userRepository.find();
     } catch (error) {
       console.error("Error @user-getAll:", error);
       throw new RequestTimeoutException();
     }
   }
 
-  public async getBy(identifier: string) {
+  public async findBy(identifier: string) {
     let user: User | null = null;
     try {
       if (isUUID(identifier)) {
         user = await this.userRepository.findOne({
           where: { id: identifier },
-          relations: ["profileRelation"],
+          relations: ["profile"],
         });
       } else {
         user = await this.userRepository.findOne({
           where: [{ username: identifier }, { email: identifier }],
-          relations: ["profileRelation"],
+          relations: ["profile"],
         });
       }
     } catch (error) {
@@ -91,28 +88,32 @@ export class UserService {
     return user;
   }
 
+  public async current() {
+    return await this.findBy(USER_ID);
+  }
+
   public async update(userDto: UpdateUserDto) {
     try {
       const user = await this.userRepository.findOne({
         where: { id: USER_ID },
-        relations: ["profileRelation"],
+        relations: ["profile"],
       });
-      if (!user || !user.profileRelation) {
+      if (!user || !user.profile) {
         throw new NotFoundException("User not found");
       }
       user.username = userDto.username ?? user.username;
       user.email = userDto.email ?? user.email;
-      user.profileRelation.firstName =
-        userDto.profile?.firstName ?? user.profileRelation.firstName;
-      user.profileRelation.lastName =
-        userDto.profile?.lastName ?? user.profileRelation.lastName;
-      user.profileRelation.gender =
-        userDto.profile?.gender ?? user.profileRelation.gender;
-      user.profileRelation.dob = userDto.profile?.dob
+      user.profile.firstName =
+        userDto.profile?.firstName ?? user.profile.firstName;
+      user.profile.lastName =
+        userDto.profile?.lastName ?? user.profile.lastName;
+      user.profile.gender =
+        userDto.profile?.gender ?? user.profile.gender;
+      user.profile.dob = userDto.profile?.dob
         ? new Date(userDto.profile.dob)
-        : user.profileRelation.dob;
-      user.profileRelation.bio =
-        userDto.profile?.bio ?? user.profileRelation.bio;
+        : user.profile.dob;
+      user.profile.bio =
+        userDto.profile?.bio ?? user.profile.bio;
       return await this.userRepository.save(user);
     } catch (error) {
       if (error instanceof NotFoundException) {

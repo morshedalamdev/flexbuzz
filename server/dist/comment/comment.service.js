@@ -32,14 +32,14 @@ let CommentService = class CommentService {
     async create(commentDto) {
         try {
             const note = await this.noteService.getById(commentDto.id);
-            const user = await this.userService.getBy(constants_1.USER_ID);
+            const user = await this.userService.findBy(constants_1.USER_ID);
             if (!note || !user) {
                 throw new common_1.NotFoundException();
             }
             const comment = this.commentRepository.create({
                 content: commentDto.content,
-                userRelation: user,
-                noteRelation: note,
+                user,
+                note,
             });
             return await this.commentRepository.save(comment);
         }

@@ -23,13 +23,13 @@ export class LikeService {
   async create(id: string) {
     try {
       const note = await this.noteService.getById(id);
-      const user = await this.userService.getBy(USER_ID);
+      const user = await this.userService.findBy(USER_ID);
       if (!note || !user) {
         throw new NotFoundException();
       }
       const like = this.likeRepository.create({
-        userRelation: user,
-        noteRelation: note,
+        user,
+        note,
       });
       return await this.likeRepository.save(like);
     } catch (error) {

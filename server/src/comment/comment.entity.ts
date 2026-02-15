@@ -19,10 +19,10 @@ export class Comment {
   content: string;
 
   @Column({ name: "user_id", type: "uuid" })
-  userId: User;
+  userId: string;
 
   @Column({ name: "note_id", type: "uuid" })
-  noteId: Note;
+  noteId: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
@@ -30,12 +30,12 @@ export class Comment {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  // Relations
-  @ManyToOne(() => User, (user) => user.commentRelation, { onDelete: "CASCADE" })
+  // ============ RELATIONSHIPS ============
+  @ManyToOne(() => User, (user) => user.comments, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
-  userRelation: User;
+  user: User;
 
-  @ManyToOne(() => Note, (note) => note.commentRelation, { onDelete: "CASCADE" })
+  @ManyToOne(() => Note, (note) => note.comments, { onDelete: "CASCADE" })
   @JoinColumn({ name: "note_id" })
-  noteRelation: Note;
+  note: Note;
 }

@@ -14,28 +14,34 @@ const note_entity_1 = require("../note/note.entity");
 const typeorm_1 = require("typeorm");
 let Hashtag = class Hashtag {
     id;
-    name;
+    tag;
+    count;
     createdAt;
-    noteRelation;
+    notes;
 };
 exports.Hashtag = Hashtag;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "_id" }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
 ], Hashtag.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar", length: 100, unique: true }),
+    (0, typeorm_1.Column)({ type: "varchar", length: 100 }),
     __metadata("design:type", String)
-], Hashtag.prototype, "name", void 0);
+], Hashtag.prototype, "tag", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "int", default: 1 }),
+    __metadata("design:type", Number)
+], Hashtag.prototype, "count", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: "created_at" }),
     __metadata("design:type", Date)
 ], Hashtag.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => note_entity_1.Note, (note) => note.hashtagRelation),
+    (0, typeorm_1.ManyToMany)(() => note_entity_1.Note, (note) => note.hashtags),
     __metadata("design:type", Array)
-], Hashtag.prototype, "noteRelation", void 0);
+], Hashtag.prototype, "notes", void 0);
 exports.Hashtag = Hashtag = __decorate([
-    (0, typeorm_1.Entity)("hashtags")
+    (0, typeorm_1.Entity)("hashtags"),
+    (0, typeorm_1.Unique)(["tag"])
 ], Hashtag);
 //# sourceMappingURL=hashtag.entity.js.map

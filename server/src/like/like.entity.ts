@@ -1,7 +1,6 @@
 import { Note } from "src/note/note.entity";
 import { User } from "src/user/user.entity";
 import {
-  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -14,23 +13,20 @@ import {
 @Unique(["userId", "noteId"])
 export class Like {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  userId: string;
 
-  @Column({ name: "user_id", type: "uuid" })
-  userId: User;
-
-  @Column({ name: "note_id", type: "uuid" })
-  noteId: Note;
+  @PrimaryGeneratedColumn("uuid", { name: "note_id" })
+  noteId: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  // Relations
-  @ManyToOne(() => User, (user) => user.likeRelation, { onDelete: "CASCADE" })
+  // ============ RELATIONSHIPS ============
+  @ManyToOne(() => User, (user) => user.likes, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
-  userRelation: User;
+  user: User;
 
-  @ManyToOne(() => Note, (note) => note.likeRelation, { onDelete: "CASCADE" })
+  @ManyToOne(() => Note, (note) => note.likes, { onDelete: "CASCADE" })
   @JoinColumn({ name: "note_id" })
-  noteRelation: Note;
+  note: Note;
 }

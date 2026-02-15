@@ -9,42 +9,41 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Like = void 0;
-const note_entity_1 = require("../note/note.entity");
+exports.Follow = void 0;
 const user_entity_1 = require("../user/user.entity");
 const typeorm_1 = require("typeorm");
-let Like = class Like {
-    userId;
-    noteId;
+let Follow = class Follow {
+    followerId;
+    followingId;
     createdAt;
-    user;
-    note;
+    follower;
+    following;
 };
-exports.Like = Like;
+exports.Follow = Follow;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "follower_id" }),
     __metadata("design:type", String)
-], Like.prototype, "userId", void 0);
+], Follow.prototype, "followerId", void 0);
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "note_id" }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "following_id" }),
     __metadata("design:type", String)
-], Like.prototype, "noteId", void 0);
+], Follow.prototype, "followingId", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: "created_at" }),
     __metadata("design:type", Date)
-], Like.prototype, "createdAt", void 0);
+], Follow.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.likes, { onDelete: "CASCADE" }),
-    (0, typeorm_1.JoinColumn)({ name: "user_id" }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.followers, { onDelete: "CASCADE" }),
+    (0, typeorm_1.JoinColumn)({ name: "follower_id" }),
     __metadata("design:type", user_entity_1.User)
-], Like.prototype, "user", void 0);
+], Follow.prototype, "follower", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => note_entity_1.Note, (note) => note.likes, { onDelete: "CASCADE" }),
-    (0, typeorm_1.JoinColumn)({ name: "note_id" }),
-    __metadata("design:type", note_entity_1.Note)
-], Like.prototype, "note", void 0);
-exports.Like = Like = __decorate([
-    (0, typeorm_1.Entity)("likes"),
-    (0, typeorm_1.Unique)(["userId", "noteId"])
-], Like);
-//# sourceMappingURL=like.entity.js.map
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.followings, { onDelete: "CASCADE" }),
+    (0, typeorm_1.JoinColumn)({ name: "following_id" }),
+    __metadata("design:type", user_entity_1.User)
+], Follow.prototype, "following", void 0);
+exports.Follow = Follow = __decorate([
+    (0, typeorm_1.Entity)("follows"),
+    (0, typeorm_1.Unique)(["followerId", "followingId"])
+], Follow);
+//# sourceMappingURL=follow.entity.js.map

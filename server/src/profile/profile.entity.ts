@@ -17,7 +17,7 @@ export enum Gender {
 @Entity("profiles")
 @Unique(["userId"])
 export class Profile {
-  @PrimaryGeneratedColumn("uuid", { name: "_id" })
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ name: "first_name", type: "varchar", nullable: true, length: 100 })
@@ -38,8 +38,8 @@ export class Profile {
   @Column({ name: "user_id", type: "uuid" })
   userId: string;
 
-  // Relations
-  @OneToOne(() => User, (user) => user.profileRelation, { onDelete: "CASCADE" })
+  // ============ RELATIONSHIPS ============
+  @OneToOne(() => User, (user) => user.profile, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
-  userRelation: User;
+  user: User;
 }

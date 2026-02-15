@@ -5,20 +5,25 @@ import {
   Entity,
   ManyToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from "typeorm";
 
 @Entity("hashtags")
+@Unique(["tag"])
 export class Hashtag {
-  @PrimaryGeneratedColumn("uuid", { name: "_id" })
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ type: "varchar", length: 100, unique: true })
-  name: string;
+  @Column({ type: "varchar", length: 100})
+  tag: string;
+
+  @Column({type: "int", default: 1 })
+  count: number;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  // Relations
-  @ManyToMany(() => Note, (note) => note.hashtagRelation)
-  noteRelation: Note[];
+  // ============ RELATIONSHIPS ============
+  @ManyToMany(() => Note, (note) => note.hashtags)
+  notes: Note[];
 }

@@ -4,5 +4,5 @@ export class CreateHashtagDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(100)
-  name: string;
+  tag: string;
 }

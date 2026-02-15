@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const comment_entity_1 = require("../comment/comment.entity");
+const follow_entity_1 = require("../follow/follow.entity");
 const like_entity_1 = require("../like/like.entity");
 const note_entity_1 = require("../note/note.entity");
 const profile_entity_1 = require("../profile/profile.entity");
@@ -23,14 +24,16 @@ let User = class User {
     createdAt;
     updatedAt;
     deletedAt;
-    profileRelation;
-    noteRelation;
-    likeRelation;
-    commentRelation;
+    profile;
+    followers;
+    followings;
+    notes;
+    likes;
+    comments;
 };
 exports.User = User;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "_id" }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
 ], User.prototype, "id", void 0);
 __decorate([
@@ -58,21 +61,31 @@ __decorate([
     __metadata("design:type", Date)
 ], User.prototype, "deletedAt", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => profile_entity_1.Profile, (profile) => profile.userRelation, { cascade: true }),
+    (0, typeorm_1.OneToOne)(() => profile_entity_1.Profile, (profile) => profile.user, { eager: true, onDelete: "CASCADE" }),
     __metadata("design:type", profile_entity_1.Profile)
-], User.prototype, "profileRelation", void 0);
+], User.prototype, "profile", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => note_entity_1.Note, (note) => note.userRelation),
+    (0, typeorm_1.OneToMany)(() => follow_entity_1.Follow, (follow) => follow.follower, { onDelete: "CASCADE" }),
     __metadata("design:type", Array)
-], User.prototype, "noteRelation", void 0);
+], User.prototype, "followers", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => like_entity_1.Like, (like) => like.userRelation),
+    (0, typeorm_1.OneToMany)(() => follow_entity_1.Follow, (follow) => follow.following, {
+        onDelete: "CASCADE",
+    }),
     __metadata("design:type", Array)
-], User.prototype, "likeRelation", void 0);
+], User.prototype, "followings", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.userRelation),
+    (0, typeorm_1.OneToMany)(() => note_entity_1.Note, (note) => note.user, { onDelete: "CASCADE" }),
     __metadata("design:type", Array)
-], User.prototype, "commentRelation", void 0);
+], User.prototype, "notes", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => like_entity_1.Like, (like) => like.user, { onDelete: "CASCADE" }),
+    __metadata("design:type", Array)
+], User.prototype, "likes", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.user, { onDelete: "CASCADE" }),
+    __metadata("design:type", Array)
+], User.prototype, "comments", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)("users"),
     (0, typeorm_1.Unique)(["username", "email"])

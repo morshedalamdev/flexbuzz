@@ -31,12 +31,12 @@ let NoteService = class NoteService {
     }
     async create(noteDto) {
         try {
-            const user = await this.userService.getBy(constants_1.USER_ID);
+            const user = await this.userService.findBy(constants_1.USER_ID);
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
             const newNote = this.noteRepository.create({
                 ...noteDto,
-                userRelation: user,
-                hashtagRelation: hashtags,
+                user,
+                hashtags,
             });
             return await this.noteRepository.save(newNote);
         }
@@ -49,10 +49,10 @@ let NoteService = class NoteService {
         let notes = null;
         try {
             if (user) {
-                const userEntity = await this.userService.getBy(user);
+                const userEntity = await this.userService.findBy(user);
                 const noteEntity = await this.noteRepository.find({
                     where: { userId: userEntity.id },
-                    relations: ["hashtagRelation"],
+                    relations: ["hashtags"],
                 });
                 notes = await Promise.all(noteEntity.map(async (note) => ({
                     ...note,
@@ -65,7 +65,7 @@ let NoteService = class NoteService {
                 });
                 notes = await Promise.all(noteEntity.map(async (note) => ({
                     ...note,
-                    userRelation: await this.userService.getBy(note.userId),
+                    userRelation: await this.userService.findBy(note.userId),
                 })));
             }
         }
@@ -87,7 +87,7 @@ let NoteService = class NoteService {
             if (!note) {
                 throw new common_1.NotFoundException("Note not found");
             }
-            const user = await this.userService.getBy(note.userId);
+            const user = await this.userService.findBy(note.userId);
             return { ...note, userRelation: user };
         }
         catch (error) {
@@ -108,8 +108,8 @@ let NoteService = class NoteService {
             }
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
             note.content = noteDto.content || note.content;
-            note.hashtagRelation =
-                hashtags.length > 0 ? hashtags : note.hashtagRelation;
+            note.hashtags =
+                hashtags.length > 0 ? hashtags : note.hashtags;
             return await this.noteRepository.save(note);
         }
         catch (error) {

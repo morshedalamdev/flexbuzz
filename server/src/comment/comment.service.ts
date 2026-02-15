@@ -23,14 +23,14 @@ export class CommentService {
   async create(commentDto: CommentDto) {
     try {
       const note = await this.noteService.getById(commentDto.id);
-      const user = await this.userService.getBy(USER_ID);
+      const user = await this.userService.findBy(USER_ID);
       if (!note || !user) {
         throw new NotFoundException();
       }
       const comment = this.commentRepository.create({
         content: commentDto.content,
-        userRelation: user,
-        noteRelation: note,
+        user,
+        note,
       });
       return await this.commentRepository.save(comment);
     } catch (error) {

@@ -1,4 +1,5 @@
 import { Comment } from "src/comment/comment.entity";
+import { Follow } from "src/follow/follow.entity";
 import { Like } from "src/like/like.entity";
 import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
@@ -17,7 +18,7 @@ import {
 @Entity("users")
 @Unique(["username", "email"])
 export class User {
-  @PrimaryGeneratedColumn("uuid", { name: "_id" })
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ type: "varchar", nullable: false, length: 24 })
@@ -38,16 +39,24 @@ export class User {
   @DeleteDateColumn({ name: "deleted_at" })
   deletedAt: Date;
 
-  // Relations
-  @OneToOne(() => Profile, (profile) => profile.userRelation, { cascade: true })
-  profileRelation: Profile;
+  // ============ RELATIONSHIPS ============
+  @OneToOne(() => Profile, (profile) => profile.user, { eager: true, onDelete: "CASCADE" })
+  profile: Profile;
 
-  @OneToMany(() => Note, (note) => note.userRelation)
-  noteRelation: Note[];
+  @OneToMany(() => Follow, (follow) => follow.follower, { onDelete: "CASCADE" })
+  followers: Follow[];
 
-  @OneToMany(() => Like, (like) => like.userRelation)
-  likeRelation: Like[];
+  @OneToMany(() => Follow, (follow) => follow.following, {
+    onDelete: "CASCADE",
+  })
+  followings: Follow[];
 
-  @OneToMany(() => Comment, (comment) => comment.userRelation)
-  commentRelation: Comment[];
+  @OneToMany(() => Note, (note) => note.user, { onDelete: "CASCADE" })
+  notes: Note[];
+
+  @OneToMany(() => Like, (like) => like.user, { onDelete: "CASCADE" })
+  likes: Like[];
+
+  @OneToMany(() => Comment, (comment) => comment.user, { onDelete: "CASCADE" })
+  comments: Comment[];
 }
