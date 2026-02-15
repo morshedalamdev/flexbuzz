@@ -148,9 +148,9 @@ users ────────── posts ─────── post_hashtags �
 - [ ] Test like and comment endpoints
 
 ### Milestone 6: Follow System & Advanced Feed API
-- [ ] Create `follows` table/entity (follower_id, following_id)
-- [ ] Implement `POST /users/:id/follow` — follow a user
-- [ ] Implement `DELETE /users/:id/follow` — unfollow a user
+- [x] Create `follows` table/entity (follower_id, following_id)
+- [x] Implement `POST /users/:id/follow` — follow a user
+- [x] Implement `DELETE /users/:id/follow` — unfollow a user
 - [ ] Implement `GET /users/:id/followers` — list followers (paginated)
 - [ ] Implement `GET /users/:id/following` — list following (paginated)
 - [ ] Implement `GET /posts/feed` — personalized feed (posts from followed users)
