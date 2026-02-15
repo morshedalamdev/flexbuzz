@@ -47,7 +47,7 @@ let UserService = class UserService {
             const newUser = this.userRepository.create({
                 ...userDto,
                 password: await this.hashingProvider.hashPassword(userDto.password),
-                profileRelation: {},
+                profile: {},
             });
             return await this.userRepository.save(newUser);
         }
@@ -56,28 +56,28 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getAll() {
+    async findAll() {
         try {
-            return this.userRepository.find({ relations: ["profileRelation"] });
+            return this.userRepository.find();
         }
         catch (error) {
             console.error("Error @user-getAll:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getBy(identifier) {
+    async findBy(identifier) {
         let user = null;
         try {
             if ((0, class_validator_1.isUUID)(identifier)) {
                 user = await this.userRepository.findOne({
                     where: { id: identifier },
-                    relations: ["profileRelation"],
+                    relations: ["profile"],
                 });
             }
             else {
                 user = await this.userRepository.findOne({
                     where: [{ username: identifier }, { email: identifier }],
-                    relations: ["profileRelation"],
+                    relations: ["profile"],
                 });
             }
         }
@@ -90,28 +90,31 @@ let UserService = class UserService {
         }
         return user;
     }
+    async current() {
+        return await this.findBy(constants_1.USER_ID);
+    }
     async update(userDto) {
         try {
             const user = await this.userRepository.findOne({
                 where: { id: constants_1.USER_ID },
-                relations: ["profileRelation"],
+                relations: ["profile"],
             });
-            if (!user || !user.profileRelation) {
+            if (!user || !user.profile) {
                 throw new common_1.NotFoundException("User not found");
             }
             user.username = userDto.username ?? user.username;
             user.email = userDto.email ?? user.email;
-            user.profileRelation.firstName =
-                userDto.profile?.firstName ?? user.profileRelation.firstName;
-            user.profileRelation.lastName =
-                userDto.profile?.lastName ?? user.profileRelation.lastName;
-            user.profileRelation.gender =
-                userDto.profile?.gender ?? user.profileRelation.gender;
-            user.profileRelation.dob = userDto.profile?.dob
+            user.profile.firstName =
+                userDto.profile?.firstName ?? user.profile.firstName;
+            user.profile.lastName =
+                userDto.profile?.lastName ?? user.profile.lastName;
+            user.profile.gender =
+                userDto.profile?.gender ?? user.profile.gender;
+            user.profile.dob = userDto.profile?.dob
                 ? new Date(userDto.profile.dob)
-                : user.profileRelation.dob;
-            user.profileRelation.bio =
-                userDto.profile?.bio ?? user.profileRelation.bio;
+                : user.profile.dob;
+            user.profile.bio =
+                userDto.profile?.bio ?? user.profile.bio;
             return await this.userRepository.save(user);
         }
         catch (error) {

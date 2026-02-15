@@ -29,16 +29,16 @@ let LikeService = class LikeService {
         this.noteService = noteService;
         this.likeRepository = likeRepository;
     }
-    async create(likeDto) {
+    async create(id) {
         try {
-            const note = await this.noteService.getById(likeDto.noteId);
-            const user = await this.userService.getBy(constants_1.USER_ID);
-            if (!note) {
+            const note = await this.noteService.getById(id);
+            const user = await this.userService.findBy(constants_1.USER_ID);
+            if (!note || !user) {
                 throw new common_1.NotFoundException();
             }
             const like = this.likeRepository.create({
-                userRelation: user,
-                noteRelation: note,
+                user,
+                note,
             });
             return await this.likeRepository.save(like);
         }

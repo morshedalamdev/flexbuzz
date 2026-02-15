@@ -1,4 +1,5 @@
 import { Comment } from "src/comment/comment.entity";
+import { Follow } from "src/follow/follow.entity";
 import { Like } from "src/like/like.entity";
 import { Note } from "src/note/note.entity";
 import { Profile } from "src/profile/profile.entity";
@@ -10,8 +11,10 @@ export declare class User {
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
-    profileRelation: Profile;
-    noteRelation: Note[];
-    likeRelation: Like[];
-    commentRelation: Comment[];
+    profile: Profile;
+    followers: Follow[];
+    followings: Follow[];
+    notes: Note[];
+    likes: Like[];
+    comments: Comment[];
 }

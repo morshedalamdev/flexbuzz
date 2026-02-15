@@ -13,7 +13,7 @@ import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import envValidation from "./config/env.validation";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { MeModule } from './me/me.module';
+import { FollowModule } from './follow/follow.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -24,6 +24,9 @@ const ENV = process.env.NODE_ENV;
     HashtagModule,
     CommentModule,
     LikeModule,
+    NoteModule,
+    ProfileModule,
+    FollowModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !ENV ? ".env" : `.env.${ENV}`,
@@ -43,9 +46,6 @@ const ENV = process.env.NODE_ENV;
         database: configService.get<string>("database.name"),
       }),
     }),
-    NoteModule,
-    ProfileModule,
-    MeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

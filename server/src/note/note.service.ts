@@ -23,15 +23,15 @@ export class NoteService {
 
   public async create(noteDto: CreateNoteDto) {
     try {
-      const user = await this.userService.getBy(USER_ID);
+      const user = await this.userService.findBy(USER_ID);
       const hashtags = await this.hashtagService.getByIds(
         noteDto.hashtags || [],
       );
 
       const newNote = this.noteRepository.create({
         ...noteDto,
-        userRelation: user,
-        hashtagRelation: hashtags,
+        user,
+        hashtags,
       });
       return await this.noteRepository.save(newNote);
     } catch (error) {
@@ -44,10 +44,10 @@ export class NoteService {
     let notes: Note[] | null = null;
     try {
       if (user) {
-        const userEntity = await this.userService.getBy(user);
+        const userEntity = await this.userService.findBy(user);
         const noteEntity = await this.noteRepository.find({
           where: { userId: userEntity.id },
-          relations: ["hashtagRelation"],
+          relations: ["hashtags"],
         });
         notes = await Promise.all(
           noteEntity.map(async (note) => ({
@@ -62,7 +62,7 @@ export class NoteService {
         notes = await Promise.all(
           noteEntity.map(async (note) => ({
             ...note,
-            userRelation: await this.userService.getBy(note.userId),
+            userRelation: await this.userService.findBy(note.userId),
           })),
         );
       }
@@ -86,7 +86,7 @@ export class NoteService {
       if (!note) {
         throw new NotFoundException("Note not found");
       }
-      const user = await this.userService.getBy(note.userId);
+      const user = await this.userService.findBy(note.userId);
 
       return { ...note, userRelation: user };
     } catch (error) {
@@ -111,8 +111,8 @@ export class NoteService {
         noteDto.hashtags || [],
       );
       note.content = noteDto.content || note.content;
-      note.hashtagRelation =
-        hashtags.length > 0 ? hashtags : note.hashtagRelation;
+      note.hashtags =
+        hashtags.length > 0 ? hashtags : note.hashtags;
 
       return await this.noteRepository.save(note);
     } catch (error) {

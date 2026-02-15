@@ -9,15 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LikeDto = void 0;
+exports.CommentDto = void 0;
 const class_validator_1 = require("class-validator");
-class LikeDto {
-    noteId;
+class CommentDto {
+    id;
+    content;
 }
-exports.LikeDto = LikeDto;
+exports.CommentDto = CommentDto;
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], LikeDto.prototype, "noteId", void 0);
-//# sourceMappingURL=like.dto.js.map
+], CommentDto.prototype, "id", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CommentDto.prototype, "content", void 0);
+//# sourceMappingURL=comment.dto.js.map

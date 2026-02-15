@@ -15,14 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LikeController = void 0;
 const common_1 = require("@nestjs/common");
 const like_service_1 = require("./like.service");
-const like_dto_1 = require("./dto/like.dto");
 let LikeController = class LikeController {
     likeService;
     constructor(likeService) {
         this.likeService = likeService;
     }
-    async GiveLike(likeDto) {
-        return this.likeService.create(likeDto);
+    async GiveLike(id) {
+        return this.likeService.create(id);
     }
     async RemoveLike(id) {
         return this.likeService.delete(id);
@@ -30,10 +29,10 @@ let LikeController = class LikeController {
 };
 exports.LikeController = LikeController;
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Post)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [like_dto_1.LikeDto]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], LikeController.prototype, "GiveLike", null);
 __decorate([

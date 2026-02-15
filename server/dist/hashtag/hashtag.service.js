@@ -24,7 +24,7 @@ let HashtagService = class HashtagService {
     }
     async create(hashtagDto) {
         const isExist = await this.hashtagRepository.findOne({
-            where: { name: hashtagDto.name },
+            where: { tag: hashtagDto.tag },
         });
         if (isExist) {
             throw new common_1.ConflictException("Hashtag already exists");
@@ -42,7 +42,7 @@ let HashtagService = class HashtagService {
         try {
             if (search) {
                 const response = await this.hashtagRepository.findOne({
-                    where: { name: search },
+                    where: { tag: search },
                 });
                 if (!response) {
                     throw new common_1.NotFoundException("Hashtag not found");

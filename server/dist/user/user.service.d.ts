@@ -8,8 +8,9 @@ export declare class UserService {
     private userRepository;
     constructor(hashingProvider: HashingProvider, userRepository: Repository<User>);
     create(userDto: CreateUserDto): Promise<User>;
-    getAll(): Promise<User[]>;
-    getBy(identifier: string): Promise<User>;
+    findAll(): Promise<User[]>;
+    findBy(identifier: string): Promise<User>;
+    current(): Promise<User>;
     update(userDto: UpdateUserDto): Promise<User>;
     delete(): Promise<{
         deleted: boolean;

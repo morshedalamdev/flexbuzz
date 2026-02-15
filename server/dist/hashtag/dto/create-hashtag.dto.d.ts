@@ -1,3 +1,3 @@
 export declare class CreateHashtagDto {
-    name: string;
+    tag: string;
 }

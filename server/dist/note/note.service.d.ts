@@ -18,9 +18,10 @@ export declare class NoteService {
         userId: string;
         createdAt: Date;
         updatedAt: Date;
-        hashtagRelation: import("../hashtag/hashtag.entity").Hashtag[];
-        likeRelation: import("../like/like.entity").Like[];
-        commentRelation: import("../comment/comment.entity").Comment[];
+        user: import("../user/user.entity").User;
+        hashtags: import("../hashtag/hashtag.entity").Hashtag[];
+        likes: import("../like/like.entity").Like[];
+        comments: import("../comment/comment.entity").Comment[];
     }>;
     update(noteDto: UpdateNoteDto): Promise<Note>;
     delete(id: string): Promise<{

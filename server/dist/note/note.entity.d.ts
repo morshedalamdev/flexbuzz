@@ -8,8 +8,8 @@ export declare class Note {
     userId: string;
     createdAt: Date;
     updatedAt: Date;
-    userRelation: User;
-    hashtagRelation: Hashtag[];
-    likeRelation: Like[];
-    commentRelation: Comment[];
+    user: User;
+    hashtags: Hashtag[];
+    likes: Like[];
+    comments: Comment[];
 }

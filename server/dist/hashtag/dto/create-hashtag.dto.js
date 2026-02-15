@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateHashtagDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateHashtagDto {
-    name;
+    tag;
 }
 exports.CreateHashtagDto = CreateHashtagDto;
 __decorate([
@@ -20,5 +20,5 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
-], CreateHashtagDto.prototype, "name", void 0);
+], CreateHashtagDto.prototype, "tag", void 0);
 //# sourceMappingURL=create-hashtag.dto.js.map

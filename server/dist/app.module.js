@@ -25,7 +25,7 @@ const app_config_1 = __importDefault(require("./config/app.config"));
 const database_config_1 = __importDefault(require("./config/database.config"));
 const env_validation_1 = __importDefault(require("./config/env.validation"));
 const typeorm_1 = require("@nestjs/typeorm");
-const me_module_1 = require("./me/me.module");
+const follow_module_1 = require("./follow/follow.module");
 const ENV = process.env.NODE_ENV;
 let AppModule = class AppModule {
 };
@@ -38,6 +38,9 @@ exports.AppModule = AppModule = __decorate([
             hashtag_module_1.HashtagModule,
             comment_module_1.CommentModule,
             like_module_1.LikeModule,
+            note_module_1.NoteModule,
+            profile_module_1.ProfileModule,
+            follow_module_1.FollowModule,
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 envFilePath: !ENV ? ".env" : `.env.${ENV}`,
@@ -57,9 +60,6 @@ exports.AppModule = AppModule = __decorate([
                     database: configService.get("database.name"),
                 }),
             }),
-            note_module_1.NoteModule,
-            profile_module_1.ProfileModule,
-            me_module_1.MeModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

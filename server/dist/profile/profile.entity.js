@@ -26,11 +26,11 @@ let Profile = class Profile {
     dob;
     bio;
     userId;
-    userRelation;
+    user;
 };
 exports.Profile = Profile;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "_id" }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
 ], Profile.prototype, "id", void 0);
 __decorate([
@@ -58,10 +58,10 @@ __decorate([
     __metadata("design:type", String)
 ], Profile.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => user_entity_1.User, (user) => user.profileRelation, { onDelete: "CASCADE" }),
+    (0, typeorm_1.OneToOne)(() => user_entity_1.User, (user) => user.profile, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: "user_id" }),
     __metadata("design:type", user_entity_1.User)
-], Profile.prototype, "userRelation", void 0);
+], Profile.prototype, "user", void 0);
 exports.Profile = Profile = __decorate([
     (0, typeorm_1.Entity)("profiles"),
     (0, typeorm_1.Unique)(["userId"])

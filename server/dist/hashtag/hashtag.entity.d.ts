@@ -1,7 +1,8 @@
 import { Note } from "src/note/note.entity";
 export declare class Hashtag {
     id: string;
-    name: string;
+    tag: string;
+    count: number;
     createdAt: Date;
-    noteRelation: Note[];
+    notes: Note[];
 }

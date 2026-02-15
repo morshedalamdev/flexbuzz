@@ -17,7 +17,7 @@ import {
 
 @Entity("notes")
 export class Note {
-  @PrimaryGeneratedColumn("uuid", { name: "_id" })
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ type: "text", nullable: false })
@@ -32,18 +32,18 @@ export class Note {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  // Relations
-  @ManyToOne(() => User, (user) => user.noteRelation, { eager: true })
+  // ============ RELATIONSHIPS ============
+  @ManyToOne(() => User, (user) => user.notes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: "user_id" })
-  userRelation: User;
+  user: User;
 
-  @ManyToMany(() => Hashtag, (hashtag) => hashtag.noteRelation, { eager: true })
+  @ManyToMany(() => Hashtag, (hashtag) => hashtag.notes, { eager: true })
   @JoinTable({ name: "note_hashtag" })
-  hashtagRelation: Hashtag[];
+  hashtags: Hashtag[];
 
-  @OneToMany(() => Like, (like) => like.noteRelation)
-  likeRelation: Like[];
+  @OneToMany(() => Like, (like) => like.note)
+  likes: Like[];
 
-  @OneToMany(() => Comment, (comment) => comment.noteRelation)
-  commentRelation: Comment[];
+  @OneToMany(() => Comment, (comment) => comment.note)
+  comments: Comment[];
 }
