@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const note_service_1 = require("./note.service");
 const create_note_dto_1 = require("./dto/create-note.dto");
 const update_note_dto_1 = require("./dto/update-note.dto");
+const comment_dto_1 = require("../comment/dto/comment.dto");
 let NoteController = class NoteController {
     noteService;
     constructor(noteService) {
@@ -36,6 +37,21 @@ let NoteController = class NoteController {
     }
     DeleteNote(id) {
         return this.noteService.delete(id);
+    }
+    async GiveLike(id) {
+        return this.noteService.like(id);
+    }
+    async RemoveLike(id) {
+        return this.noteService.dislike(id);
+    }
+    async AddComment(createDto) {
+        return this.noteService.addComment({ ...createDto });
+    }
+    async EditComment(updateDto) {
+        return this.noteService.updateComment({ ...updateDto });
+    }
+    async DeleteComment(id) {
+        return this.noteService.deleteComment(id);
     }
 };
 exports.NoteController = NoteController;
@@ -74,6 +90,41 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], NoteController.prototype, "DeleteNote", null);
+__decorate([
+    (0, common_1.Post)(":id/like"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "GiveLike", null);
+__decorate([
+    (0, common_1.Delete)(":id/dislike"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "RemoveLike", null);
+__decorate([
+    (0, common_1.Post)("/comment"),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [comment_dto_1.CommentDto]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "AddComment", null);
+__decorate([
+    (0, common_1.Patch)("/comment"),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [comment_dto_1.CommentDto]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "EditComment", null);
+__decorate([
+    (0, common_1.Delete)("/comment"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "DeleteComment", null);
 exports.NoteController = NoteController = __decorate([
     (0, common_1.Controller)("note"),
     __metadata("design:paramtypes", [note_service_1.NoteService])

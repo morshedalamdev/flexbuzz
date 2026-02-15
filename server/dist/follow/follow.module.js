@@ -18,6 +18,7 @@ exports.FollowModule = FollowModule = __decorate([
     (0, common_1.Module)({
         controllers: [],
         providers: [follow_service_1.FollowService],
+        exports: [follow_service_1.FollowService],
         imports: [typeorm_1.TypeOrmModule.forFeature([follow_entity_1.Follow])],
     })
 ], FollowModule);

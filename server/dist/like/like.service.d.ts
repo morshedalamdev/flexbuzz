@@ -1,14 +1,12 @@
 import { Like } from "./like.entity";
 import { Repository } from "typeorm";
-import { NoteService } from "src/note/note.service";
-import { UserService } from "src/user/user.service";
+import { Note } from "src/note/note.entity";
+import { User } from "src/user/user.entity";
 export declare class LikeService {
-    private readonly userService;
-    private readonly noteService;
     private readonly likeRepository;
-    constructor(userService: UserService, noteService: NoteService, likeRepository: Repository<Like>);
-    create(id: string): Promise<Like>;
-    delete(id: string): Promise<{
+    constructor(likeRepository: Repository<Like>);
+    create(note: Note, user: User): Promise<Like>;
+    delete(noteId: string, userId: string): Promise<{
         deleted: boolean;
     }>;
 }

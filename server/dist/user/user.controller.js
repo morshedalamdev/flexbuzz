@@ -40,6 +40,12 @@ let UserController = class UserController {
     GetUserById(id) {
         return this.userService.findBy(id);
     }
+    FollowUser(id) {
+        return this.userService.follow(id);
+    }
+    UnfollowUser(id) {
+        return this.userService.unfollow(id);
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -81,6 +87,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserById", null);
+__decorate([
+    (0, common_1.Post)(":id/follow"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "FollowUser", null);
+__decorate([
+    (0, common_1.Delete)(":id/unfollow"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "UnfollowUser", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)("user"),
     __metadata("design:paramtypes", [user_service_1.UserService])

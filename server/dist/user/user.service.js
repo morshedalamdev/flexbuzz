@@ -21,10 +21,13 @@ const user_exists_exception_1 = require("../common/customException/user-exists.e
 const hashing_provider_1 = require("../auth/provider/hashing.provider");
 const class_validator_1 = require("class-validator");
 const constants_1 = require("../constants/constants");
+const follow_service_1 = require("../follow/follow.service");
 let UserService = class UserService {
+    followService;
     hashingProvider;
     userRepository;
-    constructor(hashingProvider, userRepository) {
+    constructor(followService, hashingProvider, userRepository) {
+        this.followService = followService;
         this.hashingProvider = hashingProvider;
         this.userRepository = userRepository;
     }
@@ -108,13 +111,11 @@ let UserService = class UserService {
                 userDto.profile?.firstName ?? user.profile.firstName;
             user.profile.lastName =
                 userDto.profile?.lastName ?? user.profile.lastName;
-            user.profile.gender =
-                userDto.profile?.gender ?? user.profile.gender;
+            user.profile.gender = userDto.profile?.gender ?? user.profile.gender;
             user.profile.dob = userDto.profile?.dob
                 ? new Date(userDto.profile.dob)
                 : user.profile.dob;
-            user.profile.bio =
-                userDto.profile?.bio ?? user.profile.bio;
+            user.profile.bio = userDto.profile?.bio ?? user.profile.bio;
             return await this.userRepository.save(user);
         }
         catch (error) {
@@ -135,13 +136,43 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async follow(id) {
+        try {
+            const userToFollow = await this.findBy(id);
+            const currentUser = await this.findBy(constants_1.USER_ID);
+            if (!userToFollow || !currentUser) {
+                throw new common_1.NotFoundException("User not found");
+            }
+            return await this.followService.follow(userToFollow, currentUser);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            console.error("Error @user-follow:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async unfollow(id) {
+        try {
+            return await this.followService.unfollow(id, constants_1.USER_ID);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            console.error("Error @user-unfollow:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)((0, common_1.forwardRef)(() => hashing_provider_1.HashingProvider))),
-    __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [hashing_provider_1.HashingProvider,
+    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => hashing_provider_1.HashingProvider))),
+    __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __metadata("design:paramtypes", [follow_service_1.FollowService,
+        hashing_provider_1.HashingProvider,
         typeorm_2.Repository])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

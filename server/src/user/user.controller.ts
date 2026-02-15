@@ -25,6 +25,7 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  // CURRENT USER
   @Get("/me")
   public GetCurrUser() {
     return this.userService.current();
@@ -43,5 +44,16 @@ export class UserController {
   @Get(":id")
   public GetUserById(@Param("id") id: string) {
     return this.userService.findBy(id);
+  }
+
+  // FOLLOW
+  @Post(":id/follow")
+  public FollowUser(@Param("id") id: string) {
+    return this.userService.follow(id);
+  }
+
+  @Delete(":id/unfollow")
+  public UnfollowUser(@Param("id") id: string) {
+    return this.userService.unfollow(id);
   }
 }

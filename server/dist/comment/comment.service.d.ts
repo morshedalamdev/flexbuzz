@@ -1,14 +1,17 @@
 import { Repository } from "typeorm";
-import { NoteService } from "src/note/note.service";
-import { UserService } from "src/user/user.service";
 import { Comment } from "./comment.entity";
 import { CommentDto } from "./dto/comment.dto";
+import { User } from "src/user/user.entity";
+import { Note } from "src/note/note.entity";
+type CreateType = {
+    content: string;
+    user: User;
+    note: Note;
+};
 export declare class CommentService {
-    private readonly userService;
-    private readonly noteService;
     private readonly commentRepository;
-    constructor(userService: UserService, noteService: NoteService, commentRepository: Repository<Comment>);
-    create(commentDto: CommentDto): Promise<Comment>;
+    constructor(commentRepository: Repository<Comment>);
+    create(props: CreateType): Promise<Comment>;
     update(updateDto: CommentDto): Promise<{
         success: boolean;
     }>;
@@ -16,3 +19,4 @@ export declare class CommentService {
         deleted: boolean;
     }>;
 }
+export {};

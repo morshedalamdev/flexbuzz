@@ -11,12 +11,17 @@ import { UserService } from "src/user/user.service";
 import { HashtagService } from "src/hashtag/hashtag.service";
 import { USER_ID } from "src/constants/constants";
 import { UpdateNoteDto } from "./dto/update-note.dto";
+import { LikeService } from "src/like/like.service";
+import { CommentDto } from "src/comment/dto/comment.dto";
+import { CommentService } from "src/comment/comment.service";
 
 @Injectable()
 export class NoteService {
   constructor(
     private readonly userService: UserService,
     private readonly hashtagService: HashtagService,
+    private readonly likeService: LikeService,
+    private readonly commentService: CommentService,
     @InjectRepository(Note)
     private readonly noteRepository: Repository<Note>,
   ) {}
@@ -57,7 +62,7 @@ export class NoteService {
         );
       } else {
         const noteEntity = await this.noteRepository.find({
-          relations: ["hashtagRelation"],
+          relations: ["hashtags"],
         });
         notes = await Promise.all(
           noteEntity.map(async (note) => ({
@@ -81,7 +86,7 @@ export class NoteService {
     try {
       const note = await this.noteRepository.findOne({
         where: { id },
-        relations: ["hashtagRelation"],
+        relations: ["hashtags"],
       });
       if (!note) {
         throw new NotFoundException("Note not found");
@@ -111,8 +116,7 @@ export class NoteService {
         noteDto.hashtags || [],
       );
       note.content = noteDto.content || note.content;
-      note.hashtags =
-        hashtags.length > 0 ? hashtags : note.hashtags;
+      note.hashtags = hashtags.length > 0 ? hashtags : note.hashtags;
 
       return await this.noteRepository.save(note);
     } catch (error) {
@@ -130,6 +134,73 @@ export class NoteService {
       return { deleted: true };
     } catch (error) {
       console.error("Error @note-delete:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  // LIKE
+  public async like(id: string) {
+    try {
+      const note = await this.getById(id);
+      const user = await this.userService.findBy(USER_ID);
+      if (!note || !user) {
+        throw new NotFoundException();
+      }
+      return await this.likeService.create(note, user);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error("Error @note-like:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async dislike(id: string) {
+    try {
+      return await this.likeService.delete(id, USER_ID);
+    } catch (error) {
+      console.error("Error @note-dislike:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  // COMMENT
+  public async addComment(commentDto: CommentDto) {
+    try {
+      const note = await this.getById(commentDto.id);
+      const user = await this.userService.findBy(USER_ID);
+      if (!note || !user) {
+        throw new NotFoundException();
+      }
+      return await this.commentService.create({
+        content: commentDto.content,
+        note,
+        user,
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error("Error @note-addComment:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async updateComment(commentDto: CommentDto) {
+    try {
+      return await this.commentService.update(commentDto);
+    } catch (error) {
+      console.error("Error @note-updateComment:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async deleteComment(id: string) {
+    try {
+      return await this.commentService.delete(id);
+    } catch (error) {
+      console.error("Error @note-deleteComment:", error);
       throw new RequestTimeoutException();
     }
   }

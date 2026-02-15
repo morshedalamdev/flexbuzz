@@ -40,7 +40,7 @@ export class User {
   deletedAt: Date;
 
   // ============ RELATIONSHIPS ============
-  @OneToOne(() => Profile, (profile) => profile.user, { eager: true, onDelete: "CASCADE" })
+  @OneToOne(() => Profile, (profile) => profile.user, { eager: true, cascade: true })
   profile: Profile;
 
   @OneToMany(() => Follow, (follow) => follow.follower, { onDelete: "CASCADE" })

@@ -14,10 +14,12 @@ import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { isUUID } from "class-validator";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { USER_ID } from "src/constants/constants";
+import { FollowService } from "src/follow/follow.service";
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly followService: FollowService,
     @Inject(forwardRef(() => HashingProvider))
     private readonly hashingProvider: HashingProvider,
     @InjectRepository(User)
@@ -25,7 +27,6 @@ export class UserService {
   ) {}
 
   public async create(userDto: CreateUserDto) {
-    // username & email validation
     const isUsernameExist = await this.userRepository.findOne({
       where: { username: userDto.username },
       withDeleted: true,
@@ -40,7 +41,6 @@ export class UserService {
     if (isEmailExist) {
       throw new UserExistsException("email", userDto.email);
     }
-    // create & save user
     try {
       const newUser = this.userRepository.create({
         ...userDto,
@@ -88,6 +88,7 @@ export class UserService {
     return user;
   }
 
+  // CURRENT USER
   public async current() {
     return await this.findBy(USER_ID);
   }
@@ -107,13 +108,11 @@ export class UserService {
         userDto.profile?.firstName ?? user.profile.firstName;
       user.profile.lastName =
         userDto.profile?.lastName ?? user.profile.lastName;
-      user.profile.gender =
-        userDto.profile?.gender ?? user.profile.gender;
+      user.profile.gender = userDto.profile?.gender ?? user.profile.gender;
       user.profile.dob = userDto.profile?.dob
         ? new Date(userDto.profile.dob)
         : user.profile.dob;
-      user.profile.bio =
-        userDto.profile?.bio ?? user.profile.bio;
+      user.profile.bio = userDto.profile?.bio ?? user.profile.bio;
       return await this.userRepository.save(user);
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -130,6 +129,36 @@ export class UserService {
       return { deleted: true };
     } catch (error) {
       console.error("Error @user-delete:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  // FOLLOW
+  public async follow(id: string) {
+    try {
+      const userToFollow = await this.findBy(id);
+      const currentUser = await this.findBy(USER_ID);
+      if (!userToFollow || !currentUser) {
+        throw new NotFoundException("User not found");
+      }
+      return await this.followService.follow(userToFollow, currentUser);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error("Error @user-follow:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async unfollow(id: string) {
+    try {
+      return await this.followService.unfollow(id, USER_ID);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error("Error @user-unfollow:", error);
       throw new RequestTimeoutException();
     }
   }

@@ -22,7 +22,7 @@ let Like = class Like {
 };
 exports.Like = Like;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid", { name: "user_id" }),
     __metadata("design:type", String)
 ], Like.prototype, "userId", void 0);
 __decorate([
