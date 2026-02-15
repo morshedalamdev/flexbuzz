@@ -154,7 +154,7 @@ let NoteService = class NoteService {
     }
     async dislike(id) {
         try {
-            return await this.likeService.delete(id);
+            return await this.likeService.delete(id, constants_1.USER_ID);
         }
         catch (error) {
             console.error("Error @note-dislike:", error);

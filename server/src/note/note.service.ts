@@ -138,6 +138,7 @@ export class NoteService {
     }
   }
 
+  // LIKE
   public async like(id: string) {
     try {
       const note = await this.getById(id);
@@ -157,13 +158,14 @@ export class NoteService {
 
   public async dislike(id: string) {
     try {
-      return await this.likeService.delete(id);
+      return await this.likeService.delete(id, USER_ID);
     } catch (error) {
       console.error("Error @note-dislike:", error);
       throw new RequestTimeoutException();
     }
   }
 
+  // COMMENT
   public async addComment(commentDto: CommentDto) {
     try {
       const note = await this.getById(commentDto.id);

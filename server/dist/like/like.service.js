@@ -38,9 +38,9 @@ let LikeService = class LikeService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async delete(noteId) {
+    async delete(noteId, userId) {
         try {
-            await this.likeRepository.delete({ noteId });
+            await this.likeRepository.delete({ noteId, userId });
             return { deleted: true };
         }
         catch (error) {

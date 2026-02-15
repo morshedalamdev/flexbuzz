@@ -32,9 +32,9 @@ export class LikeService {
     }
   }
 
-  public async delete(noteId: string) {
+  public async delete(noteId: string, userId: string) {
     try {
-      await this.likeRepository.delete({ noteId });
+      await this.likeRepository.delete({ noteId, userId });
       return { deleted: true };
     } catch (error) {
       console.error("Error @like-delete:", error);

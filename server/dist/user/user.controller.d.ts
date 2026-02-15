@@ -12,4 +12,8 @@ export declare class UserController {
         deleted: boolean;
     }>;
     GetUserById(id: string): Promise<import("./user.entity").User>;
+    FollowUser(id: string): Promise<import("../follow/follow.entity").Follow>;
+    UnfollowUser(id: string): Promise<{
+        deleted: boolean;
+    }>;
 }
