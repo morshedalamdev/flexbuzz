@@ -25,7 +25,6 @@ export class UserService {
   ) {}
 
   public async create(userDto: CreateUserDto) {
-    // username & email validation
     const isUsernameExist = await this.userRepository.findOne({
       where: { username: userDto.username },
       withDeleted: true,
@@ -40,7 +39,6 @@ export class UserService {
     if (isEmailExist) {
       throw new UserExistsException("email", userDto.email);
     }
-    // create & save user
     try {
       const newUser = this.userRepository.create({
         ...userDto,
