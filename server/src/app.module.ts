@@ -14,7 +14,7 @@ import databaseConfig from "./config/database.config";
 import envValidation from "./config/env.validation";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FollowModule } from './follow/follow.module';
-
+import { PaginationModule } from './common/pagination/pagination.module';
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -46,6 +46,7 @@ const ENV = process.env.NODE_ENV;
         database: configService.get<string>("database.name"),
       }),
     }),
+    PaginationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

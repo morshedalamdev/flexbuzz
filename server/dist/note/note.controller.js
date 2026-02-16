@@ -18,6 +18,7 @@ const note_service_1 = require("./note.service");
 const create_note_dto_1 = require("./dto/create-note.dto");
 const update_note_dto_1 = require("./dto/update-note.dto");
 const comment_dto_1 = require("../comment/dto/comment.dto");
+const note_query_dto_1 = require("./dto/note-query.dto");
 let NoteController = class NoteController {
     noteService;
     constructor(noteService) {
@@ -26,8 +27,8 @@ let NoteController = class NoteController {
     CreateNote(createDto) {
         return this.noteService.create(createDto);
     }
-    GetNotes(query) {
-        return this.noteService.getAll(query.user);
+    GetNotes(paginationQueryDto) {
+        return this.noteService.getAll(paginationQueryDto);
     }
     GetById(id) {
         return this.noteService.getById(id);
@@ -66,7 +67,7 @@ __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [note_query_dto_1.NoteQueryDto]),
     __metadata("design:returntype", void 0)
 ], NoteController.prototype, "GetNotes", null);
 __decorate([

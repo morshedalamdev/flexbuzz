@@ -6,6 +6,7 @@ import { User } from "./user.entity";
 import { Profile } from "src/profile/profile.entity";
 import { AuthModule } from "src/auth/auth.module";
 import { FollowModule } from "src/follow/follow.module";
+import { PaginationModule } from "src/common/pagination/pagination.module";
 
 @Module({
   controllers: [UserController],
@@ -13,6 +14,7 @@ import { FollowModule } from "src/follow/follow.module";
   exports: [UserService],
   imports: [
     FollowModule,
+    PaginationModule,
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([User, Profile]),
   ],

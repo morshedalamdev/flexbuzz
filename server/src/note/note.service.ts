@@ -14,6 +14,9 @@ import { UpdateNoteDto } from "./dto/update-note.dto";
 import { LikeService } from "src/like/like.service";
 import { CommentDto } from "src/comment/dto/comment.dto";
 import { CommentService } from "src/comment/comment.service";
+import { NoteQueryDto } from "./dto/note-query.dto";
+import { PaginationInterface } from "src/common/pagination/pagination.interface";
+import { PaginationProvider } from "src/common/pagination/pagination.provider";
 
 @Injectable()
 export class NoteService {
@@ -22,6 +25,7 @@ export class NoteService {
     private readonly hashtagService: HashtagService,
     private readonly likeService: LikeService,
     private readonly commentService: CommentService,
+    private readonly paginationProvider: PaginationProvider,
     @InjectRepository(Note)
     private readonly noteRepository: Repository<Note>,
   ) {}
@@ -45,41 +49,62 @@ export class NoteService {
     }
   }
 
-  public async getAll(user?: string) {
-    let notes: Note[] | null = null;
+  public async getAll(
+    pageQueryDto: NoteQueryDto,
+  ): Promise<PaginationInterface<Note>> {
     try {
-      if (user) {
-        const userEntity = await this.userService.findBy(user);
-        const noteEntity = await this.noteRepository.find({
-          where: { userId: userEntity.id },
-          relations: ["hashtags"],
-        });
-        notes = await Promise.all(
-          noteEntity.map(async (note) => ({
-            ...note,
-            userRelation: userEntity,
-          })),
-        );
-      } else {
-        const noteEntity = await this.noteRepository.find({
-          relations: ["hashtags"],
-        });
-        notes = await Promise.all(
-          noteEntity.map(async (note) => ({
-            ...note,
-            userRelation: await this.userService.findBy(note.userId),
-          })),
+      return await this.paginationProvider.paginateQuery(
+        pageQueryDto,
+        this.noteRepository,
+        pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined,
+        ["hashtags", "user"],
+      );
+    } catch (error) {
+      if (error.code === "ECONNREFUSED") {
+        throw new RequestTimeoutException(
+          "Failed to fetch users. Please try again later.",
+          {
+            description: "Database connection error",
+          },
         );
       }
-    } catch (error) {
-      console.error("Error @note-getAll:", error);
+      console.error("Error creating user:", error);
       throw new RequestTimeoutException();
     }
+    // let notes: Note[] | null = null;
+    // try {
+    //   if (user) {
+    //     const userEntity = await this.userService.findBy(user);
+    //     const noteEntity = await this.noteRepository.find({
+    //       where: { userId: userEntity.id },
+    //       relations: ["hashtags"],
+    //     });
+    //     notes = await Promise.all(
+    //       noteEntity.map(async (note) => ({
+    //         ...note,
+    //         userRelation: userEntity,
+    //       })),
+    //     );
+    //   } else {
+    //     const noteEntity = await this.noteRepository.find({
+    //       relations: ["hashtags"],
+    //     });
+    //     notes = await Promise.all(
+    //       noteEntity.map(async (note) => ({
+    //         ...note,
+    //         userRelation: await this.userService.findBy(note.userId),
+    //       })),
+    //     );
+    //   }
+    // } catch (error) {
+    //   console.error("Error @note-getAll:", error);
+    //   throw new RequestTimeoutException();
+    // }
 
-    if (!notes || notes.length === 0) {
-      throw new NotFoundException();
-    }
-    return notes;
+    // if (!notes || notes.length === 0) {
+    //   throw new NotFoundException();
+    // }
+    // return notes;
   }
 
   public async getById(id: string) {

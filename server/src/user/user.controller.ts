@@ -6,10 +6,12 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
 
 @Controller("user")
 export class UserController {
@@ -21,8 +23,8 @@ export class UserController {
   }
 
   @Get()
-  public GetUsers() {
-    return this.userService.findAll();
+  public GetUsers(@Query() pageQueryDto: PaginationQueryDto) {
+    return this.userService.findAll(pageQueryDto);
   }
 
   // CURRENT USER

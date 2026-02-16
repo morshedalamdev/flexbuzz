@@ -2,13 +2,12 @@ import { NoteService } from "./note.service";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { CommentDto } from "src/comment/dto/comment.dto";
+import { NoteQueryDto } from "./dto/note-query.dto";
 export declare class NoteController {
     private readonly noteService;
     constructor(noteService: NoteService);
     CreateNote(createDto: CreateNoteDto): Promise<import("./note.entity").Note>;
-    GetNotes(query: {
-        user?: string;
-    }): Promise<import("./note.entity").Note[]>;
+    GetNotes(paginationQueryDto: NoteQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("./note.entity").Note>>;
     GetById(id: string): Promise<{
         userRelation: import("../user/user.entity").User;
         id: string;

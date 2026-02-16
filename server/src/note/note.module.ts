@@ -7,11 +7,19 @@ import { Note } from "./note.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { LikeModule } from "src/like/like.module";
 import { CommentModule } from "src/comment/comment.module";
+import { PaginationModule } from "src/common/pagination/pagination.module";
 
 @Module({
   controllers: [NoteController],
   providers: [NoteService],
   exports: [NoteService],
-  imports: [UserModule, HashtagModule, LikeModule, CommentModule, TypeOrmModule.forFeature([Note])],
+  imports: [
+    UserModule,
+    HashtagModule,
+    LikeModule,
+    CommentModule,
+    PaginationModule,
+    TypeOrmModule.forFeature([Note]),
+  ],
 })
 export class NoteModule {}

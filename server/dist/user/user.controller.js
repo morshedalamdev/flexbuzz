@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const user_service_1 = require("./user.service");
 const update_user_dto_1 = require("./dto/update-user.dto");
+const pagination_query_dto_1 = require("../common/pagination/dto/pagination-query.dto");
 let UserController = class UserController {
     userService;
     constructor(userService) {
@@ -25,8 +26,8 @@ let UserController = class UserController {
     CreateUser(createDto) {
         return this.userService.create(createDto);
     }
-    GetUsers() {
-        return this.userService.findAll();
+    GetUsers(pageQueryDto) {
+        return this.userService.findAll(pageQueryDto);
     }
     GetCurrUser() {
         return this.userService.current();
@@ -57,8 +58,9 @@ __decorate([
 ], UserController.prototype, "CreateUser", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUsers", null);
 __decorate([
