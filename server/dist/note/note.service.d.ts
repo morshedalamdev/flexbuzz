@@ -19,7 +19,7 @@ export declare class NoteService {
     private readonly noteRepository;
     constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, commentService: CommentService, paginationProvider: PaginationProvider, noteRepository: Repository<Note>);
     create(noteDto: CreateNoteDto): Promise<Note>;
-    getAll(pageQueryDto: NoteQueryDto): Promise<PaginationInterface<Note>>;
+    getAll(pageQueryDto: NoteQueryDto, request?: import("express").Request): Promise<PaginationInterface<Note>>;
     getById(id: string): Promise<{
         userRelation: import("../user/user.entity").User;
         id: string;

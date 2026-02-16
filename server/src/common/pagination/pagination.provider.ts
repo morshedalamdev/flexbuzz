@@ -1,5 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { REQUEST } from "@nestjs/core";
+import { Injectable } from "@nestjs/common";
 import type { Request } from "express";
 import {
   FindManyOptions,
@@ -12,11 +11,10 @@ import { PaginationInterface } from "./pagination.interface";
 
 @Injectable()
 export class PaginationProvider {
-  constructor(@Inject(REQUEST) private readonly request: Request) {}
-
   public async paginateQuery<T extends ObjectLiteral>(
     paginationQueryDto: PaginationQueryDto,
     repository: Repository<T>,
+    request?: Request,
     where?: FindOptionsWhere<T>,
     relations?: string[],
   ): Promise<PaginationInterface<T>> {
@@ -41,11 +39,9 @@ export class PaginationProvider {
     const nextPage = currentPage === totalPages ? currentPage : currentPage + 1;
     const prevPage = currentPage === 1 ? currentPage : currentPage - 1;
 
-    const baseUrl =
-      this.request.protocol +
-      "://" +
-      this.request.get("host") +
-      this.request.path;
+    const baseUrl = request
+      ? `${request.protocol}://${request.get("host")}${request.path}`
+      : "";
 
     const response: PaginationInterface<T> = {
       data: result,

@@ -51,24 +51,26 @@ export class NoteService {
 
   public async getAll(
     pageQueryDto: NoteQueryDto,
+    request?: import("express").Request,
   ): Promise<PaginationInterface<Note>> {
     try {
       return await this.paginationProvider.paginateQuery(
         pageQueryDto,
         this.noteRepository,
+        request,
         pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined,
         ["hashtags", "user"],
       );
     } catch (error) {
       if (error.code === "ECONNREFUSED") {
         throw new RequestTimeoutException(
-          "Failed to fetch users. Please try again later.",
+          "Failed to fetch notes. Please try again later.",
           {
             description: "Database connection error",
           },
         );
       }
-      console.error("Error creating user:", error);
+      console.error("Error @note-getAll:", error);
       throw new RequestTimeoutException();
     }
     // let notes: Note[] | null = null;
