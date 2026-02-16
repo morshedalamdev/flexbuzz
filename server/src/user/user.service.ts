@@ -19,6 +19,7 @@ import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.d
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { FollowQueryDto } from "./dto/follow-query.dto";
 import { FollowService } from "src/follow/follow.service";
+import type { Request } from "express";
 
 @Injectable()
 export class UserService {
@@ -61,7 +62,7 @@ export class UserService {
 
   public async findAll(
     paginationQueryDto: PaginationQueryDto,
-    request?: import("express").Request,
+    request?: Request,
   ): Promise<PaginationInterface<User>> {
     try {
       return await this.paginationProvider.paginateQuery(
@@ -183,24 +184,24 @@ export class UserService {
     }
   }
 
-  public async getFollowers(followDto: FollowQueryDto) {
+  public async getFollowers(followDto: FollowQueryDto, request?: Request) {
     if(!followDto.followingId){
       followDto.followingId = USER_ID;
     }
     try {
-      return await this.followService.getFollows(followDto);
+      return await this.followService.getFollows(followDto, request);
     } catch (error) {
       console.error("Error @user-getFollowers:", error);
       throw new RequestTimeoutException();
     }
   }
 
-  public async getFollowing(followDto: FollowQueryDto) {
+  public async getFollowing(followDto: FollowQueryDto, request?: Request) {
     if(!followDto.followerId){
       followDto.followerId = USER_ID;
     }
     try {
-      return await this.followService.getFollows(followDto);
+      return await this.followService.getFollows(followDto, request);
     } catch (error) {
       console.error("Error @user-getFollowing:", error);
       throw new RequestTimeoutException();

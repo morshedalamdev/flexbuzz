@@ -173,24 +173,24 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowers(followDto) {
+    async getFollowers(followDto, request) {
         if (!followDto.followingId) {
             followDto.followingId = constants_1.USER_ID;
         }
         try {
-            return await this.followService.getFollows(followDto);
+            return await this.followService.getFollows(followDto, request);
         }
         catch (error) {
             console.error("Error @user-getFollowers:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowing(followDto) {
+    async getFollowing(followDto, request) {
         if (!followDto.followerId) {
             followDto.followerId = constants_1.USER_ID;
         }
         try {
-            return await this.followService.getFollows(followDto);
+            return await this.followService.getFollows(followDto, request);
         }
         catch (error) {
             console.error("Error @user-getFollowing:", error);

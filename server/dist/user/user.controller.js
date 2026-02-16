@@ -24,11 +24,17 @@ let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
-    CreateUser(createDto) {
-        return this.userService.create(createDto);
+    GetFollowers(pageQueryDto, req) {
+        return this.userService.getFollowers(pageQueryDto, req);
     }
-    GetUsers(pageQueryDto, req) {
-        return this.userService.findAll(pageQueryDto, req);
+    GetFollowing(pageQueryDto, req) {
+        return this.userService.getFollowing(pageQueryDto, req);
+    }
+    FollowUser(id) {
+        return this.userService.follow(id);
+    }
+    UnfollowUser(id) {
+        return this.userService.unfollow(id);
     }
     GetCurrUser() {
         return this.userService.current();
@@ -39,38 +45,47 @@ let UserController = class UserController {
     DeleteCurrUser() {
         return this.userService.delete();
     }
+    CreateUser(createDto) {
+        return this.userService.create(createDto);
+    }
+    GetUsers(pageQueryDto, req) {
+        return this.userService.findAll(pageQueryDto, req);
+    }
     GetUserById(id) {
         return this.userService.findBy(id);
-    }
-    GetFollowers(pageQueryDto) {
-        return this.userService.getFollowers(pageQueryDto);
-    }
-    GetFollowing(pageQueryDto) {
-        return this.userService.getFollowing(pageQueryDto);
-    }
-    FollowUser(id) {
-        return this.userService.follow(id);
-    }
-    UnfollowUser(id) {
-        return this.userService.unfollow(id);
     }
 };
 exports.UserController = UserController;
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "CreateUser", null);
-__decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)("/followers"),
     __param(0, (0, common_1.Query)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto, Object]),
+    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto, Object]),
     __metadata("design:returntype", void 0)
-], UserController.prototype, "GetUsers", null);
+], UserController.prototype, "GetFollowers", null);
+__decorate([
+    (0, common_1.Get)("/following"),
+    __param(0, (0, common_1.Query)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetFollowing", null);
+__decorate([
+    (0, common_1.Post)(":id/follow"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "FollowUser", null);
+__decorate([
+    (0, common_1.Delete)(":id/unfollow"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "UnfollowUser", null);
 __decorate([
     (0, common_1.Get)("/me"),
     __metadata("design:type", Function),
@@ -91,40 +106,27 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "DeleteCurrUser", null);
 __decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "CreateUser", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetUsers", null);
+__decorate([
     (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserById", null);
-__decorate([
-    (0, common_1.Get)("/followers"),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "GetFollowers", null);
-__decorate([
-    (0, common_1.Get)("/following"),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "GetFollowing", null);
-__decorate([
-    (0, common_1.Post)(":id/follow"),
-    __param(0, (0, common_1.Param)("id")),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "FollowUser", null);
-__decorate([
-    (0, common_1.Delete)(":id/unfollow"),
-    __param(0, (0, common_1.Param)("id")),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "UnfollowUser", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)("user"),
     __metadata("design:paramtypes", [user_service_1.UserService])

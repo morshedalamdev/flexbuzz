@@ -17,6 +17,7 @@ import { CommentService } from "src/comment/comment.service";
 import { NoteQueryDto } from "./dto/note-query.dto";
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
+import type { Request } from "express";
 
 @Injectable()
 export class NoteService {
@@ -51,7 +52,7 @@ export class NoteService {
 
   public async getAll(
     pageQueryDto: NoteQueryDto,
-    request?: import("express").Request,
+    request?: Request,
   ): Promise<PaginationInterface<Note>> {
     try {
       return await this.paginationProvider.paginateQuery(
@@ -73,40 +74,6 @@ export class NoteService {
       console.error("Error @note-getAll:", error);
       throw new RequestTimeoutException();
     }
-    // let notes: Note[] | null = null;
-    // try {
-    //   if (user) {
-    //     const userEntity = await this.userService.findBy(user);
-    //     const noteEntity = await this.noteRepository.find({
-    //       where: { userId: userEntity.id },
-    //       relations: ["hashtags"],
-    //     });
-    //     notes = await Promise.all(
-    //       noteEntity.map(async (note) => ({
-    //         ...note,
-    //         userRelation: userEntity,
-    //       })),
-    //     );
-    //   } else {
-    //     const noteEntity = await this.noteRepository.find({
-    //       relations: ["hashtags"],
-    //     });
-    //     notes = await Promise.all(
-    //       noteEntity.map(async (note) => ({
-    //         ...note,
-    //         userRelation: await this.userService.findBy(note.userId),
-    //       })),
-    //     );
-    //   }
-    // } catch (error) {
-    //   console.error("Error @note-getAll:", error);
-    //   throw new RequestTimeoutException();
-    // }
-
-    // if (!notes || notes.length === 0) {
-    //   throw new NotFoundException();
-    // }
-    // return notes;
   }
 
   public async getById(id: string) {

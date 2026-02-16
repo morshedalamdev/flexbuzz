@@ -47,11 +47,25 @@ let FollowService = class FollowService {
             return { deleted: true };
         }
         catch (error) {
-            console.error("Error @follow-follow:", error);
+            console.error("Error @follow-unfollow:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollows(followDto) {
+    async getFollows(followDto, request) {
+        try {
+            return await this.paginationProvider.paginateQuery(followDto, this.followRepository, request ? request : undefined, followDto.followerId
+                ? { followerId: followDto.followerId }
+                : { followingId: followDto.followingId });
+        }
+        catch (error) {
+            if (error.code === "ECONNREFUSED") {
+                throw new common_1.RequestTimeoutException("Failed to fetch users. Please try again later.", {
+                    description: "Database connection error",
+                });
+            }
+            console.error("Error @follow-getFollows:", error);
+            throw new common_1.RequestTimeoutException();
+        }
     }
 };
 exports.FollowService = FollowService;

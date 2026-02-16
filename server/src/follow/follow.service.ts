@@ -5,6 +5,7 @@ import { User } from "src/user/user.entity";
 import { FollowQueryDto } from "src/user/dto/follow-query.dto";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
 import { Follow } from "./follow.entity";
+import type { Request } from "express";
 
 @Injectable()
 export class FollowService {
@@ -35,31 +36,32 @@ export class FollowService {
       });
       return { deleted: true };
     } catch (error) {
-      console.error("Error @follow-follow:", error);
+      console.error("Error @follow-unfollow:", error);
       throw new RequestTimeoutException();
     }
   }
 
-  public async getFollows(followDto: FollowQueryDto) {
-    // try {
-    //   return await this.paginationProvider.paginateQuery(
-    //     followDto,
-    //     this.followRepository,
-    //     followDto.followerId
-    //       ? { followerId: followDto.followerId }
-    //       : { followingId: followDto.followingId },
-    //   );
-    // } catch (error) {
-    //   if (error.code === "ECONNREFUSED") {
-    //     throw new RequestTimeoutException(
-    //       "Failed to fetch users. Please try again later.",
-    //       {
-    //         description: "Database connection error",
-    //       },
-    //     );
-    //   }
-    //   console.error("Error fetching followers:", error);
-    //   throw new RequestTimeoutException();
-    // }
+  public async getFollows(followDto: FollowQueryDto, request?: Request) {
+    try {
+      return await this.paginationProvider.paginateQuery(
+        followDto,
+        this.followRepository,
+        request ? request : undefined,
+        followDto.followerId
+          ? { followerId: followDto.followerId }
+          : { followingId: followDto.followingId },
+      );
+    } catch (error) {
+      if (error.code === "ECONNREFUSED") {
+        throw new RequestTimeoutException(
+          "Failed to fetch users. Please try again later.",
+          {
+            description: "Database connection error",
+          },
+        );
+      }
+      console.error("Error @follow-getFollows:", error);
+      throw new RequestTimeoutException();
+    }
   }
 }
