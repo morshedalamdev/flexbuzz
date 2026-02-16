@@ -26,6 +26,7 @@ const database_config_1 = __importDefault(require("./config/database.config"));
 const env_validation_1 = __importDefault(require("./config/env.validation"));
 const typeorm_1 = require("@nestjs/typeorm");
 const follow_module_1 = require("./follow/follow.module");
+const pagination_module_1 = require("./common/pagination/pagination.module");
 const ENV = process.env.NODE_ENV;
 let AppModule = class AppModule {
 };
@@ -60,6 +61,7 @@ exports.AppModule = AppModule = __decorate([
                     database: configService.get("database.name"),
                 }),
             }),
+            pagination_module_1.PaginationModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

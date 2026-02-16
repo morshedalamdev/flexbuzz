@@ -21,13 +21,16 @@ const user_exists_exception_1 = require("../common/customException/user-exists.e
 const hashing_provider_1 = require("../auth/provider/hashing.provider");
 const class_validator_1 = require("class-validator");
 const constants_1 = require("../constants/constants");
+const pagination_provider_1 = require("../common/pagination/pagination.provider");
 const follow_service_1 = require("../follow/follow.service");
 let UserService = class UserService {
     followService;
+    paginationProvider;
     hashingProvider;
     userRepository;
-    constructor(followService, hashingProvider, userRepository) {
+    constructor(followService, paginationProvider, hashingProvider, userRepository) {
         this.followService = followService;
+        this.paginationProvider = paginationProvider;
         this.hashingProvider = hashingProvider;
         this.userRepository = userRepository;
     }
@@ -59,11 +62,16 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async findAll() {
+    async findAll(paginationQueryDto, request) {
         try {
-            return this.userRepository.find();
+            return await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository, request);
         }
         catch (error) {
+            if (error.code === "ECONNREFUSED") {
+                throw new common_1.RequestTimeoutException("Failed to fetch users. Please try again later.", {
+                    description: "Database connection error",
+                });
+            }
             console.error("Error @user-getAll:", error);
             throw new common_1.RequestTimeoutException();
         }
@@ -165,13 +173,38 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async getFollowers(followDto, request) {
+        if (!followDto.followingId) {
+            followDto.followingId = constants_1.USER_ID;
+        }
+        try {
+            return await this.followService.getFollows(followDto, request);
+        }
+        catch (error) {
+            console.error("Error @user-getFollowers:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async getFollowing(followDto, request) {
+        if (!followDto.followerId) {
+            followDto.followerId = constants_1.USER_ID;
+        }
+        try {
+            return await this.followService.getFollows(followDto, request);
+        }
+        catch (error) {
+            console.error("Error @user-getFollowing:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => hashing_provider_1.HashingProvider))),
-    __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => hashing_provider_1.HashingProvider))),
+    __param(3, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [follow_service_1.FollowService,
+        pagination_provider_1.PaginationProvider,
         hashing_provider_1.HashingProvider,
         typeorm_2.Repository])
 ], UserService);

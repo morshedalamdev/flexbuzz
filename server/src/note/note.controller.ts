@@ -7,11 +7,15 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from "@nestjs/common";
+import type { Request } from "express";
 import { NoteService } from "./note.service";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { CommentDto } from "src/comment/dto/comment.dto";
+import { NoteQueryDto } from "./dto/note-query.dto";
+
 @Controller("note")
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
@@ -22,8 +26,8 @@ export class NoteController {
   }
 
   @Get()
-  public GetNotes(@Query() query: { user?: string }) {
-    return this.noteService.getAll(query.user);
+  public GetNotes(@Query() paginationQueryDto: NoteQueryDto, @Req() req: Request) {
+    return this.noteService.getAll(paginationQueryDto, req);
   }
 
   @Get(":id")

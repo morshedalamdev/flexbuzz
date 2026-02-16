@@ -6,23 +6,45 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  Req,
 } from "@nestjs/common";
+import type { Request } from "express";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
+import { FollowQueryDto } from "./dto/follow-query.dto";
 
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  public CreateUser(@Body() createDto: CreateUserDto) {
-    return this.userService.create(createDto);
+  // FOLLOW
+  @Get("/followers")
+  public GetFollowers(
+    @Query() pageQueryDto: FollowQueryDto,
+    @Req() req: Request,
+  ) {
+    return this.userService.getFollowers(pageQueryDto, req);
   }
 
-  @Get()
-  public GetUsers() {
-    return this.userService.findAll();
+  @Get("/following")
+  public GetFollowing(
+    @Query() pageQueryDto: FollowQueryDto,
+    @Req() req: Request,
+  ) {
+    return this.userService.getFollowing(pageQueryDto, req);
+  }
+
+  @Post(":id/follow")
+  public FollowUser(@Param("id") id: string) {
+    return this.userService.follow(id);
+  }
+
+  @Delete(":id/unfollow")
+  public UnfollowUser(@Param("id") id: string) {
+    return this.userService.unfollow(id);
   }
 
   // CURRENT USER
@@ -41,19 +63,22 @@ export class UserController {
     return this.userService.delete();
   }
 
+  // ROOT
+  @Post()
+  public CreateUser(@Body() createDto: CreateUserDto) {
+    return this.userService.create(createDto);
+  }
+
+  @Get()
+  public GetUsers(
+    @Query() pageQueryDto: PaginationQueryDto,
+    @Req() req: Request,
+  ) {
+    return this.userService.findAll(pageQueryDto, req);
+  }
+
   @Get(":id")
   public GetUserById(@Param("id") id: string) {
     return this.userService.findBy(id);
-  }
-
-  // FOLLOW
-  @Post(":id/follow")
-  public FollowUser(@Param("id") id: string) {
-    return this.userService.follow(id);
-  }
-
-  @Delete(":id/unfollow")
-  public UnfollowUser(@Param("id") id: string) {
-    return this.userService.unfollow(id);
   }
 }

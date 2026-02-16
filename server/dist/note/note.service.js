@@ -22,17 +22,20 @@ const hashtag_service_1 = require("../hashtag/hashtag.service");
 const constants_1 = require("../constants/constants");
 const like_service_1 = require("../like/like.service");
 const comment_service_1 = require("../comment/comment.service");
+const pagination_provider_1 = require("../common/pagination/pagination.provider");
 let NoteService = class NoteService {
     userService;
     hashtagService;
     likeService;
     commentService;
+    paginationProvider;
     noteRepository;
-    constructor(userService, hashtagService, likeService, commentService, noteRepository) {
+    constructor(userService, hashtagService, likeService, commentService, paginationProvider, noteRepository) {
         this.userService = userService;
         this.hashtagService = hashtagService;
         this.likeService = likeService;
         this.commentService = commentService;
+        this.paginationProvider = paginationProvider;
         this.noteRepository = noteRepository;
     }
     async create(noteDto) {
@@ -51,38 +54,19 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getAll(user) {
-        let notes = null;
+    async getAll(pageQueryDto, request) {
         try {
-            if (user) {
-                const userEntity = await this.userService.findBy(user);
-                const noteEntity = await this.noteRepository.find({
-                    where: { userId: userEntity.id },
-                    relations: ["hashtags"],
-                });
-                notes = await Promise.all(noteEntity.map(async (note) => ({
-                    ...note,
-                    userRelation: userEntity,
-                })));
-            }
-            else {
-                const noteEntity = await this.noteRepository.find({
-                    relations: ["hashtags"],
-                });
-                notes = await Promise.all(noteEntity.map(async (note) => ({
-                    ...note,
-                    userRelation: await this.userService.findBy(note.userId),
-                })));
-            }
+            return await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, request, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
         }
         catch (error) {
+            if (error.code === "ECONNREFUSED") {
+                throw new common_1.RequestTimeoutException("Failed to fetch notes. Please try again later.", {
+                    description: "Database connection error",
+                });
+            }
             console.error("Error @note-getAll:", error);
             throw new common_1.RequestTimeoutException();
         }
-        if (!notes || notes.length === 0) {
-            throw new common_1.NotFoundException();
-        }
-        return notes;
     }
     async getById(id) {
         try {
@@ -204,11 +188,12 @@ let NoteService = class NoteService {
 exports.NoteService = NoteService;
 exports.NoteService = NoteService = __decorate([
     (0, common_1.Injectable)(),
-    __param(4, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
+    __param(5, (0, typeorm_2.InjectRepository)(note_entity_1.Note)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         hashtag_service_1.HashtagService,
         like_service_1.LikeService,
         comment_service_1.CommentService,
+        pagination_provider_1.PaginationProvider,
         typeorm_1.Repository])
 ], NoteService);
 //# sourceMappingURL=note.service.js.map

@@ -7,15 +7,20 @@ import { UpdateNoteDto } from "./dto/update-note.dto";
 import { LikeService } from "src/like/like.service";
 import { CommentDto } from "src/comment/dto/comment.dto";
 import { CommentService } from "src/comment/comment.service";
+import { NoteQueryDto } from "./dto/note-query.dto";
+import { PaginationInterface } from "src/common/pagination/pagination.interface";
+import { PaginationProvider } from "src/common/pagination/pagination.provider";
+import type { Request } from "express";
 export declare class NoteService {
     private readonly userService;
     private readonly hashtagService;
     private readonly likeService;
     private readonly commentService;
+    private readonly paginationProvider;
     private readonly noteRepository;
-    constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, commentService: CommentService, noteRepository: Repository<Note>);
+    constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, commentService: CommentService, paginationProvider: PaginationProvider, noteRepository: Repository<Note>);
     create(noteDto: CreateNoteDto): Promise<Note>;
-    getAll(user?: string): Promise<Note[]>;
+    getAll(pageQueryDto: NoteQueryDto, request?: Request): Promise<PaginationInterface<Note>>;
     getById(id: string): Promise<{
         userRelation: import("../user/user.entity").User;
         id: string;

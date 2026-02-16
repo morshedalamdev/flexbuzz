@@ -7,10 +7,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FollowModule = void 0;
+const pagination_module_1 = require("./../common/pagination/pagination.module");
 const common_1 = require("@nestjs/common");
-const follow_service_1 = require("./follow.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const follow_entity_1 = require("./follow.entity");
+const follow_service_1 = require("./follow.service");
 let FollowModule = class FollowModule {
 };
 exports.FollowModule = FollowModule;
@@ -19,7 +20,7 @@ exports.FollowModule = FollowModule = __decorate([
         controllers: [],
         providers: [follow_service_1.FollowService],
         exports: [follow_service_1.FollowService],
-        imports: [typeorm_1.TypeOrmModule.forFeature([follow_entity_1.Follow])],
+        imports: [pagination_module_1.PaginationModule, typeorm_1.TypeOrmModule.forFeature([follow_entity_1.Follow])],
     })
 ], FollowModule);
 //# sourceMappingURL=follow.module.js.map

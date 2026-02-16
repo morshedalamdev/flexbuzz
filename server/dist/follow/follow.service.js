@@ -15,12 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FollowService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const follow_entity_1 = require("./follow.entity");
 const typeorm_2 = require("typeorm");
+const pagination_provider_1 = require("../common/pagination/pagination.provider");
+const follow_entity_1 = require("./follow.entity");
 let FollowService = class FollowService {
     followRepository;
-    constructor(followRepository) {
+    paginationProvider;
+    constructor(followRepository, paginationProvider) {
         this.followRepository = followRepository;
+        this.paginationProvider = paginationProvider;
     }
     async follow(userToFollow, currentUser) {
         try {
@@ -44,7 +47,23 @@ let FollowService = class FollowService {
             return { deleted: true };
         }
         catch (error) {
-            console.error("Error @follow-follow:", error);
+            console.error("Error @follow-unfollow:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async getFollows(followDto, request) {
+        try {
+            return await this.paginationProvider.paginateQuery(followDto, this.followRepository, request ? request : undefined, followDto.followerId
+                ? { followerId: followDto.followerId }
+                : { followingId: followDto.followingId });
+        }
+        catch (error) {
+            if (error.code === "ECONNREFUSED") {
+                throw new common_1.RequestTimeoutException("Failed to fetch users. Please try again later.", {
+                    description: "Database connection error",
+                });
+            }
+            console.error("Error @follow-getFollows:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
@@ -53,6 +72,7 @@ exports.FollowService = FollowService;
 exports.FollowService = FollowService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(follow_entity_1.Follow)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        pagination_provider_1.PaginationProvider])
 ], FollowService);
 //# sourceMappingURL=follow.service.js.map

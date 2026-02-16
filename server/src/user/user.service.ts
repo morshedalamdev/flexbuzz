@@ -14,12 +14,18 @@ import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { isUUID } from "class-validator";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { USER_ID } from "src/constants/constants";
+import { PaginationProvider } from "src/common/pagination/pagination.provider";
+import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
+import { PaginationInterface } from "src/common/pagination/pagination.interface";
+import { FollowQueryDto } from "./dto/follow-query.dto";
 import { FollowService } from "src/follow/follow.service";
+import type { Request } from "express";
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly followService: FollowService,
+    private readonly paginationProvider: PaginationProvider,
     @Inject(forwardRef(() => HashingProvider))
     private readonly hashingProvider: HashingProvider,
     @InjectRepository(User)
@@ -54,10 +60,25 @@ export class UserService {
     }
   }
 
-  public async findAll() {
+  public async findAll(
+    paginationQueryDto: PaginationQueryDto,
+    request?: Request,
+  ): Promise<PaginationInterface<User>> {
     try {
-      return this.userRepository.find();
+      return await this.paginationProvider.paginateQuery(
+        paginationQueryDto,
+        this.userRepository,
+        request,
+      );
     } catch (error) {
+      if (error.code === "ECONNREFUSED") {
+        throw new RequestTimeoutException(
+          "Failed to fetch users. Please try again later.",
+          {
+            description: "Database connection error",
+          },
+        );
+      }
       console.error("Error @user-getAll:", error);
       throw new RequestTimeoutException();
     }
@@ -159,6 +180,30 @@ export class UserService {
         throw error;
       }
       console.error("Error @user-unfollow:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async getFollowers(followDto: FollowQueryDto, request?: Request) {
+    if(!followDto.followingId){
+      followDto.followingId = USER_ID;
+    }
+    try {
+      return await this.followService.getFollows(followDto, request);
+    } catch (error) {
+      console.error("Error @user-getFollowers:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async getFollowing(followDto: FollowQueryDto, request?: Request) {
+    if(!followDto.followerId){
+      followDto.followerId = USER_ID;
+    }
+    try {
+      return await this.followService.getFollows(followDto, request);
+    } catch (error) {
+      console.error("Error @user-getFollowing:", error);
       throw new RequestTimeoutException();
     }
   }
