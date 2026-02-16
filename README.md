@@ -120,16 +120,16 @@ users ────────── posts ─────── post_hashtags �
 - [x] Implement `GET /users/me` — get current user
 - [x] Implement `PATCH /users/me` — update own profile (bio, display name)
 - [x] Add validation for profile fields
-- [ ] Implement user search endpoint (`GET /users/search?q=`)
+- [x] Implement user search endpoint (`GET /users/search?q=`)
 - [ ] Test user endpoints
 
 ### Milestone 4: Posts & Hashtags API
 - [x] Create `posts`, `hashtags`, and `post_hashtags` tables/entities
 - [x] Implement `POST /posts` — create a new post (extract hashtags automatically)
 - [ ] Implement hashtag extraction logic (parse `#word` patterns from post text)
-- [ ] Implement `GET /posts` — fetch posts feed (paginated)
+- [x] Implement `GET /posts` — fetch posts feed (paginated)
 - [x] Implement `GET /posts/:id` — fetch single post
-- [ ] Implement `GET /posts/user/:username` — fetch user's posts
+- [x] Implement `GET /posts/user/:username` — fetch user's posts
 - [x] Implement `DELETE /posts/:id` — delete own post
 - [x] Implement `PATCH /posts/:id` — edit own post (optional)
 - [x] Add post character limit validation
@@ -151,10 +151,10 @@ users ────────── posts ─────── post_hashtags �
 - [x] Create `follows` table/entity (follower_id, following_id)
 - [x] Implement `POST /users/:id/follow` — follow a user
 - [x] Implement `DELETE /users/:id/follow` — unfollow a user
-- [ ] Implement `GET /users/:id/followers` — list followers (paginated)
-- [ ] Implement `GET /users/:id/following` — list following (paginated)
-- [ ] Implement `GET /posts/feed` — personalized feed (posts from followed users)
-- [ ] Implement `GET /posts/timeline` — global timeline (all posts)
+- [x] Implement `GET /users/:id/followers` — list followers (paginated)
+- [x] Implement `GET /users/:id/following` — list following (paginated)
+- [x] Implement `GET /posts/feed` — personalized feed (posts from followed users)
+- [x] Implement `GET /posts/timeline` — global timeline (all posts)
 - [ ] Add follower/following counts to user profile
 - [ ] Test follow system endpoints
 
