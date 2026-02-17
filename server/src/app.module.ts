@@ -7,18 +7,17 @@ import { UserModule } from "./user/user.module";
 import { HashtagModule } from "./hashtag/hashtag.module";
 import { CommentModule } from "./comment/comment.module";
 import { LikeModule } from "./like/like.module";
-import { NoteModule } from './note/note.module';
-import { ProfileModule } from './profile/profile.module';
+import { NoteModule } from "./note/note.module";
+import { ProfileModule } from "./profile/profile.module";
 import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import envValidation from "./config/env.validation";
 import authConfig from "./auth/config/auth.config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { FollowModule } from './follow/follow.module';
-import { PaginationModule } from './common/pagination/pagination.module';
+import { FollowModule } from "./follow/follow.module";
+import { PaginationModule } from "./common/pagination/pagination.module";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthorizeGuard } from "./auth/guards/authorize.guard";
-import { TempDummyService } from './temp-dummy/temp-dummy.service';
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -54,9 +53,12 @@ const ENV = process.env.NODE_ENV;
     ConfigModule.forFeature(authConfig),
   ],
   controllers: [AppController],
-  providers: [AppService,{
-    provide: APP_GUARD,
-    useClass: AuthorizeGuard,
-  }, TempDummyService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthorizeGuard,
+    },
+  ],
 })
 export class AppModule {}
