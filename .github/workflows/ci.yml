@@ -1,0 +1,80 @@
+# ===== WHAT IS THIS FILE? =====
+# This is a GitHub Actions workflow file
+# It tells GitHub what to do when you push code or open a PR
+
+name: FlexBuzz CI  # Name shown in GitHub Actions tab
+
+# ===== WHEN SHOULD THIS RUN? =====
+on:
+  push:
+    branches: [main]           # Run when pushing to main branch
+    paths:
+      - 'server/**'            # Only when server files change
+  pull_request:
+    branches: [main]           # Run when PR targets main branch
+    paths:
+      - 'server/**'
+
+jobs:
+  # ===== JOB 1: LINT & BUILD =====
+  build:
+    name: 🔨 Build
+    runs-on: ubuntu-latest     # Use Ubuntu virtual machine
+
+    steps:
+      # Step 1: Download your code to the virtual machine
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      # Step 2: Install Node.js on the virtual machine
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'                    # Cache node_modules for speed
+          cache-dependency-path: server/package-lock.json
+
+      # Step 3: Install dependencies
+      - name: 📦 Install dependencies
+        working-directory: ./server       # Run commands inside /server folder
+        run: npm ci                       # ci = clean install (faster, stricter)
+
+      # Step 4: Build the project
+      - name: 🔨 Build
+        working-directory: ./server
+        run: npm run build
+
+  # ===== JOB 2: RUN UNIT TESTS =====
+  test:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: build               # Only run after build succeeds
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./server
+        run: npm ci
+
+      # Step: Run all unit tests
+      - name: 🧪 Run unit tests
+        working-directory: ./server
+        run: npm test -- --coverage --forceExit
+
+      # Step: Upload coverage report as artifact (optional but useful)
+      - name: 📊 Upload coverage report
+        if: always()           # Upload even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: server/coverage/
+          retention-days: 30

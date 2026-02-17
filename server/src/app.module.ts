@@ -18,6 +18,7 @@ import { FollowModule } from './follow/follow.module';
 import { PaginationModule } from './common/pagination/pagination.module';
 import { APP_GUARD } from "@nestjs/core";
 import { AuthorizeGuard } from "./auth/guards/authorize.guard";
+import { TempDummyService } from './temp-dummy/temp-dummy.service';
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -56,6 +57,6 @@ const ENV = process.env.NODE_ENV;
   providers: [AppService,{
     provide: APP_GUARD,
     useClass: AuthorizeGuard,
-  }],
+  }, TempDummyService],
 })
 export class AppModule {}
