@@ -32,9 +32,9 @@ exports.AuthModule = AuthModule = __decorate([
                 useClass: bcrypt_provider_1.BcryptProvider,
             },
         ],
-        exports: [auth_service_1.AuthService, jwt_1.JwtModule],
+        exports: [auth_service_1.AuthService, jwt_1.JwtModule, hashing_provider_1.HashingProvider],
         imports: [
-            (0, common_1.forwardRef)(() => user_module_1.UserModule),
+            user_module_1.UserModule,
             config_1.ConfigModule.forFeature(auth_config_1.default),
             jwt_1.JwtModule.registerAsync({
                 imports: [config_1.ConfigModule.forFeature(auth_config_1.default)],

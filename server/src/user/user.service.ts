@@ -1,6 +1,4 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
   RequestTimeoutException,
@@ -10,7 +8,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
 import { UserExistsException } from "src/common/customException/user-exists.exception";
-import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { isUUID } from "class-validator";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { USER_ID } from "src/constants/constants";
@@ -19,7 +16,6 @@ import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.d
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { FollowQueryDto } from "./dto/follow-query.dto";
 import { FollowService } from "src/follow/follow.service";
-import type { Request } from "express";
 
 @Injectable()
 export class UserService {
@@ -59,13 +55,11 @@ export class UserService {
 
   public async findAll(
     paginationQueryDto: PaginationQueryDto,
-    request?: Request,
   ): Promise<PaginationInterface<User>> {
     try {
       return await this.paginationProvider.paginateQuery(
         paginationQueryDto,
         this.userRepository,
-        request,
       );
     } catch (error) {
       if (error.code === "ECONNREFUSED") {
@@ -179,24 +173,24 @@ export class UserService {
     }
   }
 
-  public async getFollowers(followDto: FollowQueryDto, request?: Request) {
+  public async getFollowers(followDto: FollowQueryDto) {
     if(!followDto.followingId){
       followDto.followingId = USER_ID;
     }
     try {
-      return await this.followService.getFollows(followDto, request);
+      return await this.followService.getFollows(followDto);
     } catch (error) {
       console.error("Error @user-getFollowers:", error);
       throw new RequestTimeoutException();
     }
   }
 
-  public async getFollowing(followDto: FollowQueryDto, request?: Request) {
+  public async getFollowing(followDto: FollowQueryDto) {
     if(!followDto.followerId){
       followDto.followerId = USER_ID;
     }
     try {
-      return await this.followService.getFollows(followDto, request);
+      return await this.followService.getFollows(followDto);
     } catch (error) {
       console.error("Error @user-getFollowing:", error);
       throw new RequestTimeoutException();

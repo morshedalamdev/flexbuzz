@@ -17,9 +17,9 @@ import { JwtModule } from "@nestjs/jwt";
       useClass: BcryptProvider,
     },
   ],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, HashingProvider],
   imports: [
-    forwardRef(() => UserModule),
+    UserModule,
     ConfigModule.forFeature(authConfig),
     JwtModule.registerAsync({
       imports: [ConfigModule.forFeature(authConfig)],

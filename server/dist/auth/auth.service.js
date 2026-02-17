@@ -73,7 +73,6 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => user_service_1.UserService))),
     __param(2, (0, common_1.Inject)(auth_config_1.default.KEY)),
     __metadata("design:paramtypes", [hashing_provider_1.HashingProvider,
         user_service_1.UserService, void 0, jwt_1.JwtService])

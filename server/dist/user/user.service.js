@@ -58,9 +58,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async findAll(paginationQueryDto, request) {
+    async findAll(paginationQueryDto) {
         try {
-            return await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository, request);
+            return await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository);
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {
@@ -167,24 +167,24 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowers(followDto, request) {
+    async getFollowers(followDto) {
         if (!followDto.followingId) {
             followDto.followingId = constants_1.USER_ID;
         }
         try {
-            return await this.followService.getFollows(followDto, request);
+            return await this.followService.getFollows(followDto);
         }
         catch (error) {
             console.error("Error @user-getFollowers:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowing(followDto, request) {
+    async getFollowing(followDto) {
         if (!followDto.followerId) {
             followDto.followerId = constants_1.USER_ID;
         }
         try {
-            return await this.followService.getFollows(followDto, request);
+            return await this.followService.getFollows(followDto);
         }
         catch (error) {
             console.error("Error @user-getFollowing:", error);

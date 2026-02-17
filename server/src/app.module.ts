@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService, ConfigType } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
@@ -18,7 +18,6 @@ import { FollowModule } from './follow/follow.module';
 import { PaginationModule } from './common/pagination/pagination.module';
 import { APP_GUARD } from "@nestjs/core";
 import { AuthorizeGuard } from "./auth/guards/authorize.guard";
-import { JwtModule } from "@nestjs/jwt";
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -52,18 +51,6 @@ const ENV = process.env.NODE_ENV;
       }),
     }),
     ConfigModule.forFeature(authConfig),
-    JwtModule.registerAsync({
-      imports: [ConfigModule.forFeature(authConfig)],
-      useFactory: (config: ConfigType<typeof authConfig>) => ({
-        secret: config.accessTokenSecret,
-        signOptions: {
-          expiresIn: config.accessTokenExpiresIn,
-          issuer: config.issuer,
-          audience: config.audience,
-        },
-      }),
-      inject: [authConfig.KEY],
-    }),
   ],
   controllers: [AppController],
   providers: [AppService,{

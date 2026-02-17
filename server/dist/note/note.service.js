@@ -54,9 +54,9 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getAll(pageQueryDto, request) {
+    async getAll(pageQueryDto) {
         try {
-            return await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, request, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
+            return await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {

@@ -10,7 +10,6 @@ import { CommentService } from "src/comment/comment.service";
 import { NoteQueryDto } from "./dto/note-query.dto";
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
-import type { Request } from "express";
 export declare class NoteService {
     private readonly userService;
     private readonly hashtagService;
@@ -20,7 +19,7 @@ export declare class NoteService {
     private readonly noteRepository;
     constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, commentService: CommentService, paginationProvider: PaginationProvider, noteRepository: Repository<Note>);
     create(noteDto: CreateNoteDto): Promise<Note>;
-    getAll(pageQueryDto: NoteQueryDto, request?: Request): Promise<PaginationInterface<Note>>;
+    getAll(pageQueryDto: NoteQueryDto): Promise<PaginationInterface<Note>>;
     getById(id: string): Promise<{
         userRelation: import("../user/user.entity").User;
         id: string;

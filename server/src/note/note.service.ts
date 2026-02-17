@@ -17,7 +17,6 @@ import { CommentService } from "src/comment/comment.service";
 import { NoteQueryDto } from "./dto/note-query.dto";
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
-import type { Request } from "express";
 
 @Injectable()
 export class NoteService {
@@ -52,13 +51,11 @@ export class NoteService {
 
   public async getAll(
     pageQueryDto: NoteQueryDto,
-    request?: Request,
   ): Promise<PaginationInterface<Note>> {
     try {
       return await this.paginationProvider.paginateQuery(
         pageQueryDto,
         this.noteRepository,
-        request,
         pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined,
         ["hashtags", "user"],
       );

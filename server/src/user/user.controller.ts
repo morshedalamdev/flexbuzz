@@ -7,9 +7,7 @@ import {
   Patch,
   Post,
   Query,
-  Req,
 } from "@nestjs/common";
-import type { Request } from "express";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -24,17 +22,15 @@ export class UserController {
   @Get("/followers")
   public GetFollowers(
     @Query() pageQueryDto: FollowQueryDto,
-    @Req() req: Request,
   ) {
-    return this.userService.getFollowers(pageQueryDto, req);
+    return this.userService.getFollowers(pageQueryDto);
   }
 
   @Get("/following")
   public GetFollowing(
     @Query() pageQueryDto: FollowQueryDto,
-    @Req() req: Request,
   ) {
-    return this.userService.getFollowing(pageQueryDto, req);
+    return this.userService.getFollowing(pageQueryDto);
   }
 
   @Post(":id/follow")
@@ -67,9 +63,8 @@ export class UserController {
   @Get()
   public GetUsers(
     @Query() pageQueryDto: PaginationQueryDto,
-    @Req() req: Request,
   ) {
-    return this.userService.findAll(pageQueryDto, req);
+    return this.userService.findAll(pageQueryDto);
   }
 
   @Get(":id")

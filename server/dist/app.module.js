@@ -30,7 +30,6 @@ const follow_module_1 = require("./follow/follow.module");
 const pagination_module_1 = require("./common/pagination/pagination.module");
 const core_1 = require("@nestjs/core");
 const authorize_guard_1 = require("./auth/guards/authorize.guard");
-const jwt_1 = require("@nestjs/jwt");
 const ENV = process.env.NODE_ENV;
 let AppModule = class AppModule {
 };
@@ -67,18 +66,6 @@ exports.AppModule = AppModule = __decorate([
                 }),
             }),
             config_1.ConfigModule.forFeature(auth_config_1.default),
-            jwt_1.JwtModule.registerAsync({
-                imports: [config_1.ConfigModule.forFeature(auth_config_1.default)],
-                useFactory: (config) => ({
-                    secret: config.accessTokenSecret,
-                    signOptions: {
-                        expiresIn: config.accessTokenExpiresIn,
-                        issuer: config.issuer,
-                        audience: config.audience,
-                    },
-                }),
-                inject: [auth_config_1.default.KEY],
-            }),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, {

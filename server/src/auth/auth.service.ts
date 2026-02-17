@@ -19,7 +19,6 @@ import { ActiveUserType } from "./interfaces/active-user-type.interface";
 export class AuthService {
   constructor(
     private readonly hashingProvider: HashingProvider,
-    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
 
     @Inject(authConfig.KEY)

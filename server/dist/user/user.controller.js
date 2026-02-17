@@ -23,11 +23,11 @@ let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
-    GetFollowers(pageQueryDto, req) {
-        return this.userService.getFollowers(pageQueryDto, req);
+    GetFollowers(pageQueryDto) {
+        return this.userService.getFollowers(pageQueryDto);
     }
-    GetFollowing(pageQueryDto, req) {
-        return this.userService.getFollowing(pageQueryDto, req);
+    GetFollowing(pageQueryDto) {
+        return this.userService.getFollowing(pageQueryDto);
     }
     FollowUser(id) {
         return this.userService.follow(id);
@@ -44,8 +44,8 @@ let UserController = class UserController {
     DeleteCurrUser() {
         return this.userService.delete();
     }
-    GetUsers(pageQueryDto, req) {
-        return this.userService.findAll(pageQueryDto, req);
+    GetUsers(pageQueryDto) {
+        return this.userService.findAll(pageQueryDto);
     }
     GetUserById(id) {
         return this.userService.findBy(id);
@@ -55,17 +55,15 @@ exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)("/followers"),
     __param(0, (0, common_1.Query)()),
-    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto, Object]),
+    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetFollowers", null);
 __decorate([
     (0, common_1.Get)("/following"),
     __param(0, (0, common_1.Query)()),
-    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto, Object]),
+    __metadata("design:paramtypes", [follow_query_dto_1.FollowQueryDto]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetFollowing", null);
 __decorate([
@@ -104,9 +102,8 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
-    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto, Object]),
+    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUsers", null);
 __decorate([
