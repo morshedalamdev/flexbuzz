@@ -57,9 +57,21 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async findAll(paginationQueryDto) {
+    async findAll(paginationQueryDto, userId) {
         try {
-            return await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository);
+            const users = await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository);
+            const usersWithCounts = await Promise.all(users.data.map(async (user) => {
+                const followerCount = await this.followService.followerCount(user.id);
+                const followingCount = await this.followService.followingCount(user.id);
+                const isFollowedByCurrentUser = await this.followService.isFollowedByCurrentUser(user.id, userId);
+                return {
+                    ...user,
+                    followerCount,
+                    followingCount,
+                    isFollowedByCurrentUser,
+                };
+            }));
+            return { ...users, data: usersWithCounts };
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {
@@ -71,7 +83,7 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async findBy(identifier) {
+    async findBy(identifier, userId) {
         let user = null;
         try {
             if ((0, class_validator_1.isUUID)(identifier)) {
@@ -92,7 +104,18 @@ let UserService = class UserService {
         if (!user) {
             throw new common_1.NotFoundException(`User with '${identifier}' not found.`);
         }
-        return user;
+        const followerCount = await this.followService.followerCount(user.id);
+        const followingCount = await this.followService.followingCount(user.id);
+        if (userId) {
+            const isFollowedByCurrentUser = await this.followService.isFollowedByCurrentUser(user.id, userId);
+            return {
+                ...user,
+                followerCount,
+                followingCount,
+                isFollowedByCurrentUser,
+            };
+        }
+        return { ...user, followerCount, followingCount };
     }
     async current(userId) {
         return await this.findBy(userId);

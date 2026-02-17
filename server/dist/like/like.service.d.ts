@@ -9,4 +9,7 @@ export declare class LikeService {
     delete(noteId: string, userId: string): Promise<{
         deleted: boolean;
     }>;
+    getUsersLiked(noteId: string): Promise<User[]>;
+    likeCount(noteId: string): Promise<number>;
+    isLikedByCurrentUser(noteId: string, userId: string): Promise<boolean>;
 }

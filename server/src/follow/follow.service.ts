@@ -62,4 +62,41 @@ export class FollowService {
       throw new RequestTimeoutException();
     }
   }
+
+  public async followerCount(userId: string) {
+    try {
+      return await this.followRepository.count({
+        where: { followingId: userId },
+      });
+    } catch (error) {
+      console.error("Error @follow-followerCount:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async followingCount(userId: string) {
+    try {
+      return await this.followRepository.count({
+        where: { followerId: userId },
+      });
+    } catch (error) {
+      console.error("Error @follow-followingCount:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async isFollowedByCurrentUser(userId: string, currentUserId: string) {
+    try {
+      const follow = await this.followRepository.findOne({
+        where: {
+          followerId: currentUserId,
+          followingId: userId,
+        },
+      });
+      return !!follow;
+    } catch (error) {
+      console.error("Error @follow-isFollowedByCurrentUser:", error);
+      throw new RequestTimeoutException();
+    }
+  }
 }

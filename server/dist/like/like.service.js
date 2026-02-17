@@ -48,6 +48,43 @@ let LikeService = class LikeService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async getUsersLiked(noteId) {
+        try {
+            const likes = await this.likeRepository.find({
+                where: { noteId },
+                relations: ["user"],
+                order: { createdAt: "DESC" },
+            });
+            return likes.map((like) => like.user);
+        }
+        catch (error) {
+            console.error("Error @like-getUsersWhoLiked:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async likeCount(noteId) {
+        try {
+            return await this.likeRepository.count({
+                where: { noteId },
+            });
+        }
+        catch (error) {
+            console.error("Error @like-getLikeCount:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async isLikedByCurrentUser(noteId, userId) {
+        try {
+            const like = await this.likeRepository.findOne({
+                where: { noteId, userId },
+            });
+            return !!like;
+        }
+        catch (error) {
+            console.error("Error @like-isLikedByCurrentUser:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.LikeService = LikeService;
 exports.LikeService = LikeService = __decorate([

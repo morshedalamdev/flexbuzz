@@ -53,9 +53,16 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getAll(pageQueryDto) {
+    async getAll(pageQueryDto, userId) {
         try {
-            return await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
+            const notes = await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
+            const notesWithCounts = await Promise.all(notes.data.map(async (note) => {
+                const likeCount = await this.likeService.likeCount(note.id);
+                const commentCount = await this.commentService.commentCount(note.id);
+                const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
+                return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+            }));
+            return { ...notes, data: notesWithCounts };
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {
@@ -67,17 +74,22 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getById(id) {
+    async getById(id, userId) {
         try {
             const note = await this.noteRepository.findOne({
                 where: { id },
-                relations: ["hashtags"],
+                relations: ["hashtags", "user"],
             });
             if (!note) {
                 throw new common_1.NotFoundException("Note not found");
             }
-            const user = await this.userService.findBy(note.userId);
-            return { ...note, userRelation: user };
+            if (!userId) {
+                return note;
+            }
+            const likeCount = await this.likeService.likeCount(id);
+            const commentCount = await this.commentService.commentCount(id);
+            const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id, userId);
+            return { ...note, likeCount, commentCount, isLikedByCurrentUser };
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
@@ -118,6 +130,9 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async getLikes(id) {
+        return await this.likeService.getUsersLiked(id);
+    }
     async like(id, userId) {
         try {
             const note = await this.getById(id);
@@ -143,6 +158,9 @@ let NoteService = class NoteService {
             console.error("Error @note-dislike:", error);
             throw new common_1.RequestTimeoutException();
         }
+    }
+    async getComments(id, pageQueryDto) {
+        return await this.commentService.getCommentsByNote(id, pageQueryDto);
     }
     async addComment(commentDto, userId) {
         try {

@@ -65,12 +65,13 @@ export class UserController {
   @Get()
   public GetUsers(
     @Query() pageQueryDto: PaginationQueryDto,
+    @ActiveUser('sub') userId: string
   ) {
-    return this.userService.findAll(pageQueryDto);
+    return this.userService.findAll(pageQueryDto, userId);
   }
 
   @Get(":id")
-  public GetUserById(@Param("id") id: string) {
-    return this.userService.findBy(id);
+  public GetUserById(@Param("id") id: string, @ActiveUser('sub') userId: string) {
+    return this.userService.findBy(id, userId);
   }
 }

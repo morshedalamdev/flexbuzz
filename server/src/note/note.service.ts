@@ -50,14 +50,24 @@ export class NoteService {
 
   public async getAll(
     pageQueryDto: NoteQueryDto,
+    userId: string,
   ): Promise<PaginationInterface<Note>> {
     try {
-      return await this.paginationProvider.paginateQuery(
+      const notes = await this.paginationProvider.paginateQuery(
         pageQueryDto,
         this.noteRepository,
         pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined,
         ["hashtags", "user"],
       );
+      const notesWithCounts = await Promise.all(
+        notes.data.map(async (note) => {
+          const likeCount = await this.likeService.likeCount(note.id);
+          const commentCount = await this.commentService.commentCount(note.id);
+          const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
+          return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+        }),
+      );
+      return { ...notes, data: notesWithCounts };
     } catch (error) {
       if (error.code === "ECONNREFUSED") {
         throw new RequestTimeoutException(
@@ -72,18 +82,23 @@ export class NoteService {
     }
   }
 
-  public async getById(id: string) {
+  public async getById(id: string, userId?: string) {
     try {
       const note = await this.noteRepository.findOne({
         where: { id },
-        relations: ["hashtags"],
+        relations: ["hashtags", "user"],
       });
       if (!note) {
         throw new NotFoundException("Note not found");
       }
-      const user = await this.userService.findBy(note.userId);
+      if (!userId) {
+        return note;
+      }
 
-      return { ...note, userRelation: user };
+      const likeCount = await this.likeService.likeCount(id);
+      const commentCount = await this.commentService.commentCount(id);
+      const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id,userId,);
+      return { ...note, likeCount, commentCount, isLikedByCurrentUser };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -129,6 +144,10 @@ export class NoteService {
   }
 
   // LIKE
+  public async getLikes(id: string) {
+    return await this.likeService.getUsersLiked(id);
+  }
+
   public async like(id: string, userId: string) {
     try {
       const note = await this.getById(id);
@@ -156,6 +175,10 @@ export class NoteService {
   }
 
   // COMMENT
+  public async getComments(id: string, pageQueryDto: NoteQueryDto) {
+    return await this.commentService.getCommentsByNote(id, pageQueryDto);
+  }
+
   public async addComment(commentDto: CommentDto, userId: string) {
     try {
       const note = await this.getById(commentDto.id);

@@ -21,6 +21,9 @@ let Note = class Note {
     userId;
     createdAt;
     updatedAt;
+    likeCount;
+    commentCount;
+    isLikedByCurrentUser;
     user;
     hashtags;
     likes;
@@ -48,7 +51,7 @@ __decorate([
     __metadata("design:type", Date)
 ], Note.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.notes, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.notes, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: "user_id" }),
     __metadata("design:type", user_entity_1.User)
 ], Note.prototype, "user", void 0);
