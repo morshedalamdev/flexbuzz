@@ -34,7 +34,8 @@ let AuthService = class AuthService {
     }
     async register(userDto) {
         userDto.password = await this.hashingProvider.hashPassword(userDto.password);
-        return await this.userService.create(userDto);
+        const newUser = await this.userService.create(userDto);
+        return await this.generateToken(newUser);
     }
     async login(loginDto) {
         const user = await this.userService.findBy(loginDto.username);
@@ -47,7 +48,27 @@ let AuthService = class AuthService {
         }
         return await this.generateToken(user);
     }
-    async refreshToken() { }
+    async refreshToken(refreshTokenDto) {
+        try {
+            const { sub } = await this.jwtService.verifyAsync(refreshTokenDto.refreshToken, {
+                secret: this.authConfiguration.refreshTokenSecret,
+                audience: this.authConfiguration.audience,
+                issuer: this.authConfiguration.issuer,
+            });
+            const user = await this.userService.findBy(sub);
+            if (!user) {
+                throw new common_1.NotFoundException("User not found");
+            }
+            return await this.generateToken(user);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            console.error("Error @refresh-token:", error);
+            throw new common_1.UnauthorizedException(error);
+        }
+    }
     async signInToken(sub, secret, expiresIn, payload) {
         return await this.jwtService.signAsync({
             sub,

@@ -8,11 +8,11 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
 import { FollowQueryDto } from "./dto/follow-query.dto";
+import { ActiveUser } from "src/auth/decorator/active-user.decorator";
 
 @Controller("user")
 export class UserController {
@@ -22,41 +22,43 @@ export class UserController {
   @Get("/followers")
   public GetFollowers(
     @Query() pageQueryDto: FollowQueryDto,
+    @ActiveUser('sub') userId: string
   ) {
-    return this.userService.getFollowers(pageQueryDto);
+    return this.userService.getFollowers(pageQueryDto, userId);
   }
 
   @Get("/following")
   public GetFollowing(
     @Query() pageQueryDto: FollowQueryDto,
+    @ActiveUser('sub') userId: string
   ) {
-    return this.userService.getFollowing(pageQueryDto);
+    return this.userService.getFollowing(pageQueryDto, userId);
   }
 
   @Post(":id/follow")
-  public FollowUser(@Param("id") id: string) {
-    return this.userService.follow(id);
+  public FollowUser(@Param("id") id: string, @ActiveUser('sub') userId: string) {
+    return this.userService.follow(id, userId);
   }
 
   @Delete(":id/unfollow")
-  public UnfollowUser(@Param("id") id: string) {
-    return this.userService.unfollow(id);
+  public UnfollowUser(@Param("id") id: string, @ActiveUser('sub') userId: string) {
+    return this.userService.unfollow(id, userId);
   }
 
   // CURRENT USER
   @Get("/me")
-  public GetCurrUser() {
-    return this.userService.current();
+  public GetCurrUser(@ActiveUser('sub') userId: string) {
+    return this.userService.current(userId);
   }
 
   @Patch("/me")
-  public UpdateCurrUser(@Body() updateDto: UpdateUserDto) {
-    return this.userService.update(updateDto);
+  public UpdateCurrUser(@Body() updateDto: UpdateUserDto, @ActiveUser('sub') userId: string) {
+    return this.userService.update(updateDto, userId);
   }
 
   @Delete("/me")
-  public DeleteCurrUser() {
-    return this.userService.delete();
+  public DeleteCurrUser(@ActiveUser('sub') userId: string) {
+    return this.userService.delete(userId);
   }
 
   // ROOT

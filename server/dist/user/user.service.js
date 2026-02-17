@@ -19,7 +19,6 @@ const user_entity_1 = require("./user.entity");
 const typeorm_2 = require("typeorm");
 const user_exists_exception_1 = require("../common/customException/user-exists.exception");
 const class_validator_1 = require("class-validator");
-const constants_1 = require("../constants/constants");
 const pagination_provider_1 = require("../common/pagination/pagination.provider");
 const follow_service_1 = require("../follow/follow.service");
 let UserService = class UserService {
@@ -95,13 +94,13 @@ let UserService = class UserService {
         }
         return user;
     }
-    async current() {
-        return await this.findBy(constants_1.USER_ID);
+    async current(userId) {
+        return await this.findBy(userId);
     }
-    async update(userDto) {
+    async update(userDto, userId) {
         try {
             const user = await this.userRepository.findOne({
-                where: { id: constants_1.USER_ID },
+                where: { id: userId },
                 relations: ["profile"],
             });
             if (!user || !user.profile) {
@@ -128,9 +127,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async delete() {
+    async delete(userId) {
         try {
-            await this.userRepository.softDelete(constants_1.USER_ID);
+            await this.userRepository.softDelete(userId);
             return { deleted: true };
         }
         catch (error) {
@@ -138,10 +137,10 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async follow(id) {
+    async follow(id, userId) {
         try {
             const userToFollow = await this.findBy(id);
-            const currentUser = await this.findBy(constants_1.USER_ID);
+            const currentUser = await this.findBy(userId);
             if (!userToFollow || !currentUser) {
                 throw new common_1.NotFoundException("User not found");
             }
@@ -155,9 +154,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async unfollow(id) {
+    async unfollow(id, userId) {
         try {
-            return await this.followService.unfollow(id, constants_1.USER_ID);
+            return await this.followService.unfollow(id, userId);
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
@@ -167,9 +166,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowers(followDto) {
+    async getFollowers(followDto, userId) {
         if (!followDto.followingId) {
-            followDto.followingId = constants_1.USER_ID;
+            followDto.followingId = userId;
         }
         try {
             return await this.followService.getFollows(followDto);
@@ -179,9 +178,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowing(followDto) {
+    async getFollowing(followDto, userId) {
         if (!followDto.followerId) {
-            followDto.followerId = constants_1.USER_ID;
+            followDto.followerId = userId;
         }
         try {
             return await this.followService.getFollows(followDto);

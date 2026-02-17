@@ -15,15 +15,15 @@ export declare class UserService {
     create(userDto: CreateUserDto): Promise<User>;
     findAll(paginationQueryDto: PaginationQueryDto): Promise<PaginationInterface<User>>;
     findBy(identifier: string): Promise<User>;
-    current(): Promise<User>;
-    update(userDto: UpdateUserDto): Promise<User>;
-    delete(): Promise<{
+    current(userId: string): Promise<User>;
+    update(userDto: UpdateUserDto, userId: string): Promise<User>;
+    delete(userId: string): Promise<{
         deleted: boolean;
     }>;
-    follow(id: string): Promise<import("../follow/follow.entity").Follow>;
-    unfollow(id: string): Promise<{
+    follow(id: string, userId: string): Promise<import("../follow/follow.entity").Follow>;
+    unfollow(id: string, userId: string): Promise<{
         deleted: boolean;
     }>;
-    getFollowers(followDto: FollowQueryDto): Promise<PaginationInterface<import("../follow/follow.entity").Follow>>;
-    getFollowing(followDto: FollowQueryDto): Promise<PaginationInterface<import("../follow/follow.entity").Follow>>;
+    getFollowers(followDto: FollowQueryDto, userId: string): Promise<PaginationInterface<import("../follow/follow.entity").Follow>>;
+    getFollowing(followDto: FollowQueryDto, userId: string): Promise<PaginationInterface<import("../follow/follow.entity").Follow>>;
 }

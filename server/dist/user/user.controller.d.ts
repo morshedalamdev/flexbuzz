@@ -5,15 +5,15 @@ import { FollowQueryDto } from "./dto/follow-query.dto";
 export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
-    GetFollowers(pageQueryDto: FollowQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("../follow/follow.entity").Follow>>;
-    GetFollowing(pageQueryDto: FollowQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("../follow/follow.entity").Follow>>;
-    FollowUser(id: string): Promise<import("../follow/follow.entity").Follow>;
-    UnfollowUser(id: string): Promise<{
+    GetFollowers(pageQueryDto: FollowQueryDto, userId: string): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("../follow/follow.entity").Follow>>;
+    GetFollowing(pageQueryDto: FollowQueryDto, userId: string): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("../follow/follow.entity").Follow>>;
+    FollowUser(id: string, userId: string): Promise<import("../follow/follow.entity").Follow>;
+    UnfollowUser(id: string, userId: string): Promise<{
         deleted: boolean;
     }>;
-    GetCurrUser(): Promise<import("./user.entity").User>;
-    UpdateCurrUser(updateDto: UpdateUserDto): Promise<import("./user.entity").User>;
-    DeleteCurrUser(): Promise<{
+    GetCurrUser(userId: string): Promise<import("./user.entity").User>;
+    UpdateCurrUser(updateDto: UpdateUserDto, userId: string): Promise<import("./user.entity").User>;
+    DeleteCurrUser(userId: string): Promise<{
         deleted: boolean;
     }>;
     GetUsers(pageQueryDto: PaginationQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("./user.entity").User>>;
