@@ -49,8 +49,8 @@ let NoteController = class NoteController {
     CreateNote(createDto, userId) {
         return this.noteService.create(createDto, userId);
     }
-    GetNotes(paginationQueryDto) {
-        return this.noteService.getAll(paginationQueryDto);
+    GetNotes(paginationQueryDto, userId) {
+        return this.noteService.getAll(paginationQueryDto, userId);
     }
     GetById(id, userId) {
         return this.noteService.getById(id, userId);
@@ -127,8 +127,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
+    __param(1, (0, active_user_decorator_1.ActiveUser)("sub")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [note_query_dto_1.NoteQueryDto]),
+    __metadata("design:paramtypes", [note_query_dto_1.NoteQueryDto, String]),
     __metadata("design:returntype", void 0)
 ], NoteController.prototype, "GetNotes", null);
 __decorate([

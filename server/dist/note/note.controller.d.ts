@@ -20,7 +20,7 @@ export declare class NoteController {
         deleted: boolean;
     }>;
     CreateNote(createDto: CreateNoteDto, userId: string): Promise<import("./note.entity").Note>;
-    GetNotes(paginationQueryDto: NoteQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("./note.entity").Note>>;
+    GetNotes(paginationQueryDto: NoteQueryDto, userId: string): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("./note.entity").Note>>;
     GetById(id: string, userId: string): Promise<import("./note.entity").Note>;
     UpdateNote(updateDto: UpdateNoteDto, userId: string): Promise<import("./note.entity").Note>;
     DeleteNote(id: string): Promise<{

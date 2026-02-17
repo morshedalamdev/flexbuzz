@@ -13,9 +13,43 @@ export declare class UserService {
     private userRepository;
     constructor(followService: FollowService, paginationProvider: PaginationProvider, userRepository: Repository<User>);
     create(userDto: CreateUserDto): Promise<User>;
-    findAll(paginationQueryDto: PaginationQueryDto): Promise<PaginationInterface<User>>;
-    findBy(identifier: string): Promise<User>;
-    current(userId: string): Promise<User>;
+    findAll(paginationQueryDto: PaginationQueryDto, userId: string): Promise<PaginationInterface<User>>;
+    findBy(identifier: string, userId?: string): Promise<{
+        followerCount: number;
+        followingCount: number;
+        id: string;
+        username: string;
+        email: string;
+        password: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date;
+        isFollowedByCurrentUser?: boolean;
+        profile: import("../profile/profile.entity").Profile;
+        followers: import("../follow/follow.entity").Follow[];
+        followings: import("../follow/follow.entity").Follow[];
+        notes: import("../note/note.entity").Note[];
+        likes: import("../like/like.entity").Like[];
+        comments: import("../comment/comment.entity").Comment[];
+    }>;
+    current(userId: string): Promise<{
+        followerCount: number;
+        followingCount: number;
+        id: string;
+        username: string;
+        email: string;
+        password: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date;
+        isFollowedByCurrentUser?: boolean;
+        profile: import("../profile/profile.entity").Profile;
+        followers: import("../follow/follow.entity").Follow[];
+        followings: import("../follow/follow.entity").Follow[];
+        notes: import("../note/note.entity").Note[];
+        likes: import("../like/like.entity").Like[];
+        comments: import("../comment/comment.entity").Comment[];
+    }>;
     update(userDto: UpdateUserDto, userId: string): Promise<User>;
     delete(userId: string): Promise<{
         deleted: boolean;

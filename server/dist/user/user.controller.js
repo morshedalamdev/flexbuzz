@@ -45,11 +45,11 @@ let UserController = class UserController {
     DeleteCurrUser(userId) {
         return this.userService.delete(userId);
     }
-    GetUsers(pageQueryDto) {
-        return this.userService.findAll(pageQueryDto);
+    GetUsers(pageQueryDto, userId) {
+        return this.userService.findAll(pageQueryDto, userId);
     }
-    GetUserById(id) {
-        return this.userService.findBy(id);
+    GetUserById(id, userId) {
+        return this.userService.findBy(id, userId);
     }
 };
 exports.UserController = UserController;
@@ -110,15 +110,17 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
+    __param(1, (0, active_user_decorator_1.ActiveUser)('sub')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto]),
+    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto, String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUsers", null);
 __decorate([
     (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, active_user_decorator_1.ActiveUser)('sub')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserById", null);
 exports.UserController = UserController = __decorate([

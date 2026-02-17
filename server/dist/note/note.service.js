@@ -53,9 +53,16 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getAll(pageQueryDto) {
+    async getAll(pageQueryDto, userId) {
         try {
-            return await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
+            const notes = await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
+            const notesWithCounts = await Promise.all(notes.data.map(async (note) => {
+                const likeCount = await this.likeService.likeCount(note.id);
+                const commentCount = await this.commentService.commentCount(note.id);
+                const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
+                return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+            }));
+            return { ...notes, data: notesWithCounts };
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {

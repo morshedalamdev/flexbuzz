@@ -67,6 +67,43 @@ let FollowService = class FollowService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async followerCount(userId) {
+        try {
+            return await this.followRepository.count({
+                where: { followingId: userId },
+            });
+        }
+        catch (error) {
+            console.error("Error @follow-followerCount:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async followingCount(userId) {
+        try {
+            return await this.followRepository.count({
+                where: { followerId: userId },
+            });
+        }
+        catch (error) {
+            console.error("Error @follow-followingCount:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async isFollowedByCurrentUser(userId, currentUserId) {
+        try {
+            const follow = await this.followRepository.findOne({
+                where: {
+                    followerId: currentUserId,
+                    followingId: userId,
+                },
+            });
+            return !!follow;
+        }
+        catch (error) {
+            console.error("Error @follow-isFollowedByCurrentUser:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.FollowService = FollowService;
 exports.FollowService = FollowService = __decorate([

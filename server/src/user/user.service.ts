@@ -54,12 +54,30 @@ export class UserService {
 
   public async findAll(
     paginationQueryDto: PaginationQueryDto,
+    userId: string,
   ): Promise<PaginationInterface<User>> {
     try {
-      return await this.paginationProvider.paginateQuery(
+      const users = await this.paginationProvider.paginateQuery(
         paginationQueryDto,
         this.userRepository,
       );
+      const usersWithCounts = await Promise.all(
+        users.data.map(async (user) => {
+          const followerCount = await this.followService.followerCount(user.id);
+          const followingCount = await this.followService.followingCount(
+            user.id,
+          );
+          const isFollowedByCurrentUser =
+            await this.followService.isFollowedByCurrentUser(user.id, userId);
+          return {
+            ...user,
+            followerCount,
+            followingCount,
+            isFollowedByCurrentUser,
+          };
+        }),
+      );
+      return { ...users, data: usersWithCounts };
     } catch (error) {
       if (error.code === "ECONNREFUSED") {
         throw new RequestTimeoutException(
@@ -74,7 +92,7 @@ export class UserService {
     }
   }
 
-  public async findBy(identifier: string) {
+  public async findBy(identifier: string, userId?: string) {
     let user: User | null = null;
     try {
       if (isUUID(identifier)) {
@@ -94,7 +112,20 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with '${identifier}' not found.`);
     }
-    return user;
+    const followerCount = await this.followService.followerCount(user.id);
+    const followingCount = await this.followService.followingCount(user.id);
+    if (userId) {
+      const isFollowedByCurrentUser =
+        await this.followService.isFollowedByCurrentUser(user.id, userId);
+      return {
+        ...user,
+        followerCount,
+        followingCount,
+        isFollowedByCurrentUser,
+      };
+    }
+
+    return { ...user, followerCount, followingCount };
   }
 
   // CURRENT USER
@@ -160,7 +191,7 @@ export class UserService {
     }
   }
 
-  public async unfollow(id: string, userId: string  ) {
+  public async unfollow(id: string, userId: string) {
     try {
       return await this.followService.unfollow(id, userId);
     } catch (error) {
@@ -173,7 +204,7 @@ export class UserService {
   }
 
   public async getFollowers(followDto: FollowQueryDto, userId: string) {
-    if(!followDto.followingId){
+    if (!followDto.followingId) {
       followDto.followingId = userId;
     }
     try {
@@ -185,7 +216,7 @@ export class UserService {
   }
 
   public async getFollowing(followDto: FollowQueryDto, userId: string) {
-    if(!followDto.followerId){
+    if (!followDto.followerId) {
       followDto.followerId = userId;
     }
     try {

@@ -50,14 +50,24 @@ export class NoteService {
 
   public async getAll(
     pageQueryDto: NoteQueryDto,
+    userId: string,
   ): Promise<PaginationInterface<Note>> {
     try {
-      return await this.paginationProvider.paginateQuery(
+      const notes = await this.paginationProvider.paginateQuery(
         pageQueryDto,
         this.noteRepository,
         pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined,
         ["hashtags", "user"],
       );
+      const notesWithCounts = await Promise.all(
+        notes.data.map(async (note) => {
+          const likeCount = await this.likeService.likeCount(note.id);
+          const commentCount = await this.commentService.commentCount(note.id);
+          const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
+          return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+        }),
+      );
+      return { ...notes, data: notesWithCounts };
     } catch (error) {
       if (error.code === "ECONNREFUSED") {
         throw new RequestTimeoutException(
@@ -84,13 +94,10 @@ export class NoteService {
       if (!userId) {
         return note;
       }
-      
+
       const likeCount = await this.likeService.likeCount(id);
       const commentCount = await this.commentService.commentCount(id);
-      const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(
-        id,
-        userId,
-      );
+      const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id,userId,);
       return { ...note, likeCount, commentCount, isLikedByCurrentUser };
     } catch (error) {
       if (error instanceof NotFoundException) {

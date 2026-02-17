@@ -62,6 +62,7 @@ export class NoteController {
     return this.noteService.deleteComment(id);
   }
 
+  // root
   @Post()
   public CreateNote(
     @Body() createDto: CreateNoteDto,
@@ -71,8 +72,8 @@ export class NoteController {
   }
 
   @Get()
-  public GetNotes(@Query() paginationQueryDto: NoteQueryDto) {
-    return this.noteService.getAll(paginationQueryDto);
+  public GetNotes(@Query() paginationQueryDto: NoteQueryDto, @ActiveUser("sub") userId: string) {
+    return this.noteService.getAll(paginationQueryDto, userId);
   }
 
   @Get(":id")
