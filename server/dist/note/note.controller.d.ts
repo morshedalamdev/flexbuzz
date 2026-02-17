@@ -6,10 +6,12 @@ import { NoteQueryDto } from "./dto/note-query.dto";
 export declare class NoteController {
     private readonly noteService;
     constructor(noteService: NoteService);
+    GetLikes(id: string): Promise<import("../user/user.entity").User[]>;
     GiveLike(id: string, userId: string): Promise<import("../like/like.entity").Like>;
     RemoveLike(id: string, userId: string): Promise<{
         deleted: boolean;
     }>;
+    GetComments(id: string, pageQueryDto: NoteQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("../comment/comment.entity").Comment>>;
     AddComment(createDto: CommentDto, userId: string): Promise<import("../comment/comment.entity").Comment>;
     EditComment(updateDto: CommentDto): Promise<{
         success: boolean;
@@ -19,18 +21,7 @@ export declare class NoteController {
     }>;
     CreateNote(createDto: CreateNoteDto, userId: string): Promise<import("./note.entity").Note>;
     GetNotes(paginationQueryDto: NoteQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("./note.entity").Note>>;
-    GetById(id: string): Promise<{
-        userRelation: import("../user/user.entity").User;
-        id: string;
-        content: string;
-        userId: string;
-        createdAt: Date;
-        updatedAt: Date;
-        user: import("../user/user.entity").User;
-        hashtags: import("../hashtag/hashtag.entity").Hashtag[];
-        likes: import("../like/like.entity").Like[];
-        comments: import("../comment/comment.entity").Comment[];
-    }>;
+    GetById(id: string, userId: string): Promise<import("./note.entity").Note>;
     UpdateNote(updateDto: UpdateNoteDto, userId: string): Promise<import("./note.entity").Note>;
     DeleteNote(id: string): Promise<{
         deleted: boolean;

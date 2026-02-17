@@ -14,20 +14,8 @@ const mapped_types_1 = require("@nestjs/mapped-types");
 const class_validator_1 = require("class-validator");
 const pagination_query_dto_1 = require("../../common/pagination/dto/pagination-query.dto");
 class NoteBaseDto {
-    startDate;
-    endDate;
     userId;
 }
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDate)(),
-    __metadata("design:type", Date)
-], NoteBaseDto.prototype, "startDate", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDate)(),
-    __metadata("design:type", Date)
-], NoteBaseDto.prototype, "endDate", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUUID)(),

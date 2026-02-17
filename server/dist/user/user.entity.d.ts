@@ -11,6 +11,9 @@ export declare class User {
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
+    followerCount?: number;
+    followingCount?: number;
+    isFollowedByCurrentUser?: boolean;
     profile: Profile;
     followers: Follow[];
     followings: Follow[];

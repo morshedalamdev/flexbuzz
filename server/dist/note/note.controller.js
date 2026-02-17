@@ -25,11 +25,17 @@ let NoteController = class NoteController {
     constructor(noteService) {
         this.noteService = noteService;
     }
+    async GetLikes(id) {
+        return this.noteService.getLikes(id);
+    }
     async GiveLike(id, userId) {
         return this.noteService.like(id, userId);
     }
     async RemoveLike(id, userId) {
         return this.noteService.dislike(id, userId);
+    }
+    async GetComments(id, pageQueryDto) {
+        return this.noteService.getComments(id, pageQueryDto);
     }
     async AddComment(createDto, userId) {
         return this.noteService.addComment(createDto, userId);
@@ -46,8 +52,8 @@ let NoteController = class NoteController {
     GetNotes(paginationQueryDto) {
         return this.noteService.getAll(paginationQueryDto);
     }
-    GetById(id) {
-        return this.noteService.getById(id);
+    GetById(id, userId) {
+        return this.noteService.getById(id, userId);
     }
     UpdateNote(updateDto, userId) {
         return this.noteService.update(updateDto, userId);
@@ -57,6 +63,13 @@ let NoteController = class NoteController {
     }
 };
 exports.NoteController = NoteController;
+__decorate([
+    (0, common_1.Get)(":id/likes"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "GetLikes", null);
 __decorate([
     (0, common_1.Post)(":id/like"),
     __param(0, (0, common_1.Param)("id")),
@@ -73,6 +86,14 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], NoteController.prototype, "RemoveLike", null);
+__decorate([
+    (0, common_1.Get)(":id/comments"),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, note_query_dto_1.NoteQueryDto]),
+    __metadata("design:returntype", Promise)
+], NoteController.prototype, "GetComments", null);
 __decorate([
     (0, common_1.Post)("comment"),
     __param(0, (0, common_1.Body)()),
@@ -113,8 +134,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, active_user_decorator_1.ActiveUser)("sub")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], NoteController.prototype, "GetById", null);
 __decorate([

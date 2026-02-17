@@ -8,6 +8,9 @@ export declare class Note {
     userId: string;
     createdAt: Date;
     updatedAt: Date;
+    likeCount?: number;
+    commentCount?: number;
+    isLikedByCurrentUser?: boolean;
     user: User;
     hashtags: Hashtag[];
     likes: Like[];

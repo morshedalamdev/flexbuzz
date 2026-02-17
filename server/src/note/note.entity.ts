@@ -32,8 +32,13 @@ export class Note {
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
+  // ============ VIRTUAL FIELDS ============
+  likeCount?: number;
+  commentCount?: number;
+  isLikedByCurrentUser?: boolean;
+
   // ============ RELATIONSHIPS ============
-  @ManyToOne(() => User, (user) => user.notes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.notes, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
   user: User;
 

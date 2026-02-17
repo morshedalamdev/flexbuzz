@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const comment_entity_1 = require("./comment.entity");
+const pagination_provider_1 = require("../common/pagination/pagination.provider");
 let CommentService = class CommentService {
     commentRepository;
-    constructor(commentRepository) {
+    paginationProvider;
+    constructor(commentRepository, paginationProvider) {
         this.commentRepository = commentRepository;
+        this.paginationProvider = paginationProvider;
     }
     async create(props) {
         try {
@@ -61,11 +64,32 @@ let CommentService = class CommentService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async getCommentsByNote(noteId, pageQueryDto) {
+        try {
+            return await this.paginationProvider.paginateQuery(pageQueryDto, this.commentRepository, { noteId }, ["user"]);
+        }
+        catch (error) {
+            console.error("Error @comment-getByNote:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async commentCount(noteId) {
+        try {
+            return await this.commentRepository.count({
+                where: { noteId },
+            });
+        }
+        catch (error) {
+            console.error("Error @comment-commentCount:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
 };
 exports.CommentService = CommentService;
 exports.CommentService = CommentService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(comment_entity_1.Comment)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        pagination_provider_1.PaginationProvider])
 ], CommentService);
 //# sourceMappingURL=comment.service.js.map

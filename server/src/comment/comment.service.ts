@@ -9,6 +9,9 @@ import { Comment } from "./comment.entity";
 import { CommentDto } from "./dto/comment.dto";
 import { User } from "src/user/user.entity";
 import { Note } from "src/note/note.entity";
+import { PaginationProvider } from "src/common/pagination/pagination.provider";
+import { NoteQueryDto } from "src/note/dto/note-query.dto";
+import { PaginationInterface } from "src/common/pagination/pagination.interface";
 
 type CreateType = {
   content: string;
@@ -21,6 +24,7 @@ export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
   async create(props: CreateType) {
@@ -58,6 +62,34 @@ export class CommentService {
       return { deleted: true };
     } catch (error) {
       console.error("Error @comment-delete:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async getCommentsByNote(
+    noteId: string,
+    pageQueryDto: NoteQueryDto,
+  ): Promise<PaginationInterface<Comment>> {
+    try {
+      return await this.paginationProvider.paginateQuery(
+        pageQueryDto,
+        this.commentRepository,
+        { noteId },
+        ["user"],
+      );
+    } catch (error) {
+      console.error("Error @comment-getByNote:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async commentCount(noteId: string) {
+    try {
+      return await this.commentRepository.count({
+        where: { noteId },
+      });
+    } catch (error) {
+      console.error("Error @comment-commentCount:", error);
       throw new RequestTimeoutException();
     }
   }

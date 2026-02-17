@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const comment_service_1 = require("./comment.service");
 const comment_entity_1 = require("./comment.entity");
 const typeorm_1 = require("@nestjs/typeorm");
+const pagination_module_1 = require("../common/pagination/pagination.module");
 let CommentModule = class CommentModule {
 };
 exports.CommentModule = CommentModule;
@@ -19,7 +20,7 @@ exports.CommentModule = CommentModule = __decorate([
         controllers: [],
         providers: [comment_service_1.CommentService],
         exports: [comment_service_1.CommentService],
-        imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment])],
+        imports: [pagination_module_1.PaginationModule, typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment])],
     })
 ], CommentModule);
 //# sourceMappingURL=comment.module.js.map

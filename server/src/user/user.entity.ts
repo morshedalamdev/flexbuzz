@@ -39,8 +39,16 @@ export class User {
   @DeleteDateColumn({ name: "deleted_at" })
   deletedAt: Date;
 
+  // ============ VIRTUAL FIELDS ============
+  followerCount?: number;
+  followingCount?: number;
+  isFollowedByCurrentUser?: boolean;
+
   // ============ RELATIONSHIPS ============
-  @OneToOne(() => Profile, (profile) => profile.user, { eager: true, cascade: true })
+  @OneToOne(() => Profile, (profile) => profile.user, {
+    eager: true,
+    cascade: true,
+  })
   profile: Profile;
 
   @OneToMany(() => Follow, (follow) => follow.follower, { onDelete: "CASCADE" })

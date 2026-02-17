@@ -20,6 +20,11 @@ export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
   // LIKES
+  @Get(":id/likes")
+  async GetLikes(@Param("id") id: string) {
+    return this.noteService.getLikes(id);
+  }
+
   @Post(":id/like")
   async GiveLike(@Param("id") id: string, @ActiveUser("sub") userId: string) {
     return this.noteService.like(id, userId);
@@ -31,6 +36,14 @@ export class NoteController {
   }
 
   // COMMENTS
+  @Get(":id/comments")
+  async GetComments(
+    @Param("id") id: string,
+    @Query() pageQueryDto: NoteQueryDto,
+  ) {
+    return this.noteService.getComments(id, pageQueryDto);
+  }
+
   @Post("comment")
   async AddComment(
     @Body() createDto: CommentDto,
@@ -63,8 +76,8 @@ export class NoteController {
   }
 
   @Get(":id")
-  public GetById(@Param("id") id: string) {
-    return this.noteService.getById(id);
+  public GetById(@Param("id") id: string, @ActiveUser("sub") userId: string) {
+    return this.noteService.getById(id, userId);
   }
 
   @Patch()

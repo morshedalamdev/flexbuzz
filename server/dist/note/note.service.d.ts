@@ -20,26 +20,17 @@ export declare class NoteService {
     constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, commentService: CommentService, paginationProvider: PaginationProvider, noteRepository: Repository<Note>);
     create(noteDto: CreateNoteDto, userId: string): Promise<Note>;
     getAll(pageQueryDto: NoteQueryDto): Promise<PaginationInterface<Note>>;
-    getById(id: string): Promise<{
-        userRelation: import("../user/user.entity").User;
-        id: string;
-        content: string;
-        userId: string;
-        createdAt: Date;
-        updatedAt: Date;
-        user: import("../user/user.entity").User;
-        hashtags: import("../hashtag/hashtag.entity").Hashtag[];
-        likes: import("../like/like.entity").Like[];
-        comments: import("../comment/comment.entity").Comment[];
-    }>;
+    getById(id: string, userId?: string): Promise<Note>;
     update(noteDto: UpdateNoteDto, userId: string): Promise<Note>;
     delete(id: string): Promise<{
         deleted: boolean;
     }>;
+    getLikes(id: string): Promise<import("../user/user.entity").User[]>;
     like(id: string, userId: string): Promise<import("../like/like.entity").Like>;
     dislike(id: string, userId: string): Promise<{
         deleted: boolean;
     }>;
+    getComments(id: string, pageQueryDto: NoteQueryDto): Promise<PaginationInterface<import("../comment/comment.entity").Comment>>;
     addComment(commentDto: CommentDto, userId: string): Promise<import("../comment/comment.entity").Comment>;
     updateComment(commentDto: CommentDto): Promise<{
         success: boolean;
