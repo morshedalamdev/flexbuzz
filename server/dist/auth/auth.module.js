@@ -32,11 +32,22 @@ exports.AuthModule = AuthModule = __decorate([
                 useClass: bcrypt_provider_1.BcryptProvider,
             },
         ],
-        exports: [auth_service_1.AuthService],
+        exports: [auth_service_1.AuthService, jwt_1.JwtModule],
         imports: [
             (0, common_1.forwardRef)(() => user_module_1.UserModule),
             config_1.ConfigModule.forFeature(auth_config_1.default),
-            jwt_1.JwtModule.registerAsync(auth_config_1.default.asProvider()),
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule.forFeature(auth_config_1.default)],
+                useFactory: (config) => ({
+                    secret: config.accessTokenSecret,
+                    signOptions: {
+                        expiresIn: config.accessTokenExpiresIn,
+                        issuer: config.issuer,
+                        audience: config.audience,
+                    },
+                }),
+                inject: [auth_config_1.default.KEY],
+            }),
         ],
     })
 ], AuthModule);

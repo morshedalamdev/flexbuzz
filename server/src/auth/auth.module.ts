@@ -2,7 +2,7 @@ import { forwardRef, Module } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { UserModule } from "src/user/user.module";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigType } from "@nestjs/config";
 import { HashingProvider } from "./provider/hashing.provider";
 import { BcryptProvider } from "./provider/bcrypt.provider";
 import authConfig from "./config/auth.config";
@@ -17,11 +17,22 @@ import { JwtModule } from "@nestjs/jwt";
       useClass: BcryptProvider,
     },
   ],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
   imports: [
     forwardRef(() => UserModule),
     ConfigModule.forFeature(authConfig),
-    JwtModule.registerAsync(authConfig.asProvider()),
+    JwtModule.registerAsync({
+      imports: [ConfigModule.forFeature(authConfig)],
+      useFactory: (config: ConfigType<typeof authConfig>) => ({
+        secret: config.accessTokenSecret,
+        signOptions: {
+          expiresIn: config.accessTokenExpiresIn,
+          issuer: config.issuer,
+          audience: config.audience,
+        },
+      }),
+      inject: [authConfig.KEY],
+    }),
   ],
 })
 export class AuthModule {}
