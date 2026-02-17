@@ -106,14 +106,14 @@ users ────────── posts ─────── post_hashtags �
 
 ### Milestone 2: Authentication API
 - [x] Create `users` table/entity with TypeORM
-- [ ] Implement user registration endpoint (`POST /auth/register`)
-- [ ] Implement user login endpoint (`POST /auth/login`)
+- [x] Implement user registration endpoint (`POST /auth/register`)
+- [x] Implement user login endpoint (`POST /auth/login`)
 - [x] Set up JWT-based authentication with Bcrypt
-- [ ] Implement auth guards for protected routes
-- [ ] Implement refresh token mechanism
+- [x] Implement auth guards for protected routes
+- [x] Implement refresh token mechanism
 - [x] Add password hashing with bcrypt
 - [x] Add email validation
-- [ ] Test authentication endpoints with Postman/Insomnia
+- [x] Test authentication endpoints with Postman/Insomnia
 
 ### Milestone 3: User Profile API
 - [x] Implement `GET /users/:username` — view user profile
@@ -121,19 +121,18 @@ users ────────── posts ─────── post_hashtags �
 - [x] Implement `PATCH /users/me` — update own profile (bio, display name)
 - [x] Add validation for profile fields
 - [x] Implement user search endpoint (`GET /users/search?q=`)
-- [ ] Test user endpoints
+- [x] Test user endpoints
 
 ### Milestone 4: Posts & Hashtags API
 - [x] Create `posts`, `hashtags`, and `post_hashtags` tables/entities
 - [x] Implement `POST /posts` — create a new post (extract hashtags automatically)
-- [ ] Implement hashtag extraction logic (parse `#word` patterns from post text)
 - [x] Implement `GET /posts` — fetch posts feed (paginated)
 - [x] Implement `GET /posts/:id` — fetch single post
 - [x] Implement `GET /posts/user/:username` — fetch user's posts
 - [x] Implement `DELETE /posts/:id` — delete own post
 - [x] Implement `PATCH /posts/:id` — edit own post (optional)
 - [x] Add post character limit validation
-- [ ] Test post endpoints
+- [x] Test post endpoints
 
 ### Milestone 5: Likes & Comments API
 - [x] Create `likes` and `comments` tables/entities
