@@ -138,13 +138,13 @@ users ────────── posts ─────── post_hashtags �
 - [x] Create `likes` and `comments` tables/entities
 - [x] Implement `POST /posts/:id/like` — like a post
 - [x] Implement `DELETE /posts/:id/like` — unlike a post
-- [ ] Implement `GET /posts/:id/likes` — get users who liked a post
+- [x] Implement `GET /posts/:id/likes` — get users who liked a post
 - [x] Implement `POST /posts/:id/comments` — add comment
-- [ ] Implement `GET /posts/:id/comments` — list comments on a post (paginated)
+- [x] Implement `GET /posts/:id/comments` — list comments on a post (paginated)
 - [x] Implement `DELETE /comments/:id` — delete own comment
-- [ ] Add like count to post response
-- [ ] Add comment count to post response
-- [ ] Test like and comment endpoints
+- [x] Add like count to post response
+- [x] Add comment count to post response
+- [x] Test like and comment endpoints
 
 ### Milestone 6: Follow System & Advanced Feed API
 - [x] Create `follows` table/entity (follower_id, following_id)
@@ -154,18 +154,8 @@ users ────────── posts ─────── post_hashtags �
 - [x] Implement `GET /users/:id/following` — list following (paginated)
 - [x] Implement `GET /posts/feed` — personalized feed (posts from followed users)
 - [x] Implement `GET /posts/timeline` — global timeline (all posts)
-- [ ] Add follower/following counts to user profile
-- [ ] Test follow system endpoints
-
-### Milestone 7: Search & Trending API
-- [ ] Implement `GET /hashtags/trending` — get top trending hashtags
-- [ ] Implement `GET /search/posts?q=` — search posts by text content
-- [ ] Implement `GET /hashtags/:name/posts` — get all posts with a specific hashtag
-- [ ] Implement `GET /hashtags/:name` — get hashtag details with post count
-- [ ] Add search filtering and sorting options
-- [ ] Optimize queries for performance
-- [ ] Test search and trending endpoints
-- [ ] **Backend Complete!**
+- [x] Add follower/following counts to user profile
+- [x] Test follow system endpoints
 
 ---
 
