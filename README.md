@@ -102,7 +102,7 @@ users ────────── posts ─────── post_hashtags �
 - [x] Set up environment variables (`.env`) for backend
 - [x] Create initial backend folder structure
 - [x] Set up logging and error handling middleware
-- [ ] Configure CORS for frontend integration
+- [x] Configure CORS for frontend integration
 
 ### Milestone 2: Authentication API
 - [x] Create `users` table/entity with TypeORM
