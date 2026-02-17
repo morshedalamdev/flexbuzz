@@ -1,7 +1,6 @@
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
-import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
 import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
@@ -12,9 +11,8 @@ import type { Request } from "express";
 export declare class UserService {
     private readonly followService;
     private readonly paginationProvider;
-    private readonly hashingProvider;
     private userRepository;
-    constructor(followService: FollowService, paginationProvider: PaginationProvider, hashingProvider: HashingProvider, userRepository: Repository<User>);
+    constructor(followService: FollowService, paginationProvider: PaginationProvider, userRepository: Repository<User>);
     create(userDto: CreateUserDto): Promise<User>;
     findAll(paginationQueryDto: PaginationQueryDto, request?: Request): Promise<PaginationInterface<User>>;
     findBy(identifier: string): Promise<User>;

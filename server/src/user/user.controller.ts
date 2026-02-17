@@ -64,11 +64,6 @@ export class UserController {
   }
 
   // ROOT
-  @Post()
-  public CreateUser(@Body() createDto: CreateUserDto) {
-    return this.userService.create(createDto);
-  }
-
   @Get()
   public GetUsers(
     @Query() pageQueryDto: PaginationQueryDto,

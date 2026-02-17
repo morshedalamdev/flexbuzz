@@ -5,13 +5,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
-const bcrypt_provider_1 = require("./provider/bcrypt.provider");
+const user_module_1 = require("../user/user.module");
+const config_1 = require("@nestjs/config");
 const hashing_provider_1 = require("./provider/hashing.provider");
+const bcrypt_provider_1 = require("./provider/bcrypt.provider");
+const auth_config_1 = __importDefault(require("./config/auth.config"));
+const jwt_1 = require("@nestjs/jwt");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -25,7 +32,12 @@ exports.AuthModule = AuthModule = __decorate([
                 useClass: bcrypt_provider_1.BcryptProvider,
             },
         ],
-        exports: [auth_service_1.AuthService, hashing_provider_1.HashingProvider],
+        exports: [auth_service_1.AuthService],
+        imports: [
+            (0, common_1.forwardRef)(() => user_module_1.UserModule),
+            config_1.ConfigModule.forFeature(auth_config_1.default),
+            jwt_1.JwtModule.registerAsync(auth_config_1.default.asProvider()),
+        ],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

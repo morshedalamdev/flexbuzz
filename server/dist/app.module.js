@@ -27,6 +27,8 @@ const env_validation_1 = __importDefault(require("./config/env.validation"));
 const typeorm_1 = require("@nestjs/typeorm");
 const follow_module_1 = require("./follow/follow.module");
 const pagination_module_1 = require("./common/pagination/pagination.module");
+const core_1 = require("@nestjs/core");
+const authorize_guard_1 = require("./auth/guards/authorize.guard");
 const ENV = process.env.NODE_ENV;
 let AppModule = class AppModule {
 };
@@ -64,7 +66,10 @@ exports.AppModule = AppModule = __decorate([
             pagination_module_1.PaginationModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [app_service_1.AppService, {
+                provide: core_1.APP_GUARD,
+                useClass: authorize_guard_1.AuthorizeGuard,
+            }],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

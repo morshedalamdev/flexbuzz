@@ -15,6 +15,8 @@ import envValidation from "./config/env.validation";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FollowModule } from './follow/follow.module';
 import { PaginationModule } from './common/pagination/pagination.module';
+import { APP_GUARD } from "@nestjs/core";
+import { AuthorizeGuard } from "./auth/guards/authorize.guard";
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -49,6 +51,9 @@ const ENV = process.env.NODE_ENV;
     PaginationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,{
+    provide: APP_GUARD,
+    useClass: AuthorizeGuard,
+  }],
 })
 export class AppModule {}

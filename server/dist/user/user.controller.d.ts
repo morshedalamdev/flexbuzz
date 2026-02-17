@@ -1,5 +1,4 @@
 import type { Request } from "express";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
@@ -18,7 +17,6 @@ export declare class UserController {
     DeleteCurrUser(): Promise<{
         deleted: boolean;
     }>;
-    CreateUser(createDto: CreateUserDto): Promise<import("./user.entity").User>;
     GetUsers(pageQueryDto: PaginationQueryDto, req: Request): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("./user.entity").User>>;
     GetUserById(id: string): Promise<import("./user.entity").User>;
 }

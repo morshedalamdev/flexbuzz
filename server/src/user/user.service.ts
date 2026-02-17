@@ -26,8 +26,6 @@ export class UserService {
   constructor(
     private readonly followService: FollowService,
     private readonly paginationProvider: PaginationProvider,
-    @Inject(forwardRef(() => HashingProvider))
-    private readonly hashingProvider: HashingProvider,
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
@@ -50,7 +48,6 @@ export class UserService {
     try {
       const newUser = this.userRepository.create({
         ...userDto,
-        password: await this.hashingProvider.hashPassword(userDto.password),
         profile: {},
       });
       return await this.userRepository.save(newUser);
@@ -90,12 +87,10 @@ export class UserService {
       if (isUUID(identifier)) {
         user = await this.userRepository.findOne({
           where: { id: identifier },
-          relations: ["profile"],
         });
       } else {
         user = await this.userRepository.findOne({
           where: [{ username: identifier }, { email: identifier }],
-          relations: ["profile"],
         });
       }
     } catch (error) {
