@@ -5,11 +5,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaginationProvider = void 0;
 const common_1 = require("@nestjs/common");
+const core_1 = require("@nestjs/core");
 let PaginationProvider = class PaginationProvider {
-    async paginateQuery(paginationQueryDto, repository, request, where, relations) {
+    request;
+    constructor(request) {
+        this.request = request;
+    }
+    async paginateQuery(paginationQueryDto, repository, where, relations) {
         const currentPage = paginationQueryDto.page || 1;
         const itemsPerPage = paginationQueryDto.limit || 10;
         const findOptions = {
@@ -27,9 +38,10 @@ let PaginationProvider = class PaginationProvider {
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         const nextPage = currentPage === totalPages ? currentPage : currentPage + 1;
         const prevPage = currentPage === 1 ? currentPage : currentPage - 1;
-        const baseUrl = request
-            ? `${request.protocol}://${request.get("host")}${request.path}`
-            : "";
+        const baseUrl = this.request.protocol +
+            "://" +
+            this.request.get("host") +
+            this.request.path;
         const response = {
             data: result,
             meta: {
@@ -50,6 +62,8 @@ let PaginationProvider = class PaginationProvider {
 };
 exports.PaginationProvider = PaginationProvider;
 exports.PaginationProvider = PaginationProvider = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)(core_1.REQUEST)),
+    __metadata("design:paramtypes", [Object])
 ], PaginationProvider);
 //# sourceMappingURL=pagination.provider.js.map

@@ -18,20 +18,16 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./user.entity");
 const typeorm_2 = require("typeorm");
 const user_exists_exception_1 = require("../common/customException/user-exists.exception");
-const hashing_provider_1 = require("../auth/provider/hashing.provider");
 const class_validator_1 = require("class-validator");
-const constants_1 = require("../constants/constants");
 const pagination_provider_1 = require("../common/pagination/pagination.provider");
 const follow_service_1 = require("../follow/follow.service");
 let UserService = class UserService {
     followService;
     paginationProvider;
-    hashingProvider;
     userRepository;
-    constructor(followService, paginationProvider, hashingProvider, userRepository) {
+    constructor(followService, paginationProvider, userRepository) {
         this.followService = followService;
         this.paginationProvider = paginationProvider;
-        this.hashingProvider = hashingProvider;
         this.userRepository = userRepository;
     }
     async create(userDto) {
@@ -52,7 +48,6 @@ let UserService = class UserService {
         try {
             const newUser = this.userRepository.create({
                 ...userDto,
-                password: await this.hashingProvider.hashPassword(userDto.password),
                 profile: {},
             });
             return await this.userRepository.save(newUser);
@@ -62,9 +57,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async findAll(paginationQueryDto, request) {
+    async findAll(paginationQueryDto) {
         try {
-            return await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository, request);
+            return await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository);
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {
@@ -82,13 +77,11 @@ let UserService = class UserService {
             if ((0, class_validator_1.isUUID)(identifier)) {
                 user = await this.userRepository.findOne({
                     where: { id: identifier },
-                    relations: ["profile"],
                 });
             }
             else {
                 user = await this.userRepository.findOne({
                     where: [{ username: identifier }, { email: identifier }],
-                    relations: ["profile"],
                 });
             }
         }
@@ -101,13 +94,13 @@ let UserService = class UserService {
         }
         return user;
     }
-    async current() {
-        return await this.findBy(constants_1.USER_ID);
+    async current(userId) {
+        return await this.findBy(userId);
     }
-    async update(userDto) {
+    async update(userDto, userId) {
         try {
             const user = await this.userRepository.findOne({
-                where: { id: constants_1.USER_ID },
+                where: { id: userId },
                 relations: ["profile"],
             });
             if (!user || !user.profile) {
@@ -134,9 +127,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async delete() {
+    async delete(userId) {
         try {
-            await this.userRepository.softDelete(constants_1.USER_ID);
+            await this.userRepository.softDelete(userId);
             return { deleted: true };
         }
         catch (error) {
@@ -144,10 +137,10 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async follow(id) {
+    async follow(id, userId) {
         try {
             const userToFollow = await this.findBy(id);
-            const currentUser = await this.findBy(constants_1.USER_ID);
+            const currentUser = await this.findBy(userId);
             if (!userToFollow || !currentUser) {
                 throw new common_1.NotFoundException("User not found");
             }
@@ -161,9 +154,9 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async unfollow(id) {
+    async unfollow(id, userId) {
         try {
-            return await this.followService.unfollow(id, constants_1.USER_ID);
+            return await this.followService.unfollow(id, userId);
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
@@ -173,24 +166,24 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowers(followDto, request) {
+    async getFollowers(followDto, userId) {
         if (!followDto.followingId) {
-            followDto.followingId = constants_1.USER_ID;
+            followDto.followingId = userId;
         }
         try {
-            return await this.followService.getFollows(followDto, request);
+            return await this.followService.getFollows(followDto);
         }
         catch (error) {
             console.error("Error @user-getFollowers:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollowing(followDto, request) {
+    async getFollowing(followDto, userId) {
         if (!followDto.followerId) {
-            followDto.followerId = constants_1.USER_ID;
+            followDto.followerId = userId;
         }
         try {
-            return await this.followService.getFollows(followDto, request);
+            return await this.followService.getFollows(followDto);
         }
         catch (error) {
             console.error("Error @user-getFollowing:", error);
@@ -201,11 +194,9 @@ let UserService = class UserService {
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => hashing_provider_1.HashingProvider))),
-    __param(3, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [follow_service_1.FollowService,
         pagination_provider_1.PaginationProvider,
-        hashing_provider_1.HashingProvider,
         typeorm_2.Repository])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

@@ -19,7 +19,6 @@ const typeorm_2 = require("@nestjs/typeorm");
 const note_entity_1 = require("./note.entity");
 const user_service_1 = require("../user/user.service");
 const hashtag_service_1 = require("../hashtag/hashtag.service");
-const constants_1 = require("../constants/constants");
 const like_service_1 = require("../like/like.service");
 const comment_service_1 = require("../comment/comment.service");
 const pagination_provider_1 = require("../common/pagination/pagination.provider");
@@ -38,9 +37,9 @@ let NoteService = class NoteService {
         this.paginationProvider = paginationProvider;
         this.noteRepository = noteRepository;
     }
-    async create(noteDto) {
+    async create(noteDto, userId) {
         try {
-            const user = await this.userService.findBy(constants_1.USER_ID);
+            const user = await this.userService.findBy(userId);
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
             const newNote = this.noteRepository.create({
                 ...noteDto,
@@ -54,9 +53,9 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getAll(pageQueryDto, request) {
+    async getAll(pageQueryDto) {
         try {
-            return await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, request, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
+            return await this.paginationProvider.paginateQuery(pageQueryDto, this.noteRepository, pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined, ["hashtags", "user"]);
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {
@@ -88,7 +87,7 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async update(noteDto) {
+    async update(noteDto, userId) {
         try {
             const note = await this.noteRepository.findOne({
                 where: { id: String(noteDto.id) },
@@ -119,10 +118,10 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async like(id) {
+    async like(id, userId) {
         try {
             const note = await this.getById(id);
-            const user = await this.userService.findBy(constants_1.USER_ID);
+            const user = await this.userService.findBy(userId);
             if (!note || !user) {
                 throw new common_1.NotFoundException();
             }
@@ -136,19 +135,19 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async dislike(id) {
+    async dislike(id, userId) {
         try {
-            return await this.likeService.delete(id, constants_1.USER_ID);
+            return await this.likeService.delete(id, userId);
         }
         catch (error) {
             console.error("Error @note-dislike:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
-    async addComment(commentDto) {
+    async addComment(commentDto, userId) {
         try {
             const note = await this.getById(commentDto.id);
-            const user = await this.userService.findBy(constants_1.USER_ID);
+            const user = await this.userService.findBy(userId);
             if (!note || !user) {
                 throw new common_1.NotFoundException();
             }

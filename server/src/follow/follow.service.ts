@@ -5,7 +5,6 @@ import { User } from "src/user/user.entity";
 import { FollowQueryDto } from "src/user/dto/follow-query.dto";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
 import { Follow } from "./follow.entity";
-import type { Request } from "express";
 
 @Injectable()
 export class FollowService {
@@ -41,12 +40,11 @@ export class FollowService {
     }
   }
 
-  public async getFollows(followDto: FollowQueryDto, request?: Request) {
+  public async getFollows(followDto: FollowQueryDto) {
     try {
       return await this.paginationProvider.paginateQuery(
         followDto,
         this.followRepository,
-        request ? request : undefined,
         followDto.followerId
           ? { followerId: followDto.followerId }
           : { followingId: followDto.followingId },

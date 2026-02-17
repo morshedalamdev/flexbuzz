@@ -1,6 +1,4 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
   RequestTimeoutException,
@@ -10,24 +8,19 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
 import { UserExistsException } from "src/common/customException/user-exists.exception";
-import { HashingProvider } from "src/auth/provider/hashing.provider";
 import { isUUID } from "class-validator";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { USER_ID } from "src/constants/constants";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
 import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { FollowQueryDto } from "./dto/follow-query.dto";
 import { FollowService } from "src/follow/follow.service";
-import type { Request } from "express";
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly followService: FollowService,
     private readonly paginationProvider: PaginationProvider,
-    @Inject(forwardRef(() => HashingProvider))
-    private readonly hashingProvider: HashingProvider,
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
@@ -50,7 +43,6 @@ export class UserService {
     try {
       const newUser = this.userRepository.create({
         ...userDto,
-        password: await this.hashingProvider.hashPassword(userDto.password),
         profile: {},
       });
       return await this.userRepository.save(newUser);
@@ -62,13 +54,11 @@ export class UserService {
 
   public async findAll(
     paginationQueryDto: PaginationQueryDto,
-    request?: Request,
   ): Promise<PaginationInterface<User>> {
     try {
       return await this.paginationProvider.paginateQuery(
         paginationQueryDto,
         this.userRepository,
-        request,
       );
     } catch (error) {
       if (error.code === "ECONNREFUSED") {
@@ -90,12 +80,10 @@ export class UserService {
       if (isUUID(identifier)) {
         user = await this.userRepository.findOne({
           where: { id: identifier },
-          relations: ["profile"],
         });
       } else {
         user = await this.userRepository.findOne({
           where: [{ username: identifier }, { email: identifier }],
-          relations: ["profile"],
         });
       }
     } catch (error) {
@@ -110,14 +98,14 @@ export class UserService {
   }
 
   // CURRENT USER
-  public async current() {
-    return await this.findBy(USER_ID);
+  public async current(userId: string) {
+    return await this.findBy(userId);
   }
 
-  public async update(userDto: UpdateUserDto) {
+  public async update(userDto: UpdateUserDto, userId: string) {
     try {
       const user = await this.userRepository.findOne({
-        where: { id: USER_ID },
+        where: { id: userId },
         relations: ["profile"],
       });
       if (!user || !user.profile) {
@@ -144,9 +132,9 @@ export class UserService {
     }
   }
 
-  public async delete() {
+  public async delete(userId: string) {
     try {
-      await this.userRepository.softDelete(USER_ID);
+      await this.userRepository.softDelete(userId);
       return { deleted: true };
     } catch (error) {
       console.error("Error @user-delete:", error);
@@ -155,10 +143,10 @@ export class UserService {
   }
 
   // FOLLOW
-  public async follow(id: string) {
+  public async follow(id: string, userId: string) {
     try {
       const userToFollow = await this.findBy(id);
-      const currentUser = await this.findBy(USER_ID);
+      const currentUser = await this.findBy(userId);
       if (!userToFollow || !currentUser) {
         throw new NotFoundException("User not found");
       }
@@ -172,9 +160,9 @@ export class UserService {
     }
   }
 
-  public async unfollow(id: string) {
+  public async unfollow(id: string, userId: string  ) {
     try {
-      return await this.followService.unfollow(id, USER_ID);
+      return await this.followService.unfollow(id, userId);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -184,24 +172,24 @@ export class UserService {
     }
   }
 
-  public async getFollowers(followDto: FollowQueryDto, request?: Request) {
+  public async getFollowers(followDto: FollowQueryDto, userId: string) {
     if(!followDto.followingId){
-      followDto.followingId = USER_ID;
+      followDto.followingId = userId;
     }
     try {
-      return await this.followService.getFollows(followDto, request);
+      return await this.followService.getFollows(followDto);
     } catch (error) {
       console.error("Error @user-getFollowers:", error);
       throw new RequestTimeoutException();
     }
   }
 
-  public async getFollowing(followDto: FollowQueryDto, request?: Request) {
+  public async getFollowing(followDto: FollowQueryDto, userId: string) {
     if(!followDto.followerId){
-      followDto.followerId = USER_ID;
+      followDto.followerId = userId;
     }
     try {
-      return await this.followService.getFollows(followDto, request);
+      return await this.followService.getFollows(followDto);
     } catch (error) {
       console.error("Error @user-getFollowing:", error);
       throw new RequestTimeoutException();

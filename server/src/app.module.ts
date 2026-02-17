@@ -12,9 +12,12 @@ import { ProfileModule } from './profile/profile.module';
 import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import envValidation from "./config/env.validation";
+import authConfig from "./auth/config/auth.config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FollowModule } from './follow/follow.module';
 import { PaginationModule } from './common/pagination/pagination.module';
+import { APP_GUARD } from "@nestjs/core";
+import { AuthorizeGuard } from "./auth/guards/authorize.guard";
 const ENV = process.env.NODE_ENV;
 
 @Module({
@@ -27,10 +30,11 @@ const ENV = process.env.NODE_ENV;
     NoteModule,
     ProfileModule,
     FollowModule,
+    PaginationModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !ENV ? ".env" : `.env.${ENV}`,
-      load: [appConfig, databaseConfig],
+      load: [appConfig, databaseConfig, authConfig],
       validationSchema: envValidation,
     }),
     TypeOrmModule.forRootAsync({
@@ -46,9 +50,12 @@ const ENV = process.env.NODE_ENV;
         database: configService.get<string>("database.name"),
       }),
     }),
-    PaginationModule,
+    ConfigModule.forFeature(authConfig),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,{
+    provide: APP_GUARD,
+    useClass: AuthorizeGuard,
+  }],
 })
 export class AppModule {}

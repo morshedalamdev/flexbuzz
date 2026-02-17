@@ -51,9 +51,9 @@ let FollowService = class FollowService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getFollows(followDto, request) {
+    async getFollows(followDto) {
         try {
-            return await this.paginationProvider.paginateQuery(followDto, this.followRepository, request ? request : undefined, followDto.followerId
+            return await this.paginationProvider.paginateQuery(followDto, this.followRepository, followDto.followerId
                 ? { followerId: followDto.followerId }
                 : { followingId: followDto.followingId });
         }

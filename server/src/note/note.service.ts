@@ -9,7 +9,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Note } from "./note.entity";
 import { UserService } from "src/user/user.service";
 import { HashtagService } from "src/hashtag/hashtag.service";
-import { USER_ID } from "src/constants/constants";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { LikeService } from "src/like/like.service";
 import { CommentDto } from "src/comment/dto/comment.dto";
@@ -17,7 +16,6 @@ import { CommentService } from "src/comment/comment.service";
 import { NoteQueryDto } from "./dto/note-query.dto";
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
-import type { Request } from "express";
 
 @Injectable()
 export class NoteService {
@@ -31,9 +29,9 @@ export class NoteService {
     private readonly noteRepository: Repository<Note>,
   ) {}
 
-  public async create(noteDto: CreateNoteDto) {
+  public async create(noteDto: CreateNoteDto, userId: string) {
     try {
-      const user = await this.userService.findBy(USER_ID);
+      const user = await this.userService.findBy(userId);
       const hashtags = await this.hashtagService.getByIds(
         noteDto.hashtags || [],
       );
@@ -52,13 +50,11 @@ export class NoteService {
 
   public async getAll(
     pageQueryDto: NoteQueryDto,
-    request?: Request,
   ): Promise<PaginationInterface<Note>> {
     try {
       return await this.paginationProvider.paginateQuery(
         pageQueryDto,
         this.noteRepository,
-        request,
         pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined,
         ["hashtags", "user"],
       );
@@ -97,7 +93,7 @@ export class NoteService {
     }
   }
 
-  public async update(noteDto: UpdateNoteDto) {
+  public async update(noteDto: UpdateNoteDto, userId: string) {
     try {
       const note = await this.noteRepository.findOne({
         where: { id: String(noteDto.id) },
@@ -133,10 +129,10 @@ export class NoteService {
   }
 
   // LIKE
-  public async like(id: string) {
+  public async like(id: string, userId: string) {
     try {
       const note = await this.getById(id);
-      const user = await this.userService.findBy(USER_ID);
+      const user = await this.userService.findBy(userId);
       if (!note || !user) {
         throw new NotFoundException();
       }
@@ -150,9 +146,9 @@ export class NoteService {
     }
   }
 
-  public async dislike(id: string) {
+  public async dislike(id: string, userId: string) {
     try {
-      return await this.likeService.delete(id, USER_ID);
+      return await this.likeService.delete(id, userId);
     } catch (error) {
       console.error("Error @note-dislike:", error);
       throw new RequestTimeoutException();
@@ -160,10 +156,10 @@ export class NoteService {
   }
 
   // COMMENT
-  public async addComment(commentDto: CommentDto) {
+  public async addComment(commentDto: CommentDto, userId: string) {
     try {
       const note = await this.getById(commentDto.id);
-      const user = await this.userService.findBy(USER_ID);
+      const user = await this.userService.findBy(userId);
       if (!note || !user) {
         throw new NotFoundException();
       }

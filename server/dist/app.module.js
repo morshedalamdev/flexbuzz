@@ -24,9 +24,12 @@ const profile_module_1 = require("./profile/profile.module");
 const app_config_1 = __importDefault(require("./config/app.config"));
 const database_config_1 = __importDefault(require("./config/database.config"));
 const env_validation_1 = __importDefault(require("./config/env.validation"));
+const auth_config_1 = __importDefault(require("./auth/config/auth.config"));
 const typeorm_1 = require("@nestjs/typeorm");
 const follow_module_1 = require("./follow/follow.module");
 const pagination_module_1 = require("./common/pagination/pagination.module");
+const core_1 = require("@nestjs/core");
+const authorize_guard_1 = require("./auth/guards/authorize.guard");
 const ENV = process.env.NODE_ENV;
 let AppModule = class AppModule {
 };
@@ -42,10 +45,11 @@ exports.AppModule = AppModule = __decorate([
             note_module_1.NoteModule,
             profile_module_1.ProfileModule,
             follow_module_1.FollowModule,
+            pagination_module_1.PaginationModule,
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 envFilePath: !ENV ? ".env" : `.env.${ENV}`,
-                load: [app_config_1.default, database_config_1.default],
+                load: [app_config_1.default, database_config_1.default, auth_config_1.default],
                 validationSchema: env_validation_1.default,
             }),
             typeorm_1.TypeOrmModule.forRootAsync({
@@ -61,10 +65,13 @@ exports.AppModule = AppModule = __decorate([
                     database: configService.get("database.name"),
                 }),
             }),
-            pagination_module_1.PaginationModule,
+            config_1.ConfigModule.forFeature(auth_config_1.default),
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [app_service_1.AppService, {
+                provide: core_1.APP_GUARD,
+                useClass: authorize_guard_1.AuthorizeGuard,
+            }],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
