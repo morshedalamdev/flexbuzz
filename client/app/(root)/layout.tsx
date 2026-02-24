@@ -1,3 +1,4 @@
+import Header from "@/components/header";
 import React, { Fragment } from "react";
 
 export default function RootLayout({
@@ -7,6 +8,7 @@ export default function RootLayout({
 }>) {
   return (
     <Fragment>
+      <Header />
       {children}
     </Fragment>
   );
