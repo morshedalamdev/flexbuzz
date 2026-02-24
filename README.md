@@ -162,10 +162,10 @@ users ────────── posts ─────── post_hashtags �
 ### **Phase 2: Frontend Development**
 
 ### Milestone 8: Frontend Setup & Configuration
-- [ ] Initialize Next.js frontend project with TypeScript
-- [ ] Install and configure Shadcn/UI components
-- [ ] Install and configure Zustand for state management
-- [ ] Install Tailwind CSS
+- [x] Initialize Next.js frontend project with TypeScript
+- [x] Install and configure Shadcn/UI components
+- [x] Install and configure Zustand for state management
+- [x] Install Tailwind CSS
 - [ ] Set up Axios or Fetch API client for backend communication
 - [ ] Create base Zustand stores (auth, UI, posts, user, search)
 - [ ] Set up environment variables (`.env`) for frontend
