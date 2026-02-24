@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/morshedalam/Developer/BACKEND/flexbuzz/client/app/%28root%29/layout.tsx"],"sourcesContent":["import React, { Fragment } from \"react\";\n\nexport default function RootLayout({\n  children,\n}: Readonly<{\n  children: React.ReactNode;\n}>) {\n  return (\n    <Fragment>\n      {children}\n    </Fragment>\n  );\n}\n"],"names":[],"mappings":";;;;;AAAA;;;AAEe,SAAS,WAAW,EACjC,QAAQ,EAGR;IACA,qBACE,8OAAC,iNAAQ;kBACN;;;;;;AAGP"}}]
+}
