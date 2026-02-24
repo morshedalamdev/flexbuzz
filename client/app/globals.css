@@ -123,4 +123,7 @@
   body {
     @apply relative bg-zinc-50 font-sans dark:bg-black;
   }
+  button{
+    @apply cursor-pointer;
+  }
 }
