@@ -1,6 +1,8 @@
 {
   "/(root)/page": "app/(root)/page.js",
+  "/(root)/settings/page": "app/(root)/settings/page.js",
+  "/(root)/user/[id]/page": "app/(root)/user/[id]/page.js",
   "/_not-found/page": "app/_not-found/page.js",
-  "/auth/page": "app/auth/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
   "/auth/signup/page": "app/auth/signup/page.js"
 }
