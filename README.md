@@ -169,9 +169,9 @@ users ────────── posts ─────── post_hashtags �
 - [ ] Set up Axios or Fetch API client for backend communication
 - [ ] Create base Zustand stores (auth, UI, posts, user, search)
 - [ ] Set up environment variables (`.env`) for frontend
-- [ ] Create initial frontend folder structure
+- [x] Create initial frontend folder structure
 - [ ] Set up API base URL and interceptors
-- [ ] Create reusable layout components (Navbar, Sidebar, Container)
+- [x] Create reusable layout components (Navbar, Sidebar, Container)
 
 ### Milestone 9: Authentication UI & User Profiles
 - [ ] Create `useAuthStore` to manage authentication state
@@ -183,7 +183,6 @@ users ────────── posts ─────── post_hashtags �
 - [ ] Create `useUserStore` for profile data and follow state
 - [ ] Build user profile page (shows user info + their posts)
 - [ ] Build edit profile modal/page
-- [ ] Add avatar support using initials/placeholder
 - [ ] Build followers/following list pages
 - [ ] Build follow/unfollow button component
 
