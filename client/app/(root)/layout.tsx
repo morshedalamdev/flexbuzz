@@ -9,7 +9,9 @@ export default function RootLayout({
   return (
     <Fragment>
       <Header />
-      {children}
+      <main className="flex w-full min-h-[calc(100dvh-48px)] max-w-3xl p-3 mx-auto flex-col items-center bg-white dark:bg-black">
+        {children}
+      </main>
     </Fragment>
   );
 }
