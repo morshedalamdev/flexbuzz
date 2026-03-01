@@ -13,12 +13,12 @@ export default function UserPage() {
   return (
     <Fragment>
       <UserDialog open={open} onOpenChange={setOpen} />
-      <div className="relative flex flex-wrap gap-x-6 gap-y-2 w-full">
+      <div className="relative flex flex-col md:flex-row flex-wrap md:gap-x-6 gap-y-2 w-full">
         <div>
           <h2 className="font-bold text-lg md:text-2xl">Morshed Alam</h2>
           <h3 className="text-sm">@morshedalam</h3>
         </div>
-        <div>
+        <div className="flex md:flex-col md:gap-0 justify-between md:justify-start">
           <p>
             <span className="font-semibold">Gender:</span> Male
           </p>
@@ -26,7 +26,7 @@ export default function UserPage() {
             <span className="font-semibold">Age:</span> 25
           </p>
         </div>
-        <p>Bio: Passionate about web development and open source projects.</p>
+        <p><span className="font-semibold">Bio:</span> Passionate about web development and open source projects.</p>
         <div className="absolute right-0">
           <Button
             variant="outline"

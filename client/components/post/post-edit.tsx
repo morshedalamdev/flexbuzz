@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import PostCreate from "./post-create";
+import { Field, FieldGroup } from "../ui/field";
+import { Textarea } from "../ui/textarea";
 
 interface PostEditProps {
   open: boolean;
@@ -33,7 +35,7 @@ export default function PostEdit({ open, onOpenChange }: PostEditProps) {
           <DialogHeader>
             <DialogTitle>Edit Post</DialogTitle>
           </DialogHeader>
-          <PostCreate />
+          <PostCreate btnLabel="Update" />
         </DialogContent>
       </Dialog>
     );
@@ -44,8 +46,13 @@ export default function PostEdit({ open, onOpenChange }: PostEditProps) {
         <DrawerHeader className="text-left">
           <DrawerTitle>Edit Post</DrawerTitle>
         </DrawerHeader>
-        <PostCreate />
+        <FieldGroup>
+          <Field className="px-4">
+               <Textarea className="max-h-60" placeholder="What's on your mind?" />
+          </Field>
+        </FieldGroup>
         <DrawerFooter className="pt-2">
+          <Button>Update</Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
           </DrawerClose>

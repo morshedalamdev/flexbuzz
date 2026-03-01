@@ -15,6 +15,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -42,7 +43,12 @@ export default function CommentDialog() {
           <div className="flex-1 overflow-y-auto px-6">
             <DialogHeader>
               <DialogTitle>@Username</DialogTitle>
-              <DialogDescription>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nemo magni quidem corrupti nihil modi veritatis laborum nam quisquam vitae et sequi, tempore non cupiditate voluptate dolore optio, alias tenetur aliquid?</DialogDescription>
+              <DialogDescription>
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nemo
+                magni quidem corrupti nihil modi veritatis laborum nam quisquam
+                vitae et sequi, tempore non cupiditate voluptate dolore optio,
+                alias tenetur aliquid?
+              </DialogDescription>
             </DialogHeader>
             <ul className="space-y-2 mt-6">
               <li>
@@ -103,14 +109,63 @@ export default function CommentDialog() {
           Comments (6)
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>@Username</DrawerTitle>
-        </DrawerHeader>
+      <DrawerContent className="flex flex-col">
+        <div className="flex-1 overflow-y-auto">
+          <DrawerHeader className="text-left!">
+            <DrawerTitle>@Username</DrawerTitle>
+            <DrawerDescription>
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nemo
+              magni quidem corrupti nihil modi veritatis laborum nam quisquam
+              vitae et sequi, tempore non cupiditate voluptate dolore optio,
+              alias tenetur aliquid?
+            </DrawerDescription>
+          </DrawerHeader>
+          <ul className="space-y-1 px-4">
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+            <li>
+              <CommentItem />
+            </li>
+          </ul>
+        </div>
         <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
+          <div className="w-full flex items-center gap-3">
+            <Input placeholder="Write a comment..." className="" />
+            <Button>
+              <SendHorizontalIcon size={15} />
+            </Button>
+          </div>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

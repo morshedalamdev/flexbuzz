@@ -6,7 +6,7 @@ import {
   InputGroupTextarea,
 } from "../ui/input-group";
 
-export default function PostCreate() {
+export default function PostCreate({ btnLabel }: { btnLabel: string }) {
   return (
     <FieldGroup>
       <Field>
@@ -17,7 +17,7 @@ export default function PostCreate() {
           />
           <InputGroupAddon align="block-end">
             <InputGroupButton variant="default" size="sm" className="ml-auto">
-              Post
+              {btnLabel}
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>
