@@ -19,22 +19,22 @@ export default function Header() {
           <Image src={ICONS.logo} alt="Logo" className="w-8 md:w-5" />
           Flex Buzz
         </Link>
-        <div className="flex items-center gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="text-sm font-medium">Username</DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <Link href="/user/me">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/user/me">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/user/me">Logout</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="text-sm font-medium">
+            Username
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <Link href="/user/me">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/user/me">Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/user/me">Logout</Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
