@@ -1,6 +1,7 @@
 "use server";
 
 import { useFetcher } from "@/hooks/use-fetcher";
+import { storeToken } from "@/lib/token";
 import { LoginState, SignupState, StatusType } from "@/lib/types";
 import { LoginSchema, SignupSchema } from "@/lib/validation";
 
@@ -14,7 +15,7 @@ export async function signup(
   formData: FormData,
 ): Promise<SignupState> {
   const data = Object.fromEntries(formData.entries());
-  const { fetcher } = useFetcher<LoginResponse>("/auth/login");
+  const { fetcher } = useFetcher<LoginResponse>("/auth/register");
 
   const validatedData = SignupSchema.safeParse(data);
   if (!validatedData.success) {
@@ -36,7 +37,19 @@ export async function signup(
     },
   });
 
-  console.log(res);
+  if (!res.success || !res.data) {
+    return {
+      status: StatusType.ERROR,
+      message: res?.message as unknown as string,
+      username: validatedData.data.username,
+      email: validatedData.data.email,
+    };
+  }
+
+  storeToken({
+    accessToken: res.data.accessToken,
+    refreshToken: res.data.refreshToken,
+  })
 
   return { status: StatusType.SUCCESS, message: "Signup successful!" };
 }
@@ -67,7 +80,7 @@ export async function login(
     },
   });
 
-  if (!res.success) {
+  if (!res.success || !res.data) {
     return {
       status: StatusType.ERROR,
       message: res?.message as unknown as string,
@@ -75,6 +88,10 @@ export async function login(
     };
   }
 
+  storeToken({
+    accessToken: res.data.accessToken,
+    refreshToken: res.data.refreshToken,
+  })
+
   return { status: StatusType.SUCCESS, message: "Login successful!" };
 }
-// password123
