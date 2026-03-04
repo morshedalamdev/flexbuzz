@@ -1,5 +1,3 @@
-"use server";
-
 import { useFetcher } from "@/hooks/use-fetcher";
 import { storeToken } from "@/lib/token";
 import { LoginState, SignupState, StatusType } from "@/lib/types";
@@ -53,7 +51,6 @@ export async function signup(
 
   return { status: StatusType.SUCCESS, message: "Signup successful!" };
 }
-// HDe94&5d
 
 export async function login(
   state: LoginState | undefined,
@@ -75,8 +72,10 @@ export async function login(
   const res = await fetcher({
     method: "POST",
     payload: {
-      username: validatedData.data.username,
-      password: validatedData.data.password,
+      // username: validatedData.data.username,
+      // password: validatedData.data.password,
+      username: "morshedalam",
+      password: "password123"
     },
   });
 
