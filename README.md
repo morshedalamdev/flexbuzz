@@ -74,17 +74,23 @@ flexbuzz/
 ### Core Tables
 
 | Table          | Description                          |
-|----------------|--------------------------------------|
-| `users`        | User accounts and profiles           |
+|----------------|--------------------------------------| 
+| `users`        | User accounts                        |
+| `profile`      | User profiles                        |
 | `posts`        | Text posts created by users          |
 | `hashtags`     | Unique hashtags extracted from posts |
-| `post_hashtags`| Many-to-many: posts ↔ hashtags       |
+| `post_hashtag` | Many-to-many: posts ↔ hashtags       |
 | `likes`        | Tracks which users liked which posts |
 | `comments`     | Comments on posts                    |
+| `follow`       | User following/follower lis          |
 
 ### Entity Relationships
 
 ```
+  ├──── follow
+  │
+  ├──── profile
+  │
 users ────────── posts ─────── post_hashtags ─────── hashtags
   │                │
   ├──── likes ─────│
