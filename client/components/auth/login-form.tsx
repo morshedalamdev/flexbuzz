@@ -10,18 +10,12 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useShowToast } from "@/hooks/use-show-toast";
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
+import { Spinner } from "../ui/spinner";
 
 export function LoginForm() {
   const [state, action, isPending] = useActionState(login, undefined);
-
-  useEffect(() => {
-    if (state?.message) {
-      useShowToast(state.status, state.message);
-    }
-  }, [state]);
 
   return (
     <form action={action}>
@@ -70,7 +64,9 @@ export function LoginForm() {
           )}
         </Field>
         <Field>
-          <Button type="submit">Login</Button>
+          <Button type="submit" disabled={isPending}>
+            {isPending ? <Spinner /> : ""}Login
+          </Button>
         </Field>
         <Field>
           <FieldDescription className="text-center">

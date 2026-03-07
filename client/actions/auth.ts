@@ -1,7 +1,9 @@
 import { useFetcher } from "@/hooks/use-fetcher";
-import { storeToken } from "@/lib/token";
+import { useShowToast } from "@/hooks/use-show-toast";
+import { deleteToken, storeToken } from "@/lib/token";
 import { LoginState, SignupState, StatusType } from "@/lib/types";
 import { LoginSchema, SignupSchema } from "@/lib/validation";
+import { redirect } from "next/navigation";
 
 type LoginResponse = {
   accessToken: string;
@@ -17,9 +19,12 @@ export async function signup(
 
   const validatedData = SignupSchema.safeParse(data);
   if (!validatedData.success) {
+    useShowToast(
+      StatusType.ERROR,
+      "Validation failed. Please check the fields.",
+    );
     return {
       errors: validatedData.error.flatten().fieldErrors,
-      status: StatusType.ERROR,
       message: "Validation failed. Please check the fields.",
       username: typeof data.username === "string" ? data.username : undefined,
       email: typeof data.email === "string" ? data.email : undefined,
@@ -36,8 +41,8 @@ export async function signup(
   });
 
   if (!res.success || !res.data) {
+    useShowToast(StatusType.ERROR, res?.message as unknown as string);
     return {
-      status: StatusType.ERROR,
       message: res?.message as unknown as string,
       username: validatedData.data.username,
       email: validatedData.data.email,
@@ -47,9 +52,10 @@ export async function signup(
   storeToken({
     accessToken: res.data.accessToken,
     refreshToken: res.data.refreshToken,
-  })
+  });
 
-  return { status: StatusType.SUCCESS, message: "Signup successful!" };
+  useShowToast(StatusType.SUCCESS, "Signup successful!");
+  redirect("/");
 }
 
 export async function login(
@@ -61,9 +67,12 @@ export async function login(
 
   const validatedData = LoginSchema.safeParse(data);
   if (!validatedData.success) {
+    useShowToast(
+      StatusType.ERROR,
+      "Validation failed. Please check the fields.",
+    );
     return {
       errors: validatedData.error.flatten().fieldErrors,
-      status: StatusType.ERROR,
       message: "Validation failed. Please check the fields.",
       username: typeof data.username === "string" ? data.username : undefined,
     };
@@ -72,16 +81,14 @@ export async function login(
   const res = await fetcher({
     method: "POST",
     payload: {
-      // username: validatedData.data.username,
-      // password: validatedData.data.password,
-      username: "morshedalam",
-      password: "password123"
+      username: validatedData.data.username,
+      password: validatedData.data.password,
     },
   });
 
   if (!res.success || !res.data) {
+    useShowToast(StatusType.ERROR, res?.message as unknown as string);
     return {
-      status: StatusType.ERROR,
       message: res?.message as unknown as string,
       username: validatedData.data.username,
     };
@@ -90,7 +97,14 @@ export async function login(
   storeToken({
     accessToken: res.data.accessToken,
     refreshToken: res.data.refreshToken,
-  })
+  });
 
-  return { status: StatusType.SUCCESS, message: "Login successful!" };
+  useShowToast(StatusType.SUCCESS, "Login successful!");
+  redirect("/");
+}
+
+export function logout() {
+  deleteToken();
+  useShowToast(StatusType.SUCCESS, "Logged out successfully!");
+  redirect("/login");
 }

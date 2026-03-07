@@ -10,19 +10,12 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import { signup } from "@/actions/auth";
 import { Spinner } from "../ui/spinner";
-import { useShowToast } from "@/hooks/use-show-toast";
 
 export function SignupForm() {
   const [state, action, isPending] = useActionState(signup, undefined);
-
-  useEffect(() => {
-    if (state?.message) {
-      useShowToast(state.status, state.message);
-    }
-  }, [state]);
 
   return (
     <form action={action}>

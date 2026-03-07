@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { UserDialog } from "./user/user-dialog";
+import { logout } from "@/actions/auth";
 
 export default function Header() {
   const [editUser, setEditUser] = useState(false);
@@ -36,9 +37,11 @@ export default function Header() {
               <DropdownMenuItem>
                 <Link href="/user/me">Profile</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={()=>setEditUser(true)}>Settings</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setEditUser(true)}>
+                Settings
+              </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/user/me">Logout</Link>
+                <button onClick={logout}>Logout</button>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
