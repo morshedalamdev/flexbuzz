@@ -68,10 +68,13 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forFeature(auth_config_1.default),
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, {
+        providers: [
+            app_service_1.AppService,
+            {
                 provide: core_1.APP_GUARD,
                 useClass: authorize_guard_1.AuthorizeGuard,
-            }],
+            },
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

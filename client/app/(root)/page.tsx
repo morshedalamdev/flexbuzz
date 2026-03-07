@@ -5,7 +5,7 @@ import { Fragment } from "react/jsx-runtime";
 export default function HomePage() {
   return (
     <Fragment>
-      <PostCreate />
+      <PostCreate btnLabel="Post" />
       <div className="space-y-3 mt-5">
         <PostItem />
         <PostItem />

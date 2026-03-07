@@ -12,10 +12,16 @@ import {
 } from "../ui/dropdown-menu";
 import PostEdit from "./post-edit";
 import PostDelete from "./post-delete";
+import { getToken } from "@/lib/token";
 
 export default function PostItem() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const handleLike = () =>{
+    const tokens = getToken()
+    console.log(tokens);
+  }
 
   return (
     <div className="border rounded-sm p-3 space-y-3 shadow-sm">
@@ -52,7 +58,7 @@ export default function PostItem() {
         tempora voluptatibus.
       </p>
       <div className="flex gap-3">
-        <Button variant="outline">
+        <Button variant="outline" onClick={handleLike}>
           <ThumbsUpIcon size={15} />
           Like (238)
         </Button>

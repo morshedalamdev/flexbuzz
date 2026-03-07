@@ -51,11 +51,10 @@ export function UserDialog({ open, onOpenChange }: UserDialogProps) {
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Edit profile</DrawerTitle>
-          <DrawerDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </DrawerDescription>
         </DrawerHeader>
+        <div className="px-4 overflow-y-auto">
           <UserEdit />
+        </div>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

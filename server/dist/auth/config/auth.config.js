@@ -6,7 +6,7 @@ exports.default = (0, config_1.registerAs)("auth", () => ({
     audience: process.env.JWT_TOKEN_AUDIENCE,
     accessTokenSecret: process.env.JWT_ACCESS_SECRET,
     refreshTokenSecret: process.env.JWT_REFRESH_SECRET,
-    accessTokenExpiresIn: parseInt(process.env.JWT_ACCESS_EXPIRATION_TIME ?? "3600", 10),
+    accessTokenExpiresIn: parseInt(process.env.JWT_ACCESS_EXPIRATION_TIME ?? "360", 10),
     refreshTokenExpiresIn: parseInt(process.env.JWT_REFRESH_EXPIRATION_TIME ?? "86400", 10),
 }));
 //# sourceMappingURL=auth.config.js.map
