@@ -13,8 +13,9 @@ import {
 import PostEdit from "./post-edit";
 import PostDelete from "./post-delete";
 import { getToken } from "@/lib/token";
+import { NoteType } from "@/lib/types";
 
-export default function PostItem() {
+export default function PostItem({ post }: { post: NoteType }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -26,7 +27,7 @@ export default function PostItem() {
   return (
     <div className="border rounded-sm p-3 space-y-3 shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">@Username</h3>
+        <h3 className="font-semibold">@{post.user.username}</h3>
         <div className="flex items-center gap-2">
           <PostEdit open={isEditOpen} onOpenChange={setIsEditOpen} />
           <PostDelete open={isDeleteOpen} onOpenChange={setIsDeleteOpen} />
@@ -52,17 +53,14 @@ export default function PostItem() {
         </div>
       </div>
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa ipsam
-        doloremque nemo debitis non harum molestiae, accusantium doloribus
-        adipisci iusto, quis deleniti autem voluptas. Laborum sed deleniti iusto
-        tempora voluptatibus.
+        {post.content}
       </p>
       <div className="flex gap-3">
         <Button variant="outline" onClick={handleLike}>
           <ThumbsUpIcon size={15} />
-          Like (238)
+          Like {post.likeCount > 0 ? `(${post.likeCount})` : ""}
         </Button>
-        <CommentDialog />
+        <CommentDialog post={post} />
       </div>
     </div>
   );
