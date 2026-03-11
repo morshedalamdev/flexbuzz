@@ -13,9 +13,9 @@ import {
 import PostEdit from "./post-edit";
 import PostDelete from "./post-delete";
 import { getToken } from "@/lib/token";
-import { NoteType } from "@/lib/types";
+import { PostType } from "@/lib/types";
 
-export default function PostItem({ post }: { post: NoteType }) {
+export default function PostItem({ post }: { post: PostType }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export default function PostItem({ post }: { post: NoteType }) {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">@{post.user.username}</h3>
         <div className="flex items-center gap-2">
-          <PostEdit open={isEditOpen} onOpenChange={setIsEditOpen} />
+          <PostEdit post={post} open={isEditOpen} onOpenChange={setIsEditOpen} />
           <PostDelete open={isDeleteOpen} onOpenChange={setIsDeleteOpen} />
           <DropdownMenu>
             <DropdownMenuTrigger className="text-sm font-medium">

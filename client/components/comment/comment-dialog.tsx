@@ -24,9 +24,9 @@ import { MessageCircleIcon, SendHorizontalIcon } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Input } from "../ui/input";
 import CommentItem from "./comment-item";
-import { NoteType } from "@/lib/types";
+import { PostType } from "@/lib/types";
 
-export default function CommentDialog({ post }: { post: NoteType }) {
+export default function CommentDialog({ post }: { post: PostType }) {
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery();
 
@@ -42,8 +42,8 @@ export default function CommentDialog({ post }: { post: NoteType }) {
         <DialogContent className="max-h-150 flex flex-col px-0">
           <div className="flex-1 overflow-y-auto px-6">
             <DialogHeader>
-              <DialogTitle>@{post.user.username}</DialogTitle>
-              <DialogDescription>{post.content}</DialogDescription>
+              <DialogTitle className="text-sm">@{post.user.username}</DialogTitle>
+              <DialogDescription className="text-black">{post.content}</DialogDescription>
             </DialogHeader>
             <ul className="space-y-2 mt-6">
               <li>

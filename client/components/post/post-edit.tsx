@@ -19,13 +19,15 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import PostCreate from "./post-create";
 import { Field, FieldGroup } from "../ui/field";
 import { Textarea } from "../ui/textarea";
+import { PostType } from "@/lib/types";
 
 interface PostEditProps {
+  post: PostType;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function PostEdit({ open, onOpenChange }: PostEditProps) {
+export default function PostEdit({ post, open, onOpenChange }: PostEditProps) {
   const isDesktop = useMediaQuery();
 
   if (isDesktop) {
@@ -35,7 +37,7 @@ export default function PostEdit({ open, onOpenChange }: PostEditProps) {
           <DialogHeader>
             <DialogTitle>Edit Post</DialogTitle>
           </DialogHeader>
-          <PostCreate btnLabel="Update" />
+          <PostCreate btnLabel="Update" post={post} />
         </DialogContent>
       </Dialog>
     );

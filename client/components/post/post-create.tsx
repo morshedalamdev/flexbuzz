@@ -9,40 +9,25 @@ import {
   InputGroupTextarea,
 } from "../ui/input-group";
 import { Spinner } from "../ui/spinner";
-import { useFetcher } from "@/hooks/use-fetcher";
-import { NoteType, StatusType } from "@/lib/types";
-import { useShowToast } from "@/hooks/use-show-toast";
+import { PostType } from "@/lib/types";
+import { usePostStore } from "@/stores/post-store";
 
-export default function PostCreate({ btnLabel }: { btnLabel: string }) {
-  const { fetcher } = useFetcher<NoteType>("/note");
-  const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+interface PostCreateProps {
+  btnLabel?: string;
+  post?: PostType;
+}
+
+export default function PostCreate({ btnLabel, post }: PostCreateProps) {
+  const isLoading = usePostStore((state) => state.isLoading);
+  const createPost = usePostStore((state) => state.createPost);
+  const [content, setContent] = useState(post?.content || "");
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetcher({
-        method: "POST",
-        payload: {
-          content,
-        },
-      });
-
-      if (!res.success || !res.data) {
-        useShowToast(StatusType.ERROR, res.message || "Failed to create post");
-      }
-    } catch (error) {
-      useShowToast(
-        StatusType.ERROR,
-        "An error occurred while creating the post",
-      );
-    } finally {
+    if (content.trim()) {
+      await createPost(content.trim());
       setContent("");
-      setIsLoading(false);
-      useShowToast(StatusType.SUCCESS, "Post created successfully");
     }
   };
-
   return (
     <FieldGroup>
       <Field>

@@ -72,7 +72,7 @@ export interface HashtagType {
   createAt: string;
 }
 
-export interface NoteType {
+export interface PostType {
   id: string;
   userId: string;
   content: string;
