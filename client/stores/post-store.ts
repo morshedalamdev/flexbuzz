@@ -8,6 +8,7 @@ interface PostStoreType {
   isLoading: boolean;
   fetchPosts: () => Promise<void>;
   createPost: (content: string) => Promise<void>;
+  updatePost: (id: string, content: string) => Promise<void>;
 }
 
 export const usePostStore = create<PostStoreType>((set, get) => ({
@@ -17,7 +18,7 @@ export const usePostStore = create<PostStoreType>((set, get) => ({
   setLoading: (isLoading: boolean) => set({ isLoading }),
 
   fetchPosts: async () => {
-    const { fetcher } = useFetcher<PaginationInterface<PostType>>("/note");
+    const { fetcher } = useFetcher<PaginationInterface<PostType>>(`/note`);
     set({ isLoading: true });
     try {
       const res = await fetcher();
@@ -35,7 +36,7 @@ export const usePostStore = create<PostStoreType>((set, get) => ({
   },
 
   createPost: async (content: string) => {
-    const { fetcher } = useFetcher<PostType>("/note");
+    const { fetcher } = useFetcher<PostType>(`/note`);
     set({ isLoading: true });
 
     try {
@@ -51,13 +52,48 @@ export const usePostStore = create<PostStoreType>((set, get) => ({
         throw new Error(res.message || "Failed to create post");
       }
 
-
       useShowToast(StatusType.SUCCESS, "Post created successfully");
-      set((state) => ({ posts: [res.data as PostType, ...state.posts], isLoading: false }));
+      set((state) => ({
+        posts: [res.data as PostType, ...state.posts],
+        isLoading: false,
+      }));
     } catch (error) {
       useShowToast(
         StatusType.ERROR,
         "An error occurred while creating the post",
+      );
+    }
+  },
+
+  updatePost: async (id: string, content: string) => {
+    const { fetcher } = useFetcher<PostType>(`/note`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "PATCH",
+        payload: {
+          id,
+          content,
+        },
+      });
+
+      if (!res.success || !res.data) {
+        useShowToast(StatusType.ERROR, res.message || "Failed to update post");
+        throw new Error(res.message || "Failed to update post");
+      }
+
+      useShowToast(StatusType.SUCCESS, "Post updated successfully");
+      set((state) => ({
+        posts: state.posts.map((post) =>
+          post.id === id ? { ...post, content } : post,
+        ),
+        isLoading: false,
+      }));
+    } catch (error) {
+      useShowToast(
+        StatusType.ERROR,
+        "An error occurred while updating the post",
       );
     }
   },

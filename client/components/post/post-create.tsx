@@ -9,18 +9,12 @@ import {
   InputGroupTextarea,
 } from "../ui/input-group";
 import { Spinner } from "../ui/spinner";
-import { PostType } from "@/lib/types";
 import { usePostStore } from "@/stores/post-store";
 
-interface PostCreateProps {
-  btnLabel?: string;
-  post?: PostType;
-}
-
-export default function PostCreate({ btnLabel, post }: PostCreateProps) {
+export default function PostCreate() {
   const isLoading = usePostStore((state) => state.isLoading);
   const createPost = usePostStore((state) => state.createPost);
-  const [content, setContent] = useState(post?.content || "");
+  const [content, setContent] = useState("");
 
   const handleSubmit = async () => {
     if (content.trim()) {
@@ -47,7 +41,7 @@ export default function PostCreate({ btnLabel, post }: PostCreateProps) {
               className="ml-auto"
             >
               {isLoading ? <Spinner /> : ""}
-              {btnLabel}
+              Post
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>

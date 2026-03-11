@@ -19,7 +19,7 @@ export default function HomePage() {
 
   return (
     <Fragment>
-      <PostCreate btnLabel="Post" />
+      <PostCreate />
       <div className="w-full space-y-3 mt-5">
         {isLoading && posts.length === 0 && [1, 2, 3].map((i) => <PostPlaceholder key={i} />)}
         {!isLoading && posts.length === 0 && (<PostEmpty label="No Posts Yet" />)}
