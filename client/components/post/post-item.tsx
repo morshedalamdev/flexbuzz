@@ -12,7 +12,6 @@ import {
 } from "../ui/dropdown-menu";
 import PostEdit from "./post-edit";
 import PostDelete from "./post-delete";
-import { getToken } from "@/lib/token";
 import { PostType } from "@/lib/types";
 
 export default function PostItem({ post }: { post: PostType }) {
@@ -20,8 +19,6 @@ export default function PostItem({ post }: { post: PostType }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const handleLike = () =>{
-    const tokens = getToken()
-    console.log(tokens);
   }
 
   return (
@@ -30,7 +27,7 @@ export default function PostItem({ post }: { post: PostType }) {
         <h3 className="font-semibold">@{post.user.username}</h3>
         <div className="flex items-center gap-2">
           <PostEdit post={post} open={isEditOpen} onOpenChange={setIsEditOpen} />
-          <PostDelete open={isDeleteOpen} onOpenChange={setIsDeleteOpen} />
+          <PostDelete postId={post.id} open={isDeleteOpen} onOpenChange={setIsDeleteOpen} />
           <DropdownMenu>
             <DropdownMenuTrigger className="text-sm font-medium">
               <EllipsisVerticalIcon size={14} />

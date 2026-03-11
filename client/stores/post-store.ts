@@ -9,6 +9,7 @@ interface PostStoreType {
   fetchPosts: () => Promise<void>;
   createPost: (content: string) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
 }
 
 export const usePostStore = create<PostStoreType>((set, get) => ({
@@ -94,6 +95,33 @@ export const usePostStore = create<PostStoreType>((set, get) => ({
       useShowToast(
         StatusType.ERROR,
         "An error occurred while updating the post",
+      );
+    }
+  },
+
+  deletePost: async (id: string) => {
+    const { fetcher } = useFetcher(`/note/${id}`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "DELETE",
+      });
+
+      if (!res.success) {
+        useShowToast(StatusType.ERROR, res.message || "Failed to delete post");
+        throw new Error(res.message || "Failed to delete post");
+      }
+
+      useShowToast(StatusType.SUCCESS, "Post deleted successfully");
+      set((state) => ({
+        posts: state.posts.filter((post) => post.id !== id),
+        isLoading: false,
+      }));
+    } catch (error) {
+      useShowToast(
+        StatusType.ERROR,
+        "An error occurred while deleting the post",
       );
     }
   },
