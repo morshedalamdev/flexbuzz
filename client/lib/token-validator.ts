@@ -15,14 +15,14 @@ export function isTokenValid(token: string): boolean {
   }
 }
 
-export interface UserType {
+export interface RootUserType {
   sub: string;
   username: string;
   email: string;
 };
 
-export function getUser(token: string): UserType | null {
-  const decoded = jwtDecode<UserType>(token);
+export function getUser(token: string): RootUserType | null {
+  const decoded = jwtDecode<RootUserType>(token);
   if (!decoded) return null;
 
   return {

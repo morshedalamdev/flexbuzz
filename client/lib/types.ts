@@ -57,6 +57,7 @@ export interface ProfileType {
   firstName: string;
   lastName: string;
   gender: Gender;
+  dob: Date;
   bio: string;
 }
 

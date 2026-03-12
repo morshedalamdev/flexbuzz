@@ -8,7 +8,7 @@ import { create } from "zustand";
 interface PostStoreType {
   posts: PostType[];
   isLoading: boolean;
-  fetchPosts: () => Promise<void>;
+  fetchPosts: (userId?: string) => Promise<void>;
   createPost: (content: string) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
@@ -20,8 +20,8 @@ export const postStore = create<PostStoreType>((set, get) => ({
 
   setLoading: (isLoading: boolean) => set({ isLoading }),
 
-  fetchPosts: async () => {
-    const { fetcher } = useFetcher<PaginationInterface<PostType>>(`/note`);
+  fetchPosts: async (userId?: string) => {
+    const { fetcher } = useFetcher<PaginationInterface<PostType>>(`/note${userId ? `?userId=${userId}` : ""}`);
     set({ isLoading: true });
     try {
       const res = await fetcher();

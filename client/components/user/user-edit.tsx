@@ -1,3 +1,4 @@
+import { userStore } from "@/stores/user-store";
 import { Button } from "../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
@@ -12,24 +13,38 @@ import {
 import { Textarea } from "../ui/textarea";
 
 export default function UserEdit() {
+  const currentUser = userStore((state) => state.currentUser);
+
   return (
     <form action="">
       <FieldGroup>
         <Field>
           <FieldLabel>First Name</FieldLabel>
-          <Input type="text" placeholder="First Name" />
+          <Input
+            type="text"
+            placeholder="First Name"
+            defaultValue={currentUser?.profile.firstName || ""}
+          />
         </Field>
         <Field>
           <FieldLabel>Last Name</FieldLabel>
-          <Input type="text" placeholder="Last Name" />
+          <Input
+            type="text"
+            placeholder="Last Name"
+            defaultValue={currentUser?.profile.lastName || ""}
+          />
         </Field>
         <Field>
           <FieldLabel>Email</FieldLabel>
-          <Input type="email" placeholder="Email" />
+          <Input
+            type="email"
+            placeholder="Email"
+            defaultValue={currentUser?.email || ""}
+          />
         </Field>
         <Field>
           <FieldLabel>Gender</FieldLabel>
-          <Select>
+          <Select defaultValue={currentUser?.profile.gender || ""}>
             <SelectTrigger>
               <SelectValue placeholder="Gender" />
             </SelectTrigger>
@@ -44,11 +59,18 @@ export default function UserEdit() {
         </Field>
         <Field>
           <FieldLabel>Date of Birth</FieldLabel>
-          <Input type="date" placeholder="Date of Birth" />
+          <Input
+            type="date"
+            placeholder="Date of Birth"
+            defaultValue={currentUser?.profile.dob || ""}
+          />
         </Field>
         <Field>
           <FieldLabel>Bio</FieldLabel>
-          <Textarea placeholder="Tell a little bit about yourself" />
+          <Textarea
+            placeholder="Tell a little bit about yourself"
+            defaultValue={currentUser?.profile.bio || ""}
+          />
         </Field>
         <Field>
           <Button type="submit">Save changes</Button>

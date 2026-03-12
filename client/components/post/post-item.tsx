@@ -13,45 +13,57 @@ import {
 import PostEdit from "./post-edit";
 import PostDelete from "./post-delete";
 import { PostType } from "@/lib/types";
+import { userStore } from "@/stores/user-store";
+import Link from "next/link";
 
 export default function PostItem({ post }: { post: PostType }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const user = userStore((state) => state.user);
 
-  const handleLike = () =>{
-  }
+  const handleLike = () => {};
 
   return (
     <div className="border rounded-sm p-3 space-y-3 shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">@{post.user.username}</h3>
+        <Link href={`/user/${post.userId}`}>
+          <h3 className="font-semibold">@{post.user.username}</h3>
+        </Link>
         <div className="flex items-center gap-2">
-          <PostEdit post={post} open={isEditOpen} onOpenChange={setIsEditOpen} />
-          <PostDelete postId={post.id} open={isDeleteOpen} onOpenChange={setIsDeleteOpen} />
-          <DropdownMenu>
-            <DropdownMenuTrigger className="text-sm font-medium">
-              <EllipsisVerticalIcon size={14} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onClick={() => setIsEditOpen(true)}
-                className="cursor-pointer"
-              >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setIsDeleteOpen(true)}
-                className="cursor-pointer"
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <PostEdit
+            post={post}
+            open={isEditOpen}
+            onOpenChange={setIsEditOpen}
+          />
+          <PostDelete
+            postId={post.id}
+            open={isDeleteOpen}
+            onOpenChange={setIsDeleteOpen}
+          />
+          {user?.sub === post.userId && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-sm font-medium">
+                <EllipsisVerticalIcon size={14} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() => setIsEditOpen(true)}
+                  className="cursor-pointer"
+                >
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setIsDeleteOpen(true)}
+                  className="cursor-pointer"
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
-      <p>
-        {post.content}
-      </p>
+      <p>{post.content}</p>
       <div className="flex gap-3">
         <Button variant="outline" onClick={handleLike}>
           <ThumbsUpIcon size={15} />
