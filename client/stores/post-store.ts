@@ -1,5 +1,7 @@
 import { useFetcher } from "@/hooks/use-fetcher";
 import { useShowToast } from "@/hooks/use-show-toast";
+import { getAccessToken } from "@/lib/token";
+import { getUser } from "@/lib/token-validator";
 import { PaginationInterface, PostType, StatusType } from "@/lib/types";
 import { create } from "zustand";
 
@@ -12,7 +14,7 @@ interface PostStoreType {
   deletePost: (id: string) => Promise<void>;
 }
 
-export const usePostStore = create<PostStoreType>((set, get) => ({
+export const postStore = create<PostStoreType>((set, get) => ({
   posts: [],
   isLoading: true,
 

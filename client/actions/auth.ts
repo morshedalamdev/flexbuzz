@@ -19,11 +19,8 @@ export async function signup(
 
   const validatedData = SignupSchema.safeParse(data);
   if (!validatedData.success) {
-    useShowToast(
-      StatusType.ERROR,
-      "Validation failed. Please check the fields.",
-    );
     return {
+      status: StatusType.ERROR,
       errors: validatedData.error.flatten().fieldErrors,
       message: "Validation failed. Please check the fields.",
       username: typeof data.username === "string" ? data.username : undefined,
@@ -41,8 +38,8 @@ export async function signup(
   });
 
   if (!res.success || !res.data) {
-    useShowToast(StatusType.ERROR, res?.message as unknown as string);
     return {
+      status: StatusType.ERROR,
       message: res?.message as unknown as string,
       username: validatedData.data.username,
       email: validatedData.data.email,
@@ -54,8 +51,11 @@ export async function signup(
     refreshToken: res.data.refreshToken,
   });
 
-  useShowToast(StatusType.SUCCESS, "Signup successful!");
-  redirect("/");
+  return {
+    status: StatusType.SUCCESS,
+    message: "Signup successful!",
+    token: res.data.accessToken,
+  };
 }
 
 export async function login(
@@ -67,11 +67,8 @@ export async function login(
 
   const validatedData = LoginSchema.safeParse(data);
   if (!validatedData.success) {
-    useShowToast(
-      StatusType.ERROR,
-      "Validation failed. Please check the fields.",
-    );
     return {
+      status: StatusType.ERROR,
       errors: validatedData.error.flatten().fieldErrors,
       message: "Validation failed. Please check the fields.",
       username: typeof data.username === "string" ? data.username : undefined,
@@ -87,8 +84,8 @@ export async function login(
   });
 
   if (!res.success || !res.data) {
-    useShowToast(StatusType.ERROR, res?.message as unknown as string);
     return {
+      status: StatusType.ERROR,
       message: res?.message as unknown as string,
       username: validatedData.data.username,
     };
@@ -99,8 +96,11 @@ export async function login(
     refreshToken: res.data.refreshToken,
   });
 
-  useShowToast(StatusType.SUCCESS, "Login successful!");
-  redirect("/");
+  return {
+    status: StatusType.SUCCESS,
+    message: "Login successful!",
+    token: res.data.accessToken,
+  };
 }
 
 export function logout() {

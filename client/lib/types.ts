@@ -34,6 +34,8 @@ export interface SignupStateType {
     password?: string[];
     confirmPassword?: string[];
   };
+  status: StatusType;
+  token?: string;
   message?: string;
   username?: string;
   email?: string;
@@ -44,6 +46,8 @@ export interface LoginStateType {
     username?: string[];
     password?: string[];
   };
+  status: StatusType;
+  token?: string;
   message?: string;
   username?: string;
 }

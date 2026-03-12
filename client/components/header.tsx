@@ -13,8 +13,10 @@ import {
 } from "./ui/dropdown-menu";
 import { UserDialog } from "./user/user-dialog";
 import { logout } from "@/actions/auth";
+import { userStore } from "@/stores/user-store";
 
 export default function Header() {
+  const user = userStore((state) => state.user);
   const [editUser, setEditUser] = useState(false);
 
   return (
@@ -30,7 +32,7 @@ export default function Header() {
         <UserDialog open={editUser} onOpenChange={setEditUser} />
         <DropdownMenu>
           <DropdownMenuTrigger className="text-sm font-medium">
-            Username
+            @{user?.username || "Username"}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuGroup>

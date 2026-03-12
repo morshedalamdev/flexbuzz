@@ -1,6 +1,6 @@
 "use client";
 
-import { usePostStore } from "@/stores/post-store";
+import { postStore } from "@/stores/post-store";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +22,7 @@ export default function PostDelete({
   open,
   onOpenChange,
 }: PostDeleteProps) {
-  const deletePost = usePostStore((state) => state.deletePost);
+  const deletePost = postStore((state) => state.deletePost);
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

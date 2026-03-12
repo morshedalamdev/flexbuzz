@@ -26,7 +26,7 @@ import {
   InputGroupTextarea,
 } from "../ui/input-group";
 import { useState } from "react";
-import { usePostStore } from "@/stores/post-store";
+import { postStore } from "@/stores/post-store";
 import { Spinner } from "../ui/spinner";
 
 interface PostEditProps {
@@ -36,8 +36,8 @@ interface PostEditProps {
 }
 
 export default function PostEdit({ post, open, onOpenChange }: PostEditProps) {
-  const isLoading = usePostStore((state) => state.isLoading);
-  const updatePost = usePostStore((state) => state.updatePost);
+  const isLoading = postStore((state) => state.isLoading);
+  const updatePost = postStore((state) => state.updatePost);
   const [content, setContent] = useState(post?.content || "");
   const isDesktop = useMediaQuery();
 
