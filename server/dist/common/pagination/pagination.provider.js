@@ -23,21 +23,22 @@ let PaginationProvider = class PaginationProvider {
     async paginateQuery(paginationQueryDto, repository, where, relations) {
         const currentPage = paginationQueryDto.page || 1;
         const itemsPerPage = paginationQueryDto.limit || 10;
-        const findOptions = {
+        const options = {
+            ...(where && { where }),
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
+            order: { createdAt: "DESC" },
         };
-        if (where) {
-            findOptions.where = where;
+        if (relations && relations.length > 0) {
+            options.relations = relations.reduce((acc, rel) => {
+                acc[rel] = true;
+                return acc;
+            }, {});
         }
-        if (relations) {
-            findOptions.relations = relations;
-        }
-        const result = await repository.find(findOptions);
-        const totalItems = await repository.count(findOptions);
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        const nextPage = currentPage === totalPages ? currentPage : currentPage + 1;
-        const prevPage = currentPage === 1 ? currentPage : currentPage - 1;
+        const [result, totalItems] = await repository.findAndCount(options);
+        const totalPages = totalItems === 0 ? 1 : Math.ceil(totalItems / itemsPerPage);
+        const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+        const prevPage = currentPage > 1 ? currentPage - 1 : null;
         const baseUrl = this.request.protocol +
             "://" +
             this.request.get("host") +

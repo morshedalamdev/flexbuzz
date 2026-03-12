@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -25,8 +24,9 @@ import { MessageCircleIcon, SendHorizontalIcon } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Input } from "../ui/input";
 import CommentItem from "./comment-item";
+import { PostType } from "@/lib/types";
 
-export default function CommentDialog() {
+export default function CommentDialog({ post }: { post: PostType }) {
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery();
 
@@ -36,19 +36,14 @@ export default function CommentDialog() {
         <DialogTrigger asChild>
           <Button variant="outline">
             <MessageCircleIcon size={15} />
-            Comments (6)
+            Comments {post.commentCount > 0 ? `(${post.commentCount})` : ""}
           </Button>
         </DialogTrigger>
         <DialogContent className="max-h-150 flex flex-col px-0">
           <div className="flex-1 overflow-y-auto px-6">
             <DialogHeader>
-              <DialogTitle>@Username</DialogTitle>
-              <DialogDescription>
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nemo
-                magni quidem corrupti nihil modi veritatis laborum nam quisquam
-                vitae et sequi, tempore non cupiditate voluptate dolore optio,
-                alias tenetur aliquid?
-              </DialogDescription>
+              <DialogTitle className="text-sm">@{post.user.username}</DialogTitle>
+              <DialogDescription className="text-black">{post.content}</DialogDescription>
             </DialogHeader>
             <ul className="space-y-2 mt-6">
               <li>
@@ -106,19 +101,14 @@ export default function CommentDialog() {
       <DrawerTrigger asChild>
         <Button variant="outline">
           <MessageCircleIcon size={15} />
-          Comments (6)
+          Comments {post.commentCount > 0 ? `(${post.commentCount})` : ""}
         </Button>
       </DrawerTrigger>
       <DrawerContent className="flex flex-col">
         <div className="flex-1 overflow-y-auto">
           <DrawerHeader className="text-left!">
-            <DrawerTitle>@Username</DrawerTitle>
-            <DrawerDescription>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nemo
-              magni quidem corrupti nihil modi veritatis laborum nam quisquam
-              vitae et sequi, tempore non cupiditate voluptate dolore optio,
-              alias tenetur aliquid?
-            </DrawerDescription>
+            <DrawerTitle>@{post.user.username}</DrawerTitle>
+            <DrawerDescription>{post.content}</DrawerDescription>
           </DrawerHeader>
           <ul className="space-y-1 px-4">
             <li>

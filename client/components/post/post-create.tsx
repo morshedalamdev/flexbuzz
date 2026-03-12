@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Field, FieldGroup } from "../ui/field";
 import {
   InputGroup,
@@ -5,8 +8,20 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "../ui/input-group";
+import { Spinner } from "../ui/spinner";
+import { usePostStore } from "@/stores/post-store";
 
-export default function PostCreate({ btnLabel }: { btnLabel: string }) {
+export default function PostCreate() {
+  const isLoading = usePostStore((state) => state.isLoading);
+  const createPost = usePostStore((state) => state.createPost);
+  const [content, setContent] = useState("");
+
+  const handleSubmit = async () => {
+    if (content.trim()) {
+      await createPost(content.trim());
+      setContent("");
+    }
+  };
   return (
     <FieldGroup>
       <Field>
@@ -14,10 +29,19 @@ export default function PostCreate({ btnLabel }: { btnLabel: string }) {
           <InputGroupTextarea
             id="block-end-textarea"
             placeholder="What's on your mind?"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
           />
           <InputGroupAddon align="block-end">
-            <InputGroupButton variant="default" size="sm" className="ml-auto">
-              {btnLabel}
+            <InputGroupButton
+              onClick={handleSubmit}
+              disabled={isLoading}
+              variant="default"
+              size="sm"
+              className="ml-auto"
+            >
+              {isLoading ? <Spinner /> : ""}
+              Post
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>

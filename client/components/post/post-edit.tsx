@@ -16,17 +16,38 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import PostCreate from "./post-create";
 import { Field, FieldGroup } from "../ui/field";
 import { Textarea } from "../ui/textarea";
+import { PostType } from "@/lib/types";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from "../ui/input-group";
+import { useState } from "react";
+import { usePostStore } from "@/stores/post-store";
+import { Spinner } from "../ui/spinner";
 
 interface PostEditProps {
+  post: PostType;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function PostEdit({ open, onOpenChange }: PostEditProps) {
+export default function PostEdit({ post, open, onOpenChange }: PostEditProps) {
+  const isLoading = usePostStore((state) => state.isLoading);
+  const updatePost = usePostStore((state) => state.updatePost);
+  const [content, setContent] = useState(post?.content || "");
   const isDesktop = useMediaQuery();
+
+  const handleSubmit = async () => {
+    if (content.trim()) {
+      await updatePost(post.id, content.trim());
+      onOpenChange(false);
+      setContent("");
+    }
+  };
 
   if (isDesktop) {
     return (
@@ -35,7 +56,29 @@ export default function PostEdit({ open, onOpenChange }: PostEditProps) {
           <DialogHeader>
             <DialogTitle>Edit Post</DialogTitle>
           </DialogHeader>
-          <PostCreate btnLabel="Update" />
+          <FieldGroup>
+            <Field>
+              <InputGroup>
+                <InputGroupTextarea
+                  id="block-end-textarea"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                />
+                <InputGroupAddon align="block-end">
+                  <InputGroupButton
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                    variant="default"
+                    size="sm"
+                    className="ml-auto"
+                  >
+                    {isLoading ? <Spinner /> : ""}
+                    Update
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+            </Field>
+          </FieldGroup>
         </DialogContent>
       </Dialog>
     );
@@ -48,11 +91,18 @@ export default function PostEdit({ open, onOpenChange }: PostEditProps) {
         </DrawerHeader>
         <FieldGroup>
           <Field className="px-4">
-               <Textarea className="max-h-60" placeholder="What's on your mind?" />
+            <Textarea
+              className="max-h-60"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
           </Field>
         </FieldGroup>
         <DrawerFooter className="pt-2">
-          <Button>Update</Button>
+          <Button onClick={handleSubmit} disabled={isLoading}>
+            {isLoading ? <Spinner /> : ""}
+            Update
+          </Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
           </DrawerClose>

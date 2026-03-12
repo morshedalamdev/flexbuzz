@@ -1,7 +1,7 @@
 import { useFetcher } from "@/hooks/use-fetcher";
 import { useShowToast } from "@/hooks/use-show-toast";
 import { deleteToken, storeToken } from "@/lib/token";
-import { LoginState, SignupState, StatusType } from "@/lib/types";
+import { LoginStateType, SignupStateType, StatusType } from "@/lib/types";
 import { LoginSchema, SignupSchema } from "@/lib/validation";
 import { redirect } from "next/navigation";
 
@@ -11,9 +11,9 @@ type LoginResponse = {
 };
 
 export async function signup(
-  state: SignupState | undefined,
+  state: SignupStateType | undefined,
   formData: FormData,
-): Promise<SignupState> {
+): Promise<SignupStateType> {
   const data = Object.fromEntries(formData.entries());
   const { fetcher } = useFetcher<LoginResponse>("/auth/register");
 
@@ -59,9 +59,9 @@ export async function signup(
 }
 
 export async function login(
-  state: LoginState | undefined,
+  state: LoginStateType | undefined,
   formData: FormData,
-): Promise<LoginState> {
+): Promise<LoginStateType> {
   const data = Object.fromEntries(formData.entries());
   const { fetcher } = useFetcher<LoginResponse>("/auth/login");
 
