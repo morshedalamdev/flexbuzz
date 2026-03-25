@@ -9,11 +9,11 @@ import {
   InputGroupTextarea,
 } from "../ui/input-group";
 import { Spinner } from "../ui/spinner";
-import { usePostStore } from "@/stores/post-store";
+import { postStore } from "@/stores/post-store";
 
 export default function PostCreate() {
-  const isLoading = usePostStore((state) => state.isLoading);
-  const createPost = usePostStore((state) => state.createPost);
+  const isLoading = postStore((state) => state.isLoading);
+  const createPost = postStore((state) => state.createPost);
   const [content, setContent] = useState("");
 
   const handleSubmit = async () => {

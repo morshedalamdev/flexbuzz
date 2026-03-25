@@ -11,11 +11,25 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { Spinner } from "../ui/spinner";
+import { useShowToast } from "@/hooks/use-show-toast";
+import { redirect } from "next/navigation";
+import { authStore } from "@/stores/auth-store";
 
 export function LoginForm() {
+  const setUser = authStore((state) => state.setUser);
   const [state, action, isPending] = useActionState(login, undefined);
+  
+    useEffect(() => {
+      if (state?.message) {
+        useShowToast(state.status, state.message);
+      }
+      if (state?.status === "success" && state.token) {
+        setUser(state.token as string);
+        redirect("/");
+      }
+    }, [state]);
 
   return (
     <form action={action}>

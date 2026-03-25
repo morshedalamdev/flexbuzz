@@ -34,6 +34,8 @@ export interface SignupStateType {
     password?: string[];
     confirmPassword?: string[];
   };
+  status: StatusType;
+  token?: string;
   message?: string;
   username?: string;
   email?: string;
@@ -44,8 +46,32 @@ export interface LoginStateType {
     username?: string[];
     password?: string[];
   };
+  status: StatusType;
+  token?: string;
   message?: string;
   username?: string;
+}
+
+export interface ProfileEditStateType {
+  errors?: {
+    firstName?: string[];
+    lastName?: string[];
+    username?: string[];
+    email?: string[];
+    gender?: string[];
+    dob?: string[];
+    bio?: string[];
+  };
+  status: StatusType;
+  token?: string;
+  message?: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  gender?: string;
+  dob?: Date;
+  bio?: string;
 }
 
 export interface ProfileType {
@@ -53,6 +79,7 @@ export interface ProfileType {
   firstName: string;
   lastName: string;
   gender: Gender;
+  dob: Date;
   bio: string;
 }
 

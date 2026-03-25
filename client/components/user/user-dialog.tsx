@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +13,6 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,

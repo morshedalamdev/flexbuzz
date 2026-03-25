@@ -4,14 +4,14 @@ import PostEmpty from "@/components/placeholder/post-empty";
 import PostPlaceholder from "@/components/placeholder/post-placeholder";
 import PostCreate from "@/components/post/post-create";
 import PostItem from "@/components/post/post-item";
-import { usePostStore } from "@/stores/post-store";
+import { postStore } from "@/stores/post-store";
 import { useEffect } from "react";
 import { Fragment } from "react/jsx-runtime";
 
 export default function HomePage() {
-  const posts = usePostStore((state) => state.posts);
-  const isLoading = usePostStore((state) => state.isLoading);
-  const fetchPosts = usePostStore((state) => state.fetchPosts);
+  const posts = postStore((state) => state.posts);
+  const isLoading = postStore((state) => state.isLoading);
+  const fetchPosts = postStore((state) => state.fetchPosts);
 
   useEffect(() => {
     fetchPosts();
