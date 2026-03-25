@@ -34,7 +34,7 @@ export default function UserEdit() {
       useShowToast(state.status, state.message);
     }
     if(state?.status === "success") {
-      router.refresh();
+      // router.refresh();
     }
   }, [state]);
   // Hey! I'm new here. Nice to meet you.
