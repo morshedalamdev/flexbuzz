@@ -52,6 +52,28 @@ export interface LoginStateType {
   username?: string;
 }
 
+export interface ProfileEditStateType {
+  errors?: {
+    firstName?: string[];
+    lastName?: string[];
+    username?: string[];
+    email?: string[];
+    gender?: string[];
+    dob?: string[];
+    bio?: string[];
+  };
+  status: StatusType;
+  token?: string;
+  message?: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  gender?: string;
+  dob?: Date;
+  bio?: string;
+}
+
 export interface ProfileType {
   id: string;
   firstName: string;

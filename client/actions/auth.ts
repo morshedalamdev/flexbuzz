@@ -1,8 +1,13 @@
 import { useFetcher } from "@/hooks/use-fetcher";
 import { useShowToast } from "@/hooks/use-show-toast";
 import { deleteToken, storeToken } from "@/lib/token";
-import { LoginStateType, SignupStateType, StatusType } from "@/lib/types";
-import { LoginSchema, SignupSchema } from "@/lib/validation";
+import {
+  LoginStateType,
+  ProfileEditStateType,
+  SignupStateType,
+  StatusType,
+} from "@/lib/types";
+import { LoginSchema, ProfileEditSchema, SignupSchema } from "@/lib/validation";
 import { redirect } from "next/navigation";
 
 type LoginResponse = {
@@ -107,4 +112,59 @@ export function logout() {
   deleteToken();
   useShowToast(StatusType.SUCCESS, "Logged out successfully!");
   redirect("/login");
+}
+
+export async function editProfile(
+  state: ProfileEditStateType | unknown,
+  formData: FormData,
+): Promise<ProfileEditStateType> {
+  const data = Object.fromEntries(formData.entries());
+  const { fetcher } = useFetcher("/user/me");
+
+  const validatedData = ProfileEditSchema.safeParse(data);
+  if (!validatedData.success) {
+    return {
+      status: StatusType.ERROR,
+      errors: validatedData.error.flatten().fieldErrors,
+      message: "Validation failed. Please check the fields.",
+      firstName:
+        typeof data.firstName === "string" ? data.firstName : undefined,
+      lastName: typeof data.lastName === "string" ? data.lastName : undefined,
+      email: typeof data.email === "string" ? data.email : undefined,
+      gender: typeof data.gender === "string" ? data.gender : undefined,
+      dob: typeof data.dob === "string" ? new Date(data.dob) : undefined,
+      bio: typeof data.bio === "string" ? data.bio : undefined,
+    };
+  }
+
+  const res = await fetcher({
+    method: "PATCH",
+    payload: {
+      firstName: validatedData.data.firstName,
+      lastName: validatedData.data.lastName,
+      // email: validatedData.data.email,
+      gender: validatedData.data.gender,
+      dob: validatedData.data.dob,
+      bio: validatedData.data.bio,
+    },
+  });
+
+  if (!res.success || !res.data) {
+    return {
+      status: StatusType.ERROR,
+      message: res?.message as unknown as string,
+      firstName:
+        typeof data.firstName === "string" ? data.firstName : undefined,
+      lastName: typeof data.lastName === "string" ? data.lastName : undefined,
+      email: typeof data.email === "string" ? data.email : undefined,
+      gender: typeof data.gender === "string" ? data.gender : undefined,
+      dob: typeof data.dob === "string" ? new Date(data.dob) : undefined,
+      bio: typeof data.bio === "string" ? data.bio : undefined,
+    };
+  }
+
+  return {
+    status: StatusType.SUCCESS,
+    message: "Profile updated successfully!",
+  };
 }

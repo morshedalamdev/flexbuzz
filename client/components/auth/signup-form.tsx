@@ -15,10 +15,10 @@ import { signup } from "@/actions/auth";
 import { Spinner } from "../ui/spinner";
 import { useShowToast } from "@/hooks/use-show-toast";
 import { redirect } from "next/navigation";
-import { userStore } from "@/stores/user-store";
+import { authStore } from "@/stores/auth-store";
 
 export function SignupForm() {
-  const setUser = userStore((state) => state.setUser);
+  const setUser = authStore((state) => state.setUser);
   const [state, action, isPending] = useActionState(signup, undefined);
 
   useEffect(() => {

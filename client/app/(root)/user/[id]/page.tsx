@@ -15,20 +15,20 @@ import { Fragment } from "react/jsx-runtime";
 export default function UserPage() {
   const { id } = useParams();
   const [open, setOpen] = useState(false);
-  const fetchCurrentUser = userStore((state) => state.fetchCurrentUser);
-  const currentUser = userStore((state) => state.currentUser);
+  const fetchUser = userStore((state) => state.fetchUser);
+  const currentUser = userStore((state) => state.user);
   const posts = postStore((state) => state.posts);
   const isLoading = postStore((state) => state.isLoading);
   const fetchPosts = postStore((state) => state.fetchPosts);
 
   useEffect(() => {
-    fetchCurrentUser(id as string);
-    fetchPosts(id as string);
-  }, [fetchCurrentUser, id]);
-  
+    fetchUser(id as string);
+    // fetchPosts(id as string);
+  }, [id]);
+
   return (
     <Fragment>
-      {currentUser && <UserDialog open={open} onOpenChange={setOpen} />}
+      <UserDialog open={open} onOpenChange={setOpen} />
       <div className="relative flex flex-col md:flex-row flex-wrap md:gap-x-6 gap-y-2 w-full">
         <div>
           {currentUser?.profile.firstName ? (
@@ -56,15 +56,17 @@ export default function UserPage() {
           <span className="font-semibold">Bio:</span>{" "}
           {currentUser?.profile.bio || "Not specified"}
         </p>
-        <div className="absolute right-0">
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => setOpen(true)}
-          >
-            <PencilIcon />
-          </Button>
-        </div>
+        {id === "me" && (
+          <div className="absolute right-0">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              onClick={() => setOpen(true)}
+            >
+              <PencilIcon />
+            </Button>
+          </div>
+        )}
       </div>
       <div className="w-full space-y-3 mt-5">
         <h2 className="font-bold text-lg">Posts</h2>

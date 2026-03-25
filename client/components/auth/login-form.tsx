@@ -13,12 +13,12 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useActionState, useEffect } from "react";
 import { Spinner } from "../ui/spinner";
-import { userStore } from "@/stores/user-store";
 import { useShowToast } from "@/hooks/use-show-toast";
 import { redirect } from "next/navigation";
+import { authStore } from "@/stores/auth-store";
 
 export function LoginForm() {
-  const setUser = userStore((state) => state.setUser);
+  const setUser = authStore((state) => state.setUser);
   const [state, action, isPending] = useActionState(login, undefined);
   
     useEffect(() => {

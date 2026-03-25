@@ -13,13 +13,13 @@ import {
 import PostEdit from "./post-edit";
 import PostDelete from "./post-delete";
 import { PostType } from "@/lib/types";
-import { userStore } from "@/stores/user-store";
 import Link from "next/link";
+import { authStore } from "@/stores/auth-store";
 
 export default function PostItem({ post }: { post: PostType }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const user = userStore((state) => state.user);
+  const user = authStore((state) => state.user);
 
   const handleLike = () => {};
 

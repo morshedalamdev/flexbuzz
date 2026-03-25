@@ -13,10 +13,10 @@ import {
 } from "./ui/dropdown-menu";
 import { UserDialog } from "./user/user-dialog";
 import { logout } from "@/actions/auth";
-import { userStore } from "@/stores/user-store";
+import { authStore } from "@/stores/auth-store";
 
 export default function Header() {
-  const user = userStore((state) => state.user);
+  const user = authStore((state) => state.user);
   const [editUser, setEditUser] = useState(false);
 
   return (
