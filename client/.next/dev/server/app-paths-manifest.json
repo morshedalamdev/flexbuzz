@@ -1,3 +1,6 @@
 {
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(auth)/signup/page": "app/(auth)/signup/page.js",
+  "/(root)/page": "app/(root)/page.js",
   "/(root)/user/[id]/page": "app/(root)/user/[id]/page.js"
 }

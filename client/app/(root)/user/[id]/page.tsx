@@ -5,6 +5,8 @@ import PostPlaceholder from "@/components/placeholder/post-placeholder";
 import PostItem from "@/components/post/post-item";
 import { Button } from "@/components/ui/button";
 import { UserDialog } from "@/components/user/user-dialog";
+import { formatDateToLocale } from "@/lib/format-date";
+import { authStore } from "@/stores/auth-store";
 import { postStore } from "@/stores/post-store";
 import { userStore } from "@/stores/user-store";
 import { PencilIcon } from "lucide-react";
@@ -17,13 +19,14 @@ export default function UserPage() {
   const [open, setOpen] = useState(false);
   const fetchUser = userStore((state) => state.fetchUser);
   const currentUser = userStore((state) => state.user);
+  const authUser = authStore((state) => state.user);
   const posts = postStore((state) => state.posts);
   const isLoading = postStore((state) => state.isLoading);
   const fetchPosts = postStore((state) => state.fetchPosts);
 
   useEffect(() => {
     fetchUser(id as string);
-    // fetchPosts(id as string);
+    fetchPosts(id as string);
   }, [id]);
 
   return (
@@ -40,7 +43,7 @@ export default function UserPage() {
           )}
           <h3 className="text-sm">@{currentUser?.username}</h3>
         </div>
-        <div className="flex md:flex-col md:gap-0 justify-between md:justify-start">
+        <div className="flex md:flex-col md:gap-0 justify-between md:justify-start capitalize">
           <p>
             <span className="font-semibold">Gender:</span>{" "}
             {currentUser?.profile.gender || "Not specified"}
@@ -48,7 +51,7 @@ export default function UserPage() {
           <p>
             <span className="font-semibold">Date of Birth:</span>{" "}
             {currentUser?.profile.dob
-              ? new Date(currentUser.profile.dob).toLocaleDateString()
+              ? formatDateToLocale(currentUser.profile.dob)
               : "Not specified"}
           </p>
         </div>
@@ -56,7 +59,7 @@ export default function UserPage() {
           <span className="font-semibold">Bio:</span>{" "}
           {currentUser?.profile.bio || "Not specified"}
         </p>
-        {id === "me" && (
+        {id === authUser?.sub && (
           <div className="absolute right-0">
             <Button
               variant="outline"

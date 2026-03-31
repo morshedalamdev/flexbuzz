@@ -63,15 +63,17 @@ export const ProfileEditSchema = z.object({
     .trim(),
   email: z.email("Please enter a valid email").trim(),
   gender: z.enum(["male", "female", "other"], "Please select your gender"),
-  dob: z.string().refine((dateStr) => {
-    const dob = new Date(dateStr);
-    const now = new Date();
-    return (
-      !isNaN(dob.getTime()) &&
-      dob > new Date(now.getFullYear() - 120, now.getMonth(), now.getDate()) &&
-      dob < new Date(now.getFullYear() - 12, now.getMonth(), now.getDate())
-    );
-  }, "Please enter a valid date of birth. You must be at least 12 years old."),
+  dob: z
+    .string()
+    .refine((dateStr) => {
+      const dob = new Date(dateStr);
+      const now = new Date();
+      return (
+        !isNaN(dob.getTime()) &&
+        dob > new Date(now.getFullYear() - 120, now.getMonth(), now.getDate()) &&
+        dob < new Date(now.getFullYear() - 12, now.getMonth(), now.getDate())
+      );
+    }, "Please enter a valid date of birth. You must be at least 12 years old."),
   bio: z
     .string()
     .min(10, "Bio must be at least 10 characters long")

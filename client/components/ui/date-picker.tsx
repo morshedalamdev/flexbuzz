@@ -9,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { formatDateToLocale } from "@/lib/format-date";
 
 interface DatePickerInputProps {
   date: Date | undefined;
@@ -34,7 +35,7 @@ export function DatePickerInput({
             id="date"
             className="justify-start font-normal"
           >
-            {date ? date.toLocaleDateString() : "Select date"}
+            {date ? formatDateToLocale(date) : "Select date"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto overflow-hidden p-0" align="start">

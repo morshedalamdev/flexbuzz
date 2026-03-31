@@ -14,17 +14,20 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { userStore } from "@/stores/user-store";
-import { editProfile } from "@/actions/auth";
+import { updateProfile } from "@/actions/auth";
 import { DatePickerInput } from "../ui/date-picker";
 import { useShowToast } from "@/hooks/use-show-toast";
 import { Spinner } from "../ui/spinner";
 import { formatDate } from "@/lib/format-date";
-import { useRouter } from "next/router";
 
-export default function UserEdit() {
-  const router = useRouter();
+export default function UserEdit({
+  onOpenChange,
+}: {
+  onOpenChange: (open: boolean) => void;
+}) {
   const user = userStore((state) => state.user);
-  const [state, action, isPending] = useActionState(editProfile, undefined);
+  const fetchUser = userStore((state) => state.fetchUser);
+  const [state, action, isPending] = useActionState(updateProfile, undefined);
   const [date, setDate] = useState<Date | undefined>(
     user?.profile.dob || state?.dob || undefined,
   );
@@ -33,11 +36,12 @@ export default function UserEdit() {
     if (state?.message) {
       useShowToast(state.status, state.message);
     }
-    if(state?.status === "success") {
-      // router.refresh();
+    if (state?.status === "success") {
+      onOpenChange(false);
+      if (user?.id) fetchUser(user.id);
     }
   }, [state]);
-  // Hey! I'm new here. Nice to meet you.
+
   return (
     <form action={action}>
       <FieldGroup>

@@ -30,33 +30,6 @@ let UserService = class UserService {
         this.paginationProvider = paginationProvider;
         this.userRepository = userRepository;
     }
-    async create(userDto) {
-        const isUsernameExist = await this.userRepository.findOne({
-            where: { username: userDto.username },
-            withDeleted: true,
-        });
-        if (isUsernameExist) {
-            throw new user_exists_exception_1.UserExistsException("username", userDto.username);
-        }
-        const isEmailExist = await this.userRepository.findOne({
-            where: { email: userDto.email },
-            withDeleted: true,
-        });
-        if (isEmailExist) {
-            throw new user_exists_exception_1.UserExistsException("email", userDto.email);
-        }
-        try {
-            const newUser = this.userRepository.create({
-                ...userDto,
-                profile: {},
-            });
-            return await this.userRepository.save(newUser);
-        }
-        catch (error) {
-            console.error("Error @user-create:", error);
-            throw new common_1.RequestTimeoutException();
-        }
-    }
     async findAll(paginationQueryDto, userId) {
         try {
             const users = await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository);
@@ -117,6 +90,33 @@ let UserService = class UserService {
         }
         return { ...user, followerCount, followingCount };
     }
+    async create(userDto) {
+        const isUsernameExist = await this.userRepository.findOne({
+            where: { username: userDto.username },
+            withDeleted: true,
+        });
+        if (isUsernameExist) {
+            throw new user_exists_exception_1.UserExistsException("username", userDto.username);
+        }
+        const isEmailExist = await this.userRepository.findOne({
+            where: { email: userDto.email },
+            withDeleted: true,
+        });
+        if (isEmailExist) {
+            throw new user_exists_exception_1.UserExistsException("email", userDto.email);
+        }
+        try {
+            const newUser = this.userRepository.create({
+                ...userDto,
+                profile: {},
+            });
+            return await this.userRepository.save(newUser);
+        }
+        catch (error) {
+            console.error("Error @user-create:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
     async current(userId) {
         return await this.findBy(userId);
     }
@@ -128,6 +128,24 @@ let UserService = class UserService {
             });
             if (!user || !user.profile) {
                 throw new common_1.NotFoundException("User not found");
+            }
+            if (userDto.username && userDto.username !== user.username) {
+                const isUsernameExist = await this.userRepository.findOne({
+                    where: { username: userDto.username },
+                    withDeleted: true,
+                });
+                if (isUsernameExist) {
+                    throw new user_exists_exception_1.UserExistsException("username", userDto.username);
+                }
+            }
+            if (userDto.email && userDto.email !== user.email) {
+                const isEmailExist = await this.userRepository.findOne({
+                    where: { email: userDto.email },
+                    withDeleted: true,
+                });
+                if (isEmailExist) {
+                    throw new user_exists_exception_1.UserExistsException("email", userDto.email);
+                }
             }
             user.username = userDto.username ?? user.username;
             user.email = userDto.email ?? user.email;
@@ -144,6 +162,9 @@ let UserService = class UserService {
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            if (error instanceof user_exists_exception_1.UserExistsException) {
                 throw error;
             }
             console.error("Error @user-update:", error);
