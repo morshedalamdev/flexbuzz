@@ -114,7 +114,7 @@ export function logout() {
   redirect("/login");
 }
 
-export async function editProfile(
+export async function updateProfile(
   state: ProfileEditStateType | unknown,
   formData: FormData,
 ): Promise<ProfileEditStateType> {
@@ -152,8 +152,7 @@ export async function editProfile(
       username: validatedData.data.username,
     },
   });
-  // ma@db.com123
-  console.log({ res });
+  
   if (!res.success || !res.data) {
     return {
       status: StatusType.ERROR,

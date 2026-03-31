@@ -1310,6 +1310,10 @@
     color: var(--color-white);
   }
 
+  .capitalize {
+    text-transform: capitalize;
+  }
+
   .underline-offset-4 {
     text-underline-offset: 4px;
   }

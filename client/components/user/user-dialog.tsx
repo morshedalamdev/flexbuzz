@@ -38,7 +38,7 @@ export function UserDialog({ open, onOpenChange }: UserDialogProps) {
               done.
             </DialogDescription>
           </DialogHeader>
-          <UserEdit />
+          <UserEdit onOpenChange={onOpenChange} />
         </DialogContent>
       </Dialog>
     );
@@ -51,7 +51,7 @@ export function UserDialog({ open, onOpenChange }: UserDialogProps) {
           <DrawerTitle>Edit profile</DrawerTitle>
         </DrawerHeader>
         <div className="px-4 overflow-y-auto">
-          <UserEdit />
+          <UserEdit onOpenChange={onOpenChange} />
         </div>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
