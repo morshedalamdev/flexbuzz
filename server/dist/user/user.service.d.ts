@@ -12,7 +12,6 @@ export declare class UserService {
     private readonly paginationProvider;
     private userRepository;
     constructor(followService: FollowService, paginationProvider: PaginationProvider, userRepository: Repository<User>);
-    create(userDto: CreateUserDto): Promise<User>;
     findAll(paginationQueryDto: PaginationQueryDto, userId: string): Promise<PaginationInterface<User>>;
     findBy(identifier: string, userId?: string): Promise<{
         followerCount: number;
@@ -32,6 +31,7 @@ export declare class UserService {
         likes: import("../like/like.entity").Like[];
         comments: import("../comment/comment.entity").Comment[];
     }>;
+    create(userDto: CreateUserDto): Promise<User>;
     current(userId: string): Promise<{
         followerCount: number;
         followingCount: number;
