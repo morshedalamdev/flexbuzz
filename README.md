@@ -172,37 +172,37 @@ users ────────── posts ─────── post_hashtags �
 - [x] Install and configure Shadcn/UI components
 - [x] Install and configure Zustand for state management
 - [x] Install Tailwind CSS
-- [ ] Set up Axios or Fetch API client for backend communication
-- [ ] Create base Zustand stores (auth, UI, posts, user, search)
-- [ ] Set up environment variables (`.env`) for frontend
+- [x] Set up Axios or Fetch API client for backend communication
+- [x] Create base Zustand stores (auth, UI, posts, user, search)
+- [x] Set up environment variables (`.env`) for frontend
 - [x] Create initial frontend folder structure
-- [ ] Set up API base URL and interceptors
+- [x] Set up API base URL and interceptors
 - [x] Create reusable layout components (Navbar, Sidebar, Container)
 
 ### Milestone 9: Authentication UI & User Profiles
-- [ ] Create `useAuthStore` to manage authentication state
-- [ ] Persist auth state to localStorage with Zustand middleware
-- [ ] Build Sign Up page with form validation
-- [ ] Build Log In page with form validation
-- [ ] Implement logout functionality
-- [ ] Add protected route middleware
-- [ ] Create `useUserStore` for profile data and follow state
-- [ ] Build user profile page (shows user info + their posts)
+- [x] Create `useAuthStore` to manage authentication state
+- [x] Persist auth state to localStorage with Zustand middleware
+- [x] Build Sign Up page with form validation
+- [x] Build Log In page with form validation
+- [x] Implement logout functionality
+- [x] Add protected route middleware
+- [x] Create `useUserStore` for profile data and follow state
+- [x] Build user profile page (shows user info + their posts)
 - [ ] Build edit profile modal/page
 - [ ] Build followers/following list pages
 - [ ] Build follow/unfollow button component
 
 ### Milestone 10: Posts Feed & Hashtags UI
-- [ ] Create `usePostStore` for feed management and caching
-- [ ] Implement optimistic UI updates in Zustand for post creation
-- [ ] Build post composer component
-- [ ] Build post card component (display post, author, hashtags, timestamps)
+- [x] Create `usePostStore` for feed management and caching
+- [x] Implement optimistic UI updates in Zustand for post creation
+- [x] Build post composer component
+- [x] Build post card component (display post, author, hashtags, timestamps)
 - [ ] Build home feed page with infinite scroll or pagination
-- [ ] Build user timeline page (single user's posts)
+- [x] Build user timeline page (single user's posts)
 - [ ] Make hashtags clickable (link to hashtag search results)
 - [ ] Build hashtag page (shows all posts with that hashtag)
-- [ ] Add post delete functionality
-- [ ] Add loading states and skeletons
+- [x] Add post delete functionality
+- [x] Add loading states and skeletons
 
 ### Milestone 11: Likes, Comments & Interactions
 - [ ] Update `usePostStore` to handle like/unlike with optimistic updates
