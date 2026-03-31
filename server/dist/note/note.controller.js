@@ -79,7 +79,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], NoteController.prototype, "GiveLike", null);
 __decorate([
-    (0, common_1.Delete)(":id/dislike"),
+    (0, common_1.Delete)(":id/like"),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, active_user_decorator_1.ActiveUser)("sub")),
     __metadata("design:type", Function),

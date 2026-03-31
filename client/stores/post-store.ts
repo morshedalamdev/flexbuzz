@@ -1,7 +1,5 @@
 import { useFetcher } from "@/hooks/use-fetcher";
 import { useShowToast } from "@/hooks/use-show-toast";
-import { getAccessToken } from "@/lib/token";
-import { getUser } from "@/lib/token-validator";
 import { PaginationInterface, PostType, StatusType } from "@/lib/types";
 import { create } from "zustand";
 
@@ -12,6 +10,7 @@ interface PostStoreType {
   createPost: (content: string) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
+  likePost: (id: string, isLiked: boolean) => Promise<void>;
 }
 
 export const postStore = create<PostStoreType>((set, get) => ({
@@ -21,7 +20,9 @@ export const postStore = create<PostStoreType>((set, get) => ({
   setLoading: (isLoading: boolean) => set({ isLoading }),
 
   fetchPosts: async (userId?: string) => {
-    const { fetcher } = useFetcher<PaginationInterface<PostType>>(`/note${userId ? `?userId=${userId}` : ""}`);
+    const { fetcher } = useFetcher<PaginationInterface<PostType>>(
+      `/note${userId ? `?userId=${userId}` : ""}`,
+    );
     set({ isLoading: true });
     try {
       const res = await fetcher();
@@ -127,5 +128,73 @@ export const postStore = create<PostStoreType>((set, get) => ({
       );
     }
   },
-  
+
+  likePost: async (id: string, isLiked: boolean) => {
+    const { fetcher } = useFetcher<PostType>(`/note/${id}/like`);
+    set({ isLoading: true });
+
+    if (!isLiked) {
+      try {
+        const res = await fetcher({
+          method: "POST",
+        });
+
+        if (!res.success || !res.data) {
+          useShowToast(StatusType.ERROR, res.message || "Failed to like post");
+          throw new Error(res.message || "Failed to like post");
+        }
+
+        set((state) => ({
+          posts: state.posts.map((post) => {
+            if (post.id === id) {
+              return {
+                ...post,
+                isLikedByCurrentUser: true,
+                likeCount: post.likeCount + 1,
+              };
+            } else {
+              return post;
+            }
+          }),
+          isLoading: false,
+        }));
+      } catch (error) {
+        useShowToast(StatusType.ERROR, "An error occurred while like the post");
+      }
+    } else {
+      try {
+        const res = await fetcher({
+          method: "DELETE",
+        });
+
+        if (!res.success) {
+          useShowToast(
+            StatusType.ERROR,
+            res.message || "Failed to dislike post",
+          );
+          throw new Error(res.message || "Failed to dislike post");
+        }
+
+        set((state) => ({
+          posts: state.posts.map((post) => {
+            if (post.id === id) {
+              return {
+                ...post,
+                isLikedByCurrentUser: false,
+                likeCount: post.likeCount - 1,
+              };
+            } else {
+              return post;
+            }
+          }),
+          isLoading: false,
+        }));
+      } catch (error) {
+        useShowToast(
+          StatusType.ERROR,
+          "An error occurred while dislike the post",
+        );
+      }
+    }
+  },
 }));

@@ -154,6 +154,9 @@
 
 @layer theme {
   :root, :host {
+    --color-blue-400: #54a2ff;
+    --color-blue-500: #3080ff;
+    --color-blue-600: #155dfc;
     --color-gray-50: #f9fafb;
     --color-gray-900: #101828;
     --color-zinc-50: #fafafa;
@@ -196,6 +199,9 @@
 
   @supports (color: lab(0% 0 0)) {
     :root, :host {
+      --color-blue-400: lab(65.0361% -1.42065 -56.9802);
+      --color-blue-500: lab(54.1736% 13.3369 -74.6839);
+      --color-blue-600: lab(44.0605% 29.0279 -86.0352);
       --color-gray-50: lab(98.2596% -.247031 -.706708);
       --color-gray-900: lab(8.11897% .811279 -12.254);
       --color-zinc-50: lab(98.26% 0 0);
@@ -1084,6 +1090,10 @@
     border-style: dashed;
   }
 
+  .border-blue-500 {
+    border-color: var(--color-blue-500);
+  }
+
   .border-input {
     border-color: var(--input);
   }
@@ -1368,6 +1378,18 @@
 
   .text-black {
     color: var(--color-black);
+  }
+
+  .text-blue-400 {
+    color: var(--color-blue-400);
+  }
+
+  .text-blue-500 {
+    color: var(--color-blue-500);
+  }
+
+  .text-blue-600 {
+    color: var(--color-blue-600);
   }
 
   .text-destructive {
@@ -1689,6 +1711,12 @@
   @media (hover: hover) {
     .hover\:text-accent-foreground:hover {
       color: var(--accent-foreground);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:text-blue-500:hover {
+      color: var(--color-blue-500);
     }
   }
 
