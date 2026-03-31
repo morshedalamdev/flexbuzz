@@ -175,13 +175,13 @@ export class NoteService {
   }
 
   // COMMENT
-  public async getComments(id: string, pageQueryDto: NoteQueryDto) {
-    return await this.commentService.getCommentsByNote(id, pageQueryDto);
+  public async getComments(postId: string, pageQueryDto: NoteQueryDto) {
+    return await this.commentService.getCommentsByNote(postId, pageQueryDto);
   }
 
   public async addComment(commentDto: CommentDto, userId: string) {
     try {
-      const note = await this.getById(commentDto.id);
+      const note = await this.getById(commentDto.postId);
       const user = await this.userService.findBy(userId);
       if (!note || !user) {
         throw new NotFoundException();

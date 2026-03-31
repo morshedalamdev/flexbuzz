@@ -1,4 +1,4 @@
 export declare class CommentDto {
-    id: string;
+    postId: string;
     content: string;
 }

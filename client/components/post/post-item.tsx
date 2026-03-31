@@ -23,10 +23,6 @@ export default function PostItem({ post }: { post: PostType }) {
   const likePost = postStore((state) => state.likePost);
   const user = authStore((state) => state.user);
 
-  const handleLike = () => {
-    likePost(post.id, post.isLikedByCurrentUser);
-  };
-
   return (
     <div className="border rounded-sm p-3 space-y-3 shadow-sm">
       <div className="flex items-center justify-between">
@@ -69,7 +65,7 @@ export default function PostItem({ post }: { post: PostType }) {
       </div>
       <p>{post.content}</p>
       <div className="flex gap-3">
-        <Button variant="outline" type="button" onClick={handleLike} className={post.isLikedByCurrentUser ? "text-blue-500 border-blue-500 hover:text-blue-500" : ""}>
+        <Button variant="outline" type="button" onClick={()=>likePost(post.id, post.isLikedByCurrentUser)} className={post.isLikedByCurrentUser ? "text-blue-500 border-blue-500 hover:text-blue-500" : ""}>
           <ThumbsUpIcon size={15} />
           Like {post.likeCount > 0 ? `(${post.likeCount})` : ""}
         </Button>

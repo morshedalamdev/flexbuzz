@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentDto = void 0;
 const class_validator_1 = require("class-validator");
 class CommentDto {
-    id;
+    postId;
     content;
 }
 exports.CommentDto = CommentDto;
@@ -20,7 +20,7 @@ __decorate([
     (0, class_validator_1.IsUUID)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CommentDto.prototype, "id", void 0);
+], CommentDto.prototype, "postId", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),

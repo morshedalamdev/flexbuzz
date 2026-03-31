@@ -41,7 +41,7 @@ let CommentService = class CommentService {
     }
     async update(updateDto) {
         try {
-            await this.commentRepository.update(updateDto.id, {
+            await this.commentRepository.update(updateDto.postId, {
                 content: updateDto.content,
             });
             return { success: true };
