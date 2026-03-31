@@ -19,7 +19,7 @@ import { DatePickerInput } from "../ui/date-picker";
 import { useShowToast } from "@/hooks/use-show-toast";
 import { Spinner } from "../ui/spinner";
 import { formatDate } from "@/lib/format-date";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function UserEdit() {
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function UserEdit() {
       useShowToast(state.status, state.message);
     }
     if(state?.status === "success") {
-      // router.refresh();
+      router.refresh();
     }
   }, [state]);
   // Hey! I'm new here. Nice to meet you.

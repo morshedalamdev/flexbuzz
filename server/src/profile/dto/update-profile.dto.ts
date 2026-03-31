@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString, MaxLength, IsDateString } from "class-validator";
+import { IsEnum, IsOptional, IsString, MaxLength, IsDate } from "class-validator";
 import { Gender } from "src/profile/profile.entity";
 
 export class UpdateProfileDto {
@@ -17,7 +17,7 @@ export class UpdateProfileDto {
   gender?: Gender;
 
   @IsOptional()
-  @IsDateString()
+  @IsDate()
   dob?: Date;
 
   @IsOptional()

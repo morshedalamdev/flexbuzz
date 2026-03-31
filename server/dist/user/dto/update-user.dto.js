@@ -17,6 +17,8 @@ const class_transformer_1 = require("class-transformer");
 const update_profile_dto_1 = require("../../profile/dto/update-profile.dto");
 class UpdateUserDto extends (0, mapped_types_1.PartialType)(create_user_dto_1.CreateUserDto) {
     profile;
+    username;
+    email;
 }
 exports.UpdateUserDto = UpdateUserDto;
 __decorate([
@@ -25,4 +27,14 @@ __decorate([
     (0, class_transformer_1.Type)(() => update_profile_dto_1.UpdateProfileDto),
     __metadata("design:type", update_profile_dto_1.UpdateProfileDto)
 ], UpdateUserDto.prototype, "profile", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "username", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "email", void 0);
 //# sourceMappingURL=update-user.dto.js.map

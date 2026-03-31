@@ -130,6 +130,7 @@ export async function editProfile(
       firstName:
         typeof data.firstName === "string" ? data.firstName : undefined,
       lastName: typeof data.lastName === "string" ? data.lastName : undefined,
+      username: typeof data.username === "string" ? data.username : undefined,
       email: typeof data.email === "string" ? data.email : undefined,
       gender: typeof data.gender === "string" ? data.gender : undefined,
       dob: typeof data.dob === "string" ? new Date(data.dob) : undefined,
@@ -140,15 +141,19 @@ export async function editProfile(
   const res = await fetcher({
     method: "PATCH",
     payload: {
-      firstName: validatedData.data.firstName,
-      lastName: validatedData.data.lastName,
-      // email: validatedData.data.email,
-      gender: validatedData.data.gender,
-      dob: validatedData.data.dob,
-      bio: validatedData.data.bio,
+      profile: {
+        firstName: validatedData.data.firstName,
+        lastName: validatedData.data.lastName,
+        gender: validatedData.data.gender,
+        dob: validatedData.data.dob,
+        bio: validatedData.data.bio,
+      },
+      email: validatedData.data.email,
+      username: validatedData.data.username,
     },
   });
-
+  // ma@db.com123
+  console.log({ res });
   if (!res.success || !res.data) {
     return {
       status: StatusType.ERROR,
@@ -156,6 +161,7 @@ export async function editProfile(
       firstName:
         typeof data.firstName === "string" ? data.firstName : undefined,
       lastName: typeof data.lastName === "string" ? data.lastName : undefined,
+      username: typeof data.username === "string" ? data.username : undefined,
       email: typeof data.email === "string" ? data.email : undefined,
       gender: typeof data.gender === "string" ? data.gender : undefined,
       dob: typeof data.dob === "string" ? new Date(data.dob) : undefined,

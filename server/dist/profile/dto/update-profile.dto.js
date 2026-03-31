@@ -39,7 +39,7 @@ __decorate([
 ], UpdateProfileDto.prototype, "gender", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsDate)(),
     __metadata("design:type", Date)
 ], UpdateProfileDto.prototype, "dob", void 0);
 __decorate([

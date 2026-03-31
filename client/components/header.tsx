@@ -37,7 +37,7 @@ export default function Header() {
           <DropdownMenuContent>
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Link href="/user/me">Profile</Link>
+                <Link href={`/user/${user?.sub}`}>Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setEditUser(true)}>
                 Settings

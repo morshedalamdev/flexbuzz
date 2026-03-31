@@ -127,4 +127,5 @@ export const postStore = create<PostStoreType>((set, get) => ({
       );
     }
   },
+  
 }));
