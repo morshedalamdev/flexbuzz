@@ -8,11 +8,11 @@ export default function CommentCreate({ postId }: { postId: string }) {
   const [comment, setComment] = useState("");
   const createComment = postStore((state) => state.createComment);
 
-  const handleCreate = async() => {
-    if (comment.trim() === "") return;
-
-    await createComment(postId, comment);
-    setComment("");
+  const handleCreate = async () => {
+    if (comment.trim()) {
+      await createComment(postId, comment);
+      setComment("");
+    }
   };
   return (
     <div className="w-full flex items-center gap-3">

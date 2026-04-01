@@ -30,7 +30,7 @@ export declare class NoteService {
     dislike(id: string, userId: string): Promise<{
         deleted: boolean;
     }>;
-    getComments(postId: string, pageQueryDto: NoteQueryDto): Promise<PaginationInterface<import("../comment/comment.entity").Comment>>;
+    getComments(id: string, pageQueryDto: NoteQueryDto): Promise<PaginationInterface<import("../comment/comment.entity").Comment>>;
     addComment(commentDto: CommentDto, userId: string): Promise<import("../comment/comment.entity").Comment>;
     updateComment(commentDto: CommentDto): Promise<{
         success: boolean;

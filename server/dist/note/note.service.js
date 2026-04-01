@@ -159,12 +159,12 @@ let NoteService = class NoteService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async getComments(postId, pageQueryDto) {
-        return await this.commentService.getCommentsByNote(postId, pageQueryDto);
+    async getComments(id, pageQueryDto) {
+        return await this.commentService.getCommentsByNote(id, pageQueryDto);
     }
     async addComment(commentDto, userId) {
         try {
-            const note = await this.getById(commentDto.postId);
+            const note = await this.getById(commentDto.id);
             const user = await this.userService.findBy(userId);
             if (!note || !user) {
                 throw new common_1.NotFoundException();

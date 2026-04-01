@@ -19,6 +19,8 @@ interface PostStoreType {
   likePost: (id: string, isLiked: boolean) => Promise<void>;
   fetchComments: (postId: string) => Promise<void>;
   createComment: (postId: string, content: string) => Promise<void>;
+  updateComment: (id: string, content: string) => Promise<void>;
+  deleteComment: (id: string) => Promise<void>;
 }
 
 export const postStore = create<PostStoreType>((set, get) => ({
@@ -234,7 +236,7 @@ export const postStore = create<PostStoreType>((set, get) => ({
       const res = await fetcher({
         method: "POST",
         payload: {
-          postId,
+          id: postId,
           content,
         },
       });
@@ -256,4 +258,41 @@ export const postStore = create<PostStoreType>((set, get) => ({
       );
     }
   },
+
+  updateComment: async (id: string, content: string) => {
+    const { fetcher } = useFetcher<CommentType>("/note/comment");
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "PATCH",
+        payload: {
+          id,
+          content,
+        },
+      });
+
+      if (!res.success || !res.data) {
+        set({ isLoading: false });
+        useShowToast(StatusType.ERROR,res.message || "Failed to update comment");
+        throw new Error(res.message || "Failed to update comment");
+      }
+      
+      set((state) => ({
+        comments: state.comments.map((comment) =>
+          comment.id === id
+            ? ({ ...comment, ...res.data, content } as CommentType)
+            : comment,
+        ),
+        isLoading: false,
+      }));
+    } catch (error) {
+      useShowToast(
+        StatusType.ERROR,
+        "An error occurred while updating the comment",
+      );
+    }
+  },
+
+  deleteComment: async (id: string) => {},
 }));

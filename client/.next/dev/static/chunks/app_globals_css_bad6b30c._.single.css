@@ -1117,6 +1117,10 @@
     padding-inline: calc(var(--spacing) * 0);
   }
 
+  .px-1 {
+    padding-inline: calc(var(--spacing) * 1);
+  }
+
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
@@ -1430,6 +1434,11 @@
   .outline {
     outline-style: var(--tw-outline-style);
     outline-width: 1px;
+  }
+
+  .outline-0 {
+    outline-style: var(--tw-outline-style);
+    outline-width: 0;
   }
 
   .transition-\[color\,box-shadow\] {

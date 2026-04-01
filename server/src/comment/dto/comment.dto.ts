@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 export class CommentDto {
      @IsUUID()
      @IsNotEmpty()
-     postId: string;
+     id: string;
 
      @IsString()
      @IsNotEmpty()

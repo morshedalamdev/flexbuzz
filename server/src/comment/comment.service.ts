@@ -43,7 +43,7 @@ export class CommentService {
 
   public async update(updateDto: CommentDto) {
     try {
-      await this.commentRepository.update(updateDto.postId, {
+      await this.commentRepository.update(updateDto.id, {
         content: updateDto.content,
       });
       return { success: true };
