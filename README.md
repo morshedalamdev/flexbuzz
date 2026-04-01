@@ -188,7 +188,7 @@ users ────────── posts ─────── post_hashtags �
 - [x] Add protected route middleware
 - [x] Create `useUserStore` for profile data and follow state
 - [x] Build user profile page (shows user info + their posts)
-- [ ] Build edit profile modal/page
+- [x] Build edit profile modal/page
 - [ ] Build followers/following list pages
 - [ ] Build follow/unfollow button component
 
@@ -205,14 +205,14 @@ users ────────── posts ─────── post_hashtags �
 - [x] Add loading states and skeletons
 
 ### Milestone 11: Likes, Comments & Interactions
-- [ ] Update `usePostStore` to handle like/unlike with optimistic updates
-- [ ] Build like button component with count
-- [ ] Build comments section component
-- [ ] Build comment input component
-- [ ] Add comment delete button
-- [ ] Add real-time like count updates
+- [x] Update `usePostStore` to handle like/unlike with optimistic updates
+- [x] Build like button component with count
+- [x] Build comments section component
+- [x] Build comment input component
+- [x] Add comment delete button
+- [x] Add real-time like count updates
 - [ ] Add comment pagination
-- [ ] Build empty states for no comments
+- [x] Build empty states for no comments
 
 ### Milestone 12: Search, Trending & UI Polish
 - [ ] Create `useSearchStore` to manage search state and results
