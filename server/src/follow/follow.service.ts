@@ -85,7 +85,7 @@ export class FollowService {
     }
   }
 
-  public async isFollowedByCurrentUser(userId: string, currentUserId: string) {
+  public async isFollowed(userId: string, currentUserId: string) {
     try {
       const follow = await this.followRepository.findOne({
         where: {
@@ -95,7 +95,7 @@ export class FollowService {
       });
       return !!follow;
     } catch (error) {
-      console.error("Error @follow-isFollowedByCurrentUser:", error);
+      console.error("Error @follow-isFollowed:", error);
       throw new RequestTimeoutException();
     }
   }

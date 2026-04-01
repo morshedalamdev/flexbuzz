@@ -40,13 +40,13 @@ export class UserService {
           const followingCount = await this.followService.followingCount(
             user.id,
           );
-          const isFollowedByCurrentUser =
-            await this.followService.isFollowedByCurrentUser(user.id, userId);
+          const isFollowed =
+            await this.followService.isFollowed(user.id, userId);
           return {
             ...user,
             followerCount,
             followingCount,
-            isFollowedByCurrentUser,
+            isFollowed,
           };
         }),
       );
@@ -88,13 +88,13 @@ export class UserService {
     const followerCount = await this.followService.followerCount(user.id);
     const followingCount = await this.followService.followingCount(user.id);
     if (userId) {
-      const isFollowedByCurrentUser =
-        await this.followService.isFollowedByCurrentUser(user.id, userId);
+      const isFollowed =
+        await this.followService.isFollowed(user.id, userId);
       return {
         ...user,
         followerCount,
         followingCount,
-        isFollowedByCurrentUser,
+        isFollowed,
       };
     }
 

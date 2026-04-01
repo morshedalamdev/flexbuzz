@@ -42,7 +42,7 @@ export class User {
   // ============ VIRTUAL FIELDS ============
   followerCount?: number;
   followingCount?: number;
-  isFollowedByCurrentUser?: boolean;
+  isFollowed?: boolean;
 
   // ============ RELATIONSHIPS ============
   @OneToOne(() => Profile, (profile) => profile.user, {

@@ -18,6 +18,7 @@ export default function UserPage() {
   const { id } = useParams();
   const [open, setOpen] = useState(false);
   const fetchUser = userStore((state) => state.fetchUser);
+  const followUser = userStore((state) => state.followUser);
   const currentUser = userStore((state) => state.user);
   const authUser = authStore((state) => state.user);
   const posts = postStore((state) => state.posts);
@@ -28,7 +29,7 @@ export default function UserPage() {
     fetchUser(id as string);
     fetchPosts(id as string);
   }, [id]);
-
+  
   return (
     <Fragment>
       <UserDialog open={open} onOpenChange={setOpen} />
@@ -55,10 +56,28 @@ export default function UserPage() {
               : "Not specified"}
           </p>
         </div>
+        <div className="w-full flex gap-2">
+          <p>
+            <span className="font-semibold">Followers:</span>{" "}
+            {currentUser?.followerCount}
+          </p>
+          <p>
+            <span className="font-semibold">Following:</span>{" "}
+            {currentUser?.followingCount}
+          </p>
+        </div>
         <p className="w-full">
           <span className="font-semibold">Bio:</span>{" "}
           {currentUser?.profile.bio || "Not specified"}
         </p>
+        {id !== authUser?.sub && currentUser?.id && (
+          <Button
+            onClick={() => followUser(currentUser.id, currentUser?.isFollowed)}
+            variant={currentUser?.isFollowed ? "outline" : "default"}
+          >
+            {currentUser?.isFollowed ? "Unfollow" : "Follow"}
+          </Button>
+        )}
         {id === authUser?.sub && (
           <div className="absolute right-0">
             <Button

@@ -87,6 +87,9 @@ export interface UserType {
   id: string;
   username: string;
   email: string;
+  followerCount: number;
+  followingCount: number;
+  isFollowed: boolean;
   profile: ProfileType;
   createdAt: string;
   updatedAt: string;

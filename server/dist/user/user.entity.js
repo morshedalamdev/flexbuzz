@@ -26,7 +26,7 @@ let User = class User {
     deletedAt;
     followerCount;
     followingCount;
-    isFollowedByCurrentUser;
+    isFollowed;
     profile;
     followers;
     followings;
