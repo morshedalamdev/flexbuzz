@@ -55,7 +55,7 @@ let FollowService = class FollowService {
         try {
             return await this.paginationProvider.paginateQuery(followDto, this.followRepository, followDto.followerId
                 ? { followerId: followDto.followerId }
-                : { followingId: followDto.followingId });
+                : { followingId: followDto.followingId }, ["follower"]);
         }
         catch (error) {
             if (error.code === "ECONNREFUSED") {
@@ -64,6 +64,22 @@ let FollowService = class FollowService {
                 });
             }
             console.error("Error @follow-getFollows:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
+    async getFollowing(followDto) {
+        try {
+            return await this.paginationProvider.paginateQuery(followDto, this.followRepository, followDto.followerId
+                ? { followerId: followDto.followerId }
+                : { followingId: followDto.followingId }, ["following"]);
+        }
+        catch (error) {
+            if (error.code === "ECONNREFUSED") {
+                throw new common_1.RequestTimeoutException("Failed to fetch users. Please try again later.", {
+                    description: "Database connection error",
+                });
+            }
+            console.error("Error @follow-getFollowing:", error);
             throw new common_1.RequestTimeoutException();
         }
     }

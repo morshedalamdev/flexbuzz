@@ -12,6 +12,7 @@ export declare class FollowService {
         deleted: boolean;
     }>;
     getFollows(followDto: FollowQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<Follow>>;
+    getFollowing(followDto: FollowQueryDto): Promise<import("../common/pagination/pagination.interface").PaginationInterface<Follow>>;
     followerCount(userId: string): Promise<number>;
     followingCount(userId: string): Promise<number>;
     isFollowed(userId: string, currentUserId: string): Promise<boolean>;

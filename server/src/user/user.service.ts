@@ -244,7 +244,7 @@ export class UserService {
       followDto.followerId = userId;
     }
     try {
-      return await this.followService.getFollows(followDto);
+      return await this.followService.getFollowing(followDto);
     } catch (error) {
       console.error("Error @user-getFollowing:", error);
       throw new RequestTimeoutException();

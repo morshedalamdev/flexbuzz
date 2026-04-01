@@ -95,6 +95,14 @@ export interface UserType {
   updatedAt: string;
 }
 
+export interface FollowListType {
+    createdAt: Date;
+    followerId: string;
+    followingId: string;
+    follower?: UserType;
+    following?: UserType;
+  }
+
 export interface HashtagType {
   id: string;
   tag: string;

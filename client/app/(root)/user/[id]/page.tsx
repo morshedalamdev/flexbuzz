@@ -37,7 +37,7 @@ export default function UserPage() {
       <UserDialog open={open} onOpenChange={setOpen} />
       <div className="relative flex flex-col md:flex-row flex-wrap md:gap-x-6 gap-y-2 w-full">
         <div>
-          {currentUser?.profile.firstName ? (
+          {currentUser?.profile?.firstName ? (
             <h2 className="font-bold text-lg md:text-2xl">
               {currentUser.profile.firstName} {currentUser.profile.lastName}
             </h2>
@@ -49,11 +49,11 @@ export default function UserPage() {
         <div className="flex md:flex-col md:gap-0 justify-between md:justify-start capitalize">
           <p>
             <span className="font-semibold">Gender:</span>{" "}
-            {currentUser?.profile.gender || "Not specified"}
+            {currentUser?.profile?.gender || "Not specified"}
           </p>
           <p>
             <span className="font-semibold">Date of Birth:</span>{" "}
-            {currentUser?.profile.dob
+            {currentUser?.profile?.dob
               ? formatDateToLocale(currentUser.profile.dob)
               : "Not specified"}
           </p>
@@ -61,7 +61,7 @@ export default function UserPage() {
         <FollowDialog user={currentUser as UserType} />
         <p className="w-full">
           <span className="font-semibold">Bio:</span>{" "}
-          {currentUser?.profile.bio || "Not specified"}
+          {currentUser?.profile?.bio || "Not specified"}
         </p>
         {id !== authUser?.sub && currentUser?.id && (
           <Button
