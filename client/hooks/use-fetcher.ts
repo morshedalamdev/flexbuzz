@@ -13,7 +13,7 @@ type OptionsType = {
   params?: unknown;
 };
 
-type FetcherResponse<T> = {
+export type FetcherResponse<T> = {
   success: boolean;
   message: string;
   data: T | null;

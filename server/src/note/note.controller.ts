@@ -30,7 +30,7 @@ export class NoteController {
     return this.noteService.like(id, userId);
   }
 
-  @Delete(":id/dislike")
+  @Delete(":id/like")
   async RemoveLike(@Param("id") id: string, @ActiveUser("sub") userId: string) {
     return this.noteService.dislike(id, userId);
   }
@@ -57,7 +57,7 @@ export class NoteController {
     return this.noteService.updateComment(updateDto);
   }
 
-  @Delete("comment")
+  @Delete("comment/:id")
   async DeleteComment(@Param("id") id: string) {
     return this.noteService.deleteComment(id);
   }
