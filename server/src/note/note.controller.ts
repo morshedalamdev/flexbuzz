@@ -57,7 +57,7 @@ export class NoteController {
     return this.noteService.updateComment(updateDto);
   }
 
-  @Delete("comment")
+  @Delete("comment/:id")
   async DeleteComment(@Param("id") id: string) {
     return this.noteService.deleteComment(id);
   }

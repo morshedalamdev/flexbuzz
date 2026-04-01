@@ -294,5 +294,29 @@ export const postStore = create<PostStoreType>((set, get) => ({
     }
   },
 
-  deleteComment: async (id: string) => {},
+  deleteComment: async (id: string) => {
+    const { fetcher } = useFetcher(`/note/comment/${id}`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "DELETE",
+      });
+
+      if (!res.success) {
+        useShowToast(StatusType.ERROR, res.message || "Failed to delete comment");
+        throw new Error(res.message || "Failed to delete comment");
+      }
+
+      set((state) => ({
+        comments: state.comments.filter((comment) => comment.id !== id),
+        isLoading: false,
+      }));
+    } catch (error) {
+      useShowToast(
+        StatusType.ERROR,
+        "An error occurred while deleting the comment",
+      );
+    }
+  },
 }));

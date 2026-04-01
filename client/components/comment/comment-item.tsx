@@ -15,6 +15,7 @@ export default function CommentItem({ comment }: { comment: CommentType }) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState("");
   const updateComment = postStore((state) => state.updateComment);
+  const deleteComment = postStore((state) => state.deleteComment);
   const authUser = authStore((state) => state.user);
 
   const handleUpdate = async () => {
@@ -43,7 +44,9 @@ export default function CommentItem({ comment }: { comment: CommentType }) {
               >
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => deleteComment(comment.id)}>
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
