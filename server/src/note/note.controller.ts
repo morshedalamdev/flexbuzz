@@ -42,7 +42,7 @@ export class NoteController {
     @Query() pageQueryDto: NoteQueryDto,
   ) {
     return this.noteService.getComments(id, pageQueryDto);
-  }
+  } 
 
   @Post("comment")
   async AddComment(

@@ -4,8 +4,10 @@ import PostEmpty from "@/components/placeholder/post-empty";
 import PostPlaceholder from "@/components/placeholder/post-placeholder";
 import PostItem from "@/components/post/post-item";
 import { Button } from "@/components/ui/button";
+import FollowDialog from "@/components/user/follow-dialog";
 import { UserDialog } from "@/components/user/user-dialog";
 import { formatDateToLocale } from "@/lib/format-date";
+import { UserType } from "@/lib/types";
 import { authStore } from "@/stores/auth-store";
 import { postStore } from "@/stores/post-store";
 import { userStore } from "@/stores/user-store";
@@ -56,16 +58,7 @@ export default function UserPage() {
               : "Not specified"}
           </p>
         </div>
-        <div className="w-full flex gap-2">
-          <p>
-            <span className="font-semibold">Followers:</span>{" "}
-            {currentUser?.followerCount}
-          </p>
-          <p>
-            <span className="font-semibold">Following:</span>{" "}
-            {currentUser?.followingCount}
-          </p>
-        </div>
+        <FollowDialog user={currentUser as UserType} />
         <p className="w-full">
           <span className="font-semibold">Bio:</span>{" "}
           {currentUser?.profile.bio || "Not specified"}
