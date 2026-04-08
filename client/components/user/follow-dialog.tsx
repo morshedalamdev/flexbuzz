@@ -25,21 +25,84 @@ import Link from "next/link";
 export default function FollowDialog({ user }: { user: UserType }) {
   const isDesktop = useMediaQuery();
   const [open, setOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"followers" | "following">(
+    "followers",
+  );
   const following = userStore((state) => state.following);
   const followers = userStore((state) => state.followers);
   const fetchFollowing = userStore((state) => state.fetchFollowing);
   const fetchFollowers = userStore((state) => state.fetchFollowers);
 
-  const handleFetchFollowers = async () => {
-    if (user) {
-      await fetchFollowers(user.id);
-    }
+  const handleTabChange = async (tab: "followers" | "following") => {
+    setActiveTab(tab);
+    tab === "followers"
+      ? await fetchFollowers(user.id)
+      : await fetchFollowing(user.id);
   };
-  const handleFetchFollowing = async () => {
-    if (user) {
-      await fetchFollowing(user.id);
-    }
-  };
+
+  const TabContents = (
+    <>
+      <TabsContent value="followers" className="max-h-150 flex flex-col">
+        {followers && (
+          <ul className="space-y-3 overflow-y-auto">
+            {followers.map((follower) => (
+              <li
+                key={follower.followerId}
+                className="flex flex-wrap gap-2 px-3"
+              >
+                <Link href={`/user/${follower.followerId}`} className="flex-1">
+                  <h3 className="text-sm font-bold">
+                    {follower?.follower?.profile?.firstName
+                      ? `${follower.follower.profile.firstName} ${follower.follower.profile.lastName}`
+                      : "No Name"}
+                  </h3>
+                  <p className="text-xs">@{follower.follower?.username}</p>
+                </Link>
+                <Button
+                  //   onClick={() => followUser(user.id, user?.isFollowed)}
+                  variant={user?.isFollowed ? "outline" : "default"}
+                  size="sm"
+                >
+                  {user?.isFollowed ? "Unfollow" : "Follow"}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </TabsContent>
+      <TabsContent value="following" className="max-h-150 flex flex-col">
+        {following && (
+          <ul className="space-y-3 overflow-y-auto">
+            {following.map((following) => (
+              <li
+                key={following.followingId}
+                className="flex flex-wrap gap-2 px-3"
+              >
+                <Link
+                  href={`/user/${following.followingId}`}
+                  className="flex-1"
+                >
+                  <h3 className="text-sm font-bold">
+                    {following?.following?.profile?.firstName
+                      ? `${following.following.profile.firstName} ${following.following.profile.lastName}`
+                      : "No Name"}
+                  </h3>
+                  <p className="text-xs">@{following.following?.username}</p>
+                </Link>
+                <Button
+                  //   onClick={() => followUser(user.id, user?.isFollowed)}
+                  variant={user?.isFollowed ? "outline" : "default"}
+                  size="sm"
+                >
+                  {user?.isFollowed ? "Unfollow" : "Follow"}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </TabsContent>
+    </>
+  );
 
   if (isDesktop) {
     return (
@@ -47,14 +110,14 @@ export default function FollowDialog({ user }: { user: UserType }) {
         <DialogTrigger asChild>
           <div className="w-full flex gap-2">
             <button
-              onClick={handleFetchFollowers}
+              onClick={() => handleTabChange("followers")}
               disabled={!user?.followerCount}
             >
               <span className="font-semibold">Followers:</span>{" "}
               {user?.followerCount}
             </button>
             <button
-              onClick={handleFetchFollowing}
+              onClick={() => handleTabChange("following")}
               disabled={!user?.followingCount}
             >
               <span className="font-semibold">Following:</span>{" "}
@@ -63,65 +126,26 @@ export default function FollowDialog({ user }: { user: UserType }) {
           </div>
         </DialogTrigger>
         <DialogContent className="px-0">
-          <Tabs defaultValue="followers" className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              handleTabChange(value as "followers" | "following")
+            }
+            className="w-full"
+          >
             <DialogHeader className="border-b border-gray-100 pb-3">
               <DialogTitle className="text-sm px-4">
                 <TabsList>
                   {user?.followerCount > 0 && (
-                    <TabsTrigger value="followers" onClick={handleFetchFollowers}>
-                      Followers
-                    </TabsTrigger>
+                    <TabsTrigger value="followers">Followers</TabsTrigger>
                   )}
                   {user?.followingCount > 0 && (
-                    <TabsTrigger value="following" onClick={handleFetchFollowing}>
-                      Following
-                    </TabsTrigger>
+                    <TabsTrigger value="following">Following</TabsTrigger>
                   )}
                 </TabsList>
               </DialogTitle>
             </DialogHeader>
-            <TabsContent value="followers" className="max-h-150 flex flex-col">
-              {followers && (
-                <ul className="space-y-3 overflow-y-auto">
-                  {followers.map((follower) => (
-                    <li key={follower.followerId} className="flex flex-wrap gap-2 px-3">
-                      <Link href={`/user/${follower.followerId}`} className="flex-1">
-                        <h3 className="text-sm font-bold">{follower?.follower?.profile?.firstName ? `${follower.follower.profile.firstName} ${follower.follower.profile.lastName}` : "No Name"}</h3>
-                        <p className="text-xs">@{follower.follower?.username}</p>
-                      </Link>
-                      <Button
-                        //   onClick={() => followUser(user.id, user?.isFollowed)}
-                        variant={user?.isFollowed ? "outline" : "default"}
-                        size="sm"
-                      >
-                        {user?.isFollowed ? "Unfollow" : "Follow"}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </TabsContent>
-            <TabsContent value="following" className="max-h-150 flex flex-col">
-              {following && (
-                <ul className="space-y-3 overflow-y-auto">
-                  {following.map((following) => (
-                    <li key={following.followingId} className="flex flex-wrap gap-2 px-3">
-                      <Link href={`/user/${following.followingId}`} className="flex-1">
-                        <h3 className="text-sm font-bold">{following?.following?.profile?.firstName ? `${following.following.profile.firstName} ${following.following.profile.lastName}` : "No Name"}</h3>
-                        <p className="text-xs">@{following.following?.username}</p>
-                      </Link>
-                      <Button
-                        //   onClick={() => followUser(user.id, user?.isFollowed)}
-                        variant={user?.isFollowed ? "outline" : "default"}
-                        size="sm"
-                      >
-                        {user?.isFollowed ? "Unfollow" : "Follow"}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </TabsContent>
+            {TabContents}
           </Tabs>
         </DialogContent>
       </Dialog>
@@ -132,14 +156,14 @@ export default function FollowDialog({ user }: { user: UserType }) {
       <DrawerTrigger asChild>
         <div className="w-full flex gap-2">
           <button
-            onClick={handleFetchFollowers}
+            onClick={() => handleTabChange("followers")}
             disabled={!user?.followerCount}
           >
             <span className="font-semibold">Followers:</span>{" "}
             {user?.followerCount}
           </button>
           <button
-            onClick={handleFetchFollowing}
+            onClick={() => handleTabChange("following")}
             disabled={!user?.followingCount}
           >
             <span className="font-semibold">Following:</span>{" "}
@@ -148,57 +172,26 @@ export default function FollowDialog({ user }: { user: UserType }) {
         </div>
       </DrawerTrigger>
       <DrawerContent className="px-0">
-        <Tabs defaultValue="followers" className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            handleTabChange(value as "followers" | "following")
+          }
+          className="w-full"
+        >
           <DrawerHeader className="border-b border-gray-100 pb-3">
             <DrawerTitle className="text-sm px-4">
               <TabsList>
                 {user?.followerCount > 0 && (
-                  <TabsTrigger value="followers" onClick={handleFetchFollowers}>
-                    Followers
-                  </TabsTrigger>
+                  <TabsTrigger value="followers">Followers</TabsTrigger>
                 )}
                 {user?.followingCount > 0 && (
-                  <TabsTrigger value="following" onClick={handleFetchFollowing}>
-                    Following
-                  </TabsTrigger>
+                  <TabsTrigger value="following">Following</TabsTrigger>
                 )}
               </TabsList>
             </DrawerTitle>
           </DrawerHeader>
-          <TabsContent value="followers" className="max-h-150 flex flex-col">
-            <ul className="space-y-3 overflow-y-auto pb-3">
-              <li className="flex flex-wrap gap-2 px-3">
-                <div className="flex-1">
-                  <h3 className="text-sm font-bold">Morshed Alam</h3>
-                  <p className="text-xs">@morshedalam</p>
-                </div>
-                <Button
-                  //   onClick={() => followUser(user.id, user?.isFollowed)}
-                  variant={user?.isFollowed ? "outline" : "default"}
-                  size="sm"
-                >
-                  {user?.isFollowed ? "Unfollow" : "Follow"}
-                </Button>
-              </li>
-            </ul>
-          </TabsContent>
-          <TabsContent value="following" className="max-h-150 flex flex-col">
-            <ul className="space-y-3 overflow-y-auto pb-3">
-              <li className="flex flex-wrap gap-2 px-3">
-                <div className="flex-1">
-                  <h3 className="text-sm font-bold">Morshed Alam</h3>
-                  <p className="text-xs">@morshedalam</p>
-                </div>
-                <Button
-                  //   onClick={() => followUser(user.id, user?.isFollowed)}
-                  variant={user?.isFollowed ? "outline" : "default"}
-                  size="sm"
-                >
-                  {user?.isFollowed ? "Unfollow" : "Follow"}
-                </Button>
-              </li>
-            </ul>
-          </TabsContent>
+          {TabContents}
         </Tabs>
       </DrawerContent>
     </Drawer>
