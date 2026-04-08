@@ -35,30 +35,13 @@ const deleteCookie = (key: string): void => {
   document.cookie = `${key}=; path=/; max-age=0; samesite=lax`;
 };
 
-const getFromLocalStorage = (key: string): string | null => {
-  if (!isClient()) return null;
-  return localStorage.getItem(key);
-};
-
-const setInLocalStorage = (key: string, value: string): void => {
-  if (!isClient()) return;
-  localStorage.setItem(key, value);
-};
-
-const removeFromLocalStorage = (key: string): void => {
-  if (!isClient()) return;
-  localStorage.removeItem(key);
-};
-
 export type TokenType = {
   accessToken: string;
   refreshToken: string;
 };
 
-// STORE TOKEN in localStorage for persistence across sessions
+// STORE TOKEN in cookies for persistence across sessions
 export const storeToken = (token: TokenType) => {
-  setInLocalStorage(TOKEN_KEY.ACCESS, token.accessToken);
-  setInLocalStorage(TOKEN_KEY.REFRESH, token.refreshToken);
   setCookie(TOKEN_KEY.ACCESS, token.accessToken);
   setCookie(TOKEN_KEY.REFRESH, token.refreshToken);
 };
@@ -74,35 +57,28 @@ export const getToken = (): TokenType | null => {
 };
 
 export const getAccessToken = (): string | null => {
-  return getFromLocalStorage(TOKEN_KEY.ACCESS) ?? getCookie(TOKEN_KEY.ACCESS);
+  return getCookie(TOKEN_KEY.ACCESS);
 };
 
 export const getRefreshToken = (): string | null => {
-  return (
-    getFromLocalStorage(TOKEN_KEY.REFRESH) ?? getCookie(TOKEN_KEY.REFRESH)
-  );
+  return getCookie(TOKEN_KEY.REFRESH);
 };
 
 // UPDATE TOKEN
 export const updateAccessToken = (newToken: string): void => {
-  setInLocalStorage(TOKEN_KEY.ACCESS, newToken);
   setCookie(TOKEN_KEY.ACCESS, newToken);
 };
 
 // DELETE TOKEN
 export const deleteToken = (): void => {
-  removeFromLocalStorage(TOKEN_KEY.ACCESS);
-  removeFromLocalStorage(TOKEN_KEY.REFRESH);
   deleteCookie(TOKEN_KEY.ACCESS);
   deleteCookie(TOKEN_KEY.REFRESH);
 };
 
 export const deleteAccessToken = (): void => {
-  removeFromLocalStorage(TOKEN_KEY.ACCESS);
   deleteCookie(TOKEN_KEY.ACCESS);
 };
 
 export const deleteRefreshToken = (): void => {
-  removeFromLocalStorage(TOKEN_KEY.REFRESH);
   deleteCookie(TOKEN_KEY.REFRESH);
 };

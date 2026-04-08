@@ -46,7 +46,7 @@ export default function UserPage() {
           )}
           <h3 className="text-sm">@{currentUser?.username}</h3>
         </div>
-        <div className="flex md:flex-col md:gap-0 justify-between md:justify-start capitalize">
+        <div className="flex md:flex-col gap-3 md:gap-0 md:justify-start capitalize">
           <p>
             <span className="font-semibold">Gender:</span>{" "}
             {currentUser?.profile?.gender || "Not specified"}
