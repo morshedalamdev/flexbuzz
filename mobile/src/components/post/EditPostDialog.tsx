@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -19,6 +19,13 @@ interface EditPostDialogProps {
 export default function EditPostDialog({ post, open, onOpenChange }: EditPostDialogProps) {
   const [content, setContent] = useState(post?.content ?? '');
   const { updatePost } = useApp();
+
+  // Sync textarea content whenever the dialog opens or the target post changes
+  useEffect(() => {
+    if (open && post) {
+      setContent(post.content);
+    }
+  }, [open, post]);
 
   const handleSave = () => {
     if (!post || !content.trim()) return;

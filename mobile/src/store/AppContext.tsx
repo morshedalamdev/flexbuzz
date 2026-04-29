@@ -30,6 +30,7 @@ interface AppState {
   // Comments
   fetchComments: (postId: string) => Comment[];
   createComment: (postId: string, content: string) => void;
+  updateComment: (id: string, content: string) => void;
   deleteComment: (id: string) => void;
 
   // Follow
@@ -156,6 +157,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateComment = (id: string, content: string) => {
+    setComments((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, content } : c)),
+    );
+  };
+
   const followUser = (userId: string) => {
     setPosts((prev) =>
       prev.map((p) => {
@@ -214,6 +221,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         likePost,
         fetchComments,
         createComment,
+        updateComment,
         deleteComment,
         followUser,
         searchPosts,

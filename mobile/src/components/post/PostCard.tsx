@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, MoreHorizontal, Trash2, Pencil } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -128,24 +127,6 @@ export default function PostCard({ post, onEdit, onDelete, compact = false }: Po
       <p className={`text-gray-800 text-sm leading-relaxed mb-3 ${compact ? 'line-clamp-3' : ''}`}>
         {renderContent(post.content)}
       </p>
-
-      {/* Hashtag badges */}
-      {post.hashtags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {post.hashtags.map((h) => (
-            <Badge
-              key={h.id}
-              variant="hashtag"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/hashtag/${h.tag}`);
-              }}
-            >
-              #{h.tag}
-            </Badge>
-          ))}
-        </div>
-      )}
 
       {/* Actions */}
       <div className="flex items-center gap-4 pt-2 border-t border-gray-50">
