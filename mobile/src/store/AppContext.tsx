@@ -193,7 +193,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const getPostsByUser = (userId: string) => {
-    return posts.filter((p) => p.userId === userId || p.userId === userId);
+    return posts.filter((p) => p.userId === userId);
   };
 
   return (
