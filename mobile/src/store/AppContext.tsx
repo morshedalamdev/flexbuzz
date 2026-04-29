@@ -19,7 +19,7 @@ interface AppState {
   isAuthenticated: boolean;
   login: (username: string) => void;
   logout: () => void;
-  updateProfile: (updates: Partial<User['profile']> & { username?: string }) => void;
+  updateProfile: (updates: Partial<User['profile']> & { username?: string; email?: string }) => void;
 
   // Posts
   createPost: (content: string) => void;
@@ -59,10 +59,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(false);
   };
 
-  const updateProfile = (updates: Partial<User['profile']> & { username?: string }) => {
+  const updateProfile = (updates: Partial<User['profile']> & { username?: string; email?: string }) => {
     setCurrentUser((prev) => ({
       ...prev,
       username: updates.username ?? prev.username,
+      email: updates.email ?? prev.email,
       profile: { ...prev.profile, ...updates },
     }));
     // Also update posts authored by current user
