@@ -35,6 +35,7 @@ export default function PostCreate() {
           <InputGroupAddon align="block-end">
             <InputGroupButton
               onClick={handleSubmit}
+              type="submit"
               disabled={isLoading}
               variant="default"
               size="sm"

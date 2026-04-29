@@ -48,6 +48,7 @@ export class FollowService {
         followDto.followerId
           ? { followerId: followDto.followerId }
           : { followingId: followDto.followingId },
+        ["follower"],
       );
     } catch (error) {
       if (error.code === "ECONNREFUSED") {
@@ -59,6 +60,30 @@ export class FollowService {
         );
       }
       console.error("Error @follow-getFollows:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  public async getFollowing(followDto: FollowQueryDto) {
+    try {
+      return await this.paginationProvider.paginateQuery(
+        followDto,
+        this.followRepository,
+        followDto.followerId
+          ? { followerId: followDto.followerId }
+          : { followingId: followDto.followingId },
+        ["following"],
+      );
+    } catch (error) {
+      if (error.code === "ECONNREFUSED") {
+        throw new RequestTimeoutException(
+          "Failed to fetch users. Please try again later.",
+          {
+            description: "Database connection error",
+          },
+        );
+      }
+      console.error("Error @follow-getFollowing:", error);
       throw new RequestTimeoutException();
     }
   }
@@ -85,7 +110,7 @@ export class FollowService {
     }
   }
 
-  public async isFollowedByCurrentUser(userId: string, currentUserId: string) {
+  public async isFollowed(userId: string, currentUserId: string) {
     try {
       const follow = await this.followRepository.findOne({
         where: {
@@ -95,7 +120,7 @@ export class FollowService {
       });
       return !!follow;
     } catch (error) {
-      console.error("Error @follow-isFollowedByCurrentUser:", error);
+      console.error("Error @follow-isFollowed:", error);
       throw new RequestTimeoutException();
     }
   }

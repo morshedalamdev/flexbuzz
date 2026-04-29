@@ -13,7 +13,7 @@ export declare class User {
     deletedAt: Date;
     followerCount?: number;
     followingCount?: number;
-    isFollowedByCurrentUser?: boolean;
+    isFollowed?: boolean;
     profile: Profile;
     followers: Follow[];
     followings: Follow[];

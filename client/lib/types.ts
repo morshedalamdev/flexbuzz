@@ -87,10 +87,21 @@ export interface UserType {
   id: string;
   username: string;
   email: string;
+  followerCount: number;
+  followingCount: number;
+  isFollowed: boolean;
   profile: ProfileType;
   createdAt: string;
   updatedAt: string;
 }
+
+export interface FollowListType {
+    createdAt: Date;
+    followerId: string;
+    followingId: string;
+    follower?: UserType;
+    following?: UserType;
+  }
 
 export interface HashtagType {
   id: string;
@@ -110,4 +121,14 @@ export interface PostType {
   hashtags: HashtagType[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CommentType {
+  id: string;
+  content: string;
+  userId: string;
+  noteId: string;
+  createdAt: string;
+  updatedAt: string;
+  user: UserType;
 }

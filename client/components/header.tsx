@@ -37,13 +37,13 @@ export default function Header() {
           <DropdownMenuContent>
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Link href={`/user/${user?.sub}`}>Profile</Link>
+                <Link href={`/user/${user?.sub}`} className="w-full">Profile</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setEditUser(true)}>
+              <DropdownMenuItem onClick={() => setEditUser(true)} className="w-full cursor-pointer">
                 Settings
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <button onClick={logout}>Logout</button>
+                <button onClick={logout} className="w-full text-left">Logout</button>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

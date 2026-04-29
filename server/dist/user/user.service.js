@@ -36,12 +36,12 @@ let UserService = class UserService {
             const usersWithCounts = await Promise.all(users.data.map(async (user) => {
                 const followerCount = await this.followService.followerCount(user.id);
                 const followingCount = await this.followService.followingCount(user.id);
-                const isFollowedByCurrentUser = await this.followService.isFollowedByCurrentUser(user.id, userId);
+                const isFollowed = await this.followService.isFollowed(user.id, userId);
                 return {
                     ...user,
                     followerCount,
                     followingCount,
-                    isFollowedByCurrentUser,
+                    isFollowed,
                 };
             }));
             return { ...users, data: usersWithCounts };
@@ -80,12 +80,12 @@ let UserService = class UserService {
         const followerCount = await this.followService.followerCount(user.id);
         const followingCount = await this.followService.followingCount(user.id);
         if (userId) {
-            const isFollowedByCurrentUser = await this.followService.isFollowedByCurrentUser(user.id, userId);
+            const isFollowed = await this.followService.isFollowed(user.id, userId);
             return {
                 ...user,
                 followerCount,
                 followingCount,
-                isFollowedByCurrentUser,
+                isFollowed,
             };
         }
         return { ...user, followerCount, followingCount };
@@ -227,7 +227,7 @@ let UserService = class UserService {
             followDto.followerId = userId;
         }
         try {
-            return await this.followService.getFollows(followDto);
+            return await this.followService.getFollowing(followDto);
         }
         catch (error) {
             console.error("Error @user-getFollowing:", error);

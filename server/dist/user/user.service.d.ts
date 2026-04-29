@@ -23,7 +23,7 @@ export declare class UserService {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date;
-        isFollowedByCurrentUser?: boolean;
+        isFollowed?: boolean;
         profile: import("../profile/profile.entity").Profile;
         followers: import("../follow/follow.entity").Follow[];
         followings: import("../follow/follow.entity").Follow[];
@@ -42,7 +42,7 @@ export declare class UserService {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date;
-        isFollowedByCurrentUser?: boolean;
+        isFollowed?: boolean;
         profile: import("../profile/profile.entity").Profile;
         followers: import("../follow/follow.entity").Follow[];
         followings: import("../follow/follow.entity").Follow[];

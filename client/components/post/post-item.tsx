@@ -15,13 +15,13 @@ import PostDelete from "./post-delete";
 import { PostType } from "@/lib/types";
 import Link from "next/link";
 import { authStore } from "@/stores/auth-store";
+import { postStore } from "@/stores/post-store";
 
 export default function PostItem({ post }: { post: PostType }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const likePost = postStore((state) => state.likePost);
   const user = authStore((state) => state.user);
-
-  const handleLike = () => {};
 
   return (
     <div className="border rounded-sm p-3 space-y-3 shadow-sm">
@@ -65,7 +65,7 @@ export default function PostItem({ post }: { post: PostType }) {
       </div>
       <p>{post.content}</p>
       <div className="flex gap-3">
-        <Button variant="outline" onClick={handleLike}>
+        <Button variant="outline" type="button" onClick={()=>likePost(post.id, post.isLikedByCurrentUser)} className={post.isLikedByCurrentUser ? "text-blue-500 border-blue-500 hover:text-blue-500" : ""}>
           <ThumbsUpIcon size={15} />
           Like {post.likeCount > 0 ? `(${post.likeCount})` : ""}
         </Button>
