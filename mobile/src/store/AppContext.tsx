@@ -8,6 +8,9 @@ import {
   MOCK_HASHTAGS,
 } from '@/lib/mock-data';
 import type { Hashtag } from '@/types';
+import { login as authLogin, logout as authLogout, signup as authSignup, type LoginInput, type SignupInput } from '@/lib/auth';
+import { getRefreshToken } from '@/lib/token';
+import { getUser } from '@/lib/token-validator';
 
 interface AppState {
   currentUser: User;
@@ -17,7 +20,9 @@ interface AppState {
 
   // Auth
   isAuthenticated: boolean;
-  login: (username: string) => void;
+  authError: string | null;
+  login: (input: LoginInput) => Promise<boolean>;
+  signup: (input: SignupInput) => Promise<boolean>;
   logout: () => void;
   updateProfile: (updates: Partial<User['profile']> & { username?: string; email?: string }) => void;
 
@@ -45,19 +50,77 @@ interface AppState {
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
+function resolveInitialUser(): User {
+  const refreshToken = getRefreshToken();
+  if (refreshToken) {
+    const decoded = getUser(refreshToken);
+    if (decoded) {
+      return {
+        ...CURRENT_USER,
+        id: decoded.sub,
+        username: decoded.username,
+        email: decoded.email,
+      };
+    }
+  }
+  return CURRENT_USER;
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [currentUser, setCurrentUser] = useState<User>(CURRENT_USER);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    () => !!getRefreshToken(),
+  );
+  const [currentUser, setCurrentUser] = useState<User>(resolveInitialUser);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
   const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
   const trendingHashtags = MOCK_HASHTAGS;
 
-  const login = (_username: string) => {
+  const login = async (input: LoginInput): Promise<boolean> => {
+    setAuthError(null);
+    const result = await authLogin(input);
+    if (!result.success) {
+      setAuthError(result.message);
+      return false;
+    }
+    const decoded = getUser(result.accessToken);
+    if (decoded) {
+      setCurrentUser((prev) => ({
+        ...prev,
+        id: decoded.sub,
+        username: decoded.username,
+        email: decoded.email,
+      }));
+    }
     setIsAuthenticated(true);
+    return true;
+  };
+
+  const signup = async (input: SignupInput): Promise<boolean> => {
+    setAuthError(null);
+    const result = await authSignup(input);
+    if (!result.success) {
+      setAuthError(result.message);
+      return false;
+    }
+    const decoded = getUser(result.accessToken);
+    if (decoded) {
+      setCurrentUser((prev) => ({
+        ...prev,
+        id: decoded.sub,
+        username: decoded.username,
+        email: decoded.email,
+      }));
+    }
+    setIsAuthenticated(true);
+    return true;
   };
 
   const logout = () => {
+    authLogout();
     setIsAuthenticated(false);
+    setCurrentUser(CURRENT_USER);
+    setAuthError(null);
   };
 
   const updateProfile = (updates: Partial<User['profile']> & { username?: string; email?: string }) => {
@@ -212,7 +275,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         comments,
         trendingHashtags,
         isAuthenticated,
+        authError,
         login,
+        signup,
         logout,
         updateProfile,
         createPost,
