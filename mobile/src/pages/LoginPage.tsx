@@ -7,7 +7,7 @@ import { useApp } from '@/store/AppContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useApp();
+  const { login, authError } = useApp();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,10 +22,13 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    login(username);
+    const success = await login({ username, password });
     setLoading(false);
-    navigate('/');
+    if (success) {
+      navigate('/');
+    } else {
+      setError(authError ?? 'Login failed. Please try again.');
+    }
   };
 
   return (

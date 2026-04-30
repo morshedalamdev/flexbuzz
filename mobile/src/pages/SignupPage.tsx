@@ -7,7 +7,7 @@ import { useApp } from '@/store/AppContext';
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const { login } = useApp();
+  const { signup, authError } = useApp();
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -28,7 +28,7 @@ export default function SignupPage() {
     if (!form.email.trim()) errs.email = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email.';
     if (!form.password) errs.password = 'Password is required.';
-    else if (form.password.length < 6) errs.password = 'At least 6 characters.';
+    else if (form.password.length < 8) errs.password = 'At least 8 characters.';
     if (form.password !== form.confirmPassword)
       errs.confirmPassword = 'Passwords do not match.';
     return errs;
@@ -40,10 +40,18 @@ export default function SignupPage() {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 700));
-    login(form.username);
+    const success = await signup({
+      username: form.username,
+      email: form.email,
+      password: form.password,
+      confirmPassword: form.confirmPassword,
+    });
     setLoading(false);
-    navigate('/');
+    if (success) {
+      navigate('/');
+    } else {
+      setErrors({ form: authError ?? 'Signup failed. Please try again.' });
+    }
   };
 
   return (
@@ -120,6 +128,8 @@ export default function SignupPage() {
               <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>
             )}
           </div>
+
+          {errors.form && <p className="text-sm text-red-500">{errors.form}</p>}
 
           <Button type="submit" className="w-full h-12 text-base mt-2" disabled={loading}>
             {loading ? 'Creating account…' : 'Sign Up'}
