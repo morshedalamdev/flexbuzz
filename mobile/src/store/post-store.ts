@@ -1,21 +1,20 @@
 import { create } from 'zustand';
 import type { Post, Comment, User } from '@/types';
 import { MOCK_POSTS, MOCK_COMMENTS } from '@/lib/mock-data';
-import { useAuthStore } from '@/store/auth-store';
 
 interface PostState {
   posts: Post[];
   comments: Comment[];
 
   // Post actions
-  createPost: (content: string) => void;
+  createPost: (content: string, currentUser: User) => void;
   deletePost: (id: string) => void;
   updatePost: (id: string, content: string) => void;
   likePost: (id: string) => void;
 
   // Comment actions
   fetchComments: (postId: string) => Comment[];
-  createComment: (postId: string, content: string) => void;
+  createComment: (postId: string, content: string, currentUser: User) => void;
   updateComment: (id: string, content: string) => void;
   deleteComment: (id: string) => void;
 
@@ -38,8 +37,7 @@ export const usePostStore = create<PostState>((set, get) => ({
   posts: MOCK_POSTS,
   comments: MOCK_COMMENTS,
 
-  createPost: (content: string) => {
-    const currentUser = useAuthStore.getState().currentUser;
+  createPost: (content: string, currentUser: User) => {
     const newPost: Post = {
       id: `p${Date.now()}`,
       userId: currentUser.id,
@@ -85,8 +83,7 @@ export const usePostStore = create<PostState>((set, get) => ({
     return get().comments.filter((c) => c.postId === postId);
   },
 
-  createComment: (postId: string, content: string) => {
-    const currentUser = useAuthStore.getState().currentUser;
+  createComment: (postId: string, content: string, currentUser: User) => {
     const newComment: Comment = {
       id: `c${Date.now()}`,
       content,

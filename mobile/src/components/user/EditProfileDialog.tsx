@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAuthStore } from '@/store/auth-store';
+import { usePostStore } from '@/store/post-store';
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ const GENDER_OPTIONS = [
 export default function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps) {
   const currentUser = useAuthStore((state) => state.currentUser);
   const updateProfile = useAuthStore((state) => state.updateProfile);
+  const syncUserInPosts = usePostStore((state) => state.syncUserInPosts);
   const [form, setForm] = useState({
     username: currentUser.username,
     email: currentUser.email,
@@ -43,6 +45,14 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
     updateProfile({
       username: form.username,
       email: form.email,
+      firstName: form.firstName,
+      lastName: form.lastName,
+      gender: form.gender,
+      dob: form.dob,
+      bio: form.bio,
+    });
+    syncUserInPosts(currentUser.id, {
+      username: form.username,
       firstName: form.firstName,
       lastName: form.lastName,
       gender: form.gender,

@@ -106,7 +106,7 @@ export default function CommentSection({ postId }: CommentListProps) {
     if (!text.trim()) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 300));
-    createComment(postId, text.trim());
+    createComment(postId, text.trim(), currentUser);
     setText('');
     setLoading(false);
   };

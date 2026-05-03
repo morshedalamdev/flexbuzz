@@ -30,7 +30,7 @@ export default function PostComposer({ onSuccess, autoFocus }: PostComposerProps
     if (!content.trim() || isOverLimit) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 400)); // simulated delay
-    createPost(content.trim());
+    createPost(content.trim(), currentUser);
     setContent('');
     setLoading(false);
     onSuccess?.();

@@ -10,7 +10,6 @@ import {
 } from '@/lib/auth';
 import { getRefreshToken } from '@/lib/token';
 import { getUser } from '@/lib/token-validator';
-import { usePostStore } from '@/store/post-store';
 
 interface AuthState {
   currentUser: User;
@@ -38,7 +37,7 @@ function resolveInitialUser(): User {
   return CURRENT_USER;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   currentUser: resolveInitialUser(),
   isAuthenticated: !!getRefreshToken(),
   authError: null,
@@ -101,8 +100,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         profile: { ...state.currentUser.profile, ...updates },
       },
     }));
-    // Sync denormalised user data inside posts/comments
-    const { id } = get().currentUser;
-    usePostStore.getState().syncUserInPosts(id, updates);
   },
 }));
