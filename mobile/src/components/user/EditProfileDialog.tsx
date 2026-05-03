@@ -42,7 +42,7 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
     setForm((f) => ({ ...f, [field]: value }));
 
   const handleSave = () => {
-    updateProfile({
+    const profileUpdates = {
       username: form.username,
       email: form.email,
       firstName: form.firstName,
@@ -50,15 +50,9 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
       gender: form.gender,
       dob: form.dob,
       bio: form.bio,
-    });
-    syncUserInPosts(currentUser.id, {
-      username: form.username,
-      firstName: form.firstName,
-      lastName: form.lastName,
-      gender: form.gender,
-      dob: form.dob,
-      bio: form.bio,
-    });
+    };
+    updateProfile(profileUpdates);
+    syncUserInPosts(currentUser.id, profileUpdates);
     onOpenChange(false);
   };
 

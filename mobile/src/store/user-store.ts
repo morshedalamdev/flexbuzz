@@ -15,7 +15,7 @@ export const useUserStore = create<UserStoreState>()(() => ({
 
   getUserById: (id: string) => {
     const currentUser = useAuthStore.getState().currentUser;
-    if (id === currentUser.id || id === 'me') return currentUser;
+    if (currentUser && (id === currentUser.id || id === 'me')) return currentUser;
     return MOCK_USERS.find((u) => u.id === id);
   },
 
