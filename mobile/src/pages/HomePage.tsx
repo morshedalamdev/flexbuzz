@@ -6,11 +6,11 @@ import PostCard from '@/components/post/PostCard';
 import PostComposer from '@/components/post/PostComposer';
 import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
-import { useApp } from '@/store/AppContext';
+import { usePostStore } from '@/store/post-store';
 import type { Post } from '@/types';
 
 export default function HomePage() {
-  const { posts } = useApp();
+  const posts = usePostStore((state) => state.posts);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
 

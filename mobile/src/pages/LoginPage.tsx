@@ -3,11 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Zap } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, authError } = useApp();
+  const login = useAuthStore((state) => state.login);
+  const authError = useAuthStore((state) => state.authError);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

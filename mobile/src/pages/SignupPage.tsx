@@ -3,11 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Zap } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const { signup, authError } = useApp();
+  const signup = useAuthStore((state) => state.signup);
+  const authError = useAuthStore((state) => state.authError);
   const [form, setForm] = useState({
     username: '',
     email: '',

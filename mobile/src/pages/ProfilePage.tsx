@@ -9,13 +9,16 @@ import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
 import EditProfileDialog from '@/components/user/EditProfileDialog';
 import { formatCount } from '@/lib/utils';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
+import { usePostStore } from '@/store/post-store';
 import { useNavigate } from 'react-router-dom';
 import type { Post } from '@/types';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { currentUser, getPostsByUser, logout } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const logout = useAuthStore((state) => state.logout);
+  const getPostsByUser = usePostStore((state) => state.getPostsByUser);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const [editProfileOpen, setEditProfileOpen] = useState(false);

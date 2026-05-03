@@ -9,7 +9,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { formatRelativeTime } from '@/lib/utils';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
+import { usePostStore } from '@/store/post-store';
 import type { Post } from '@/types';
 
 interface PostCardProps {
@@ -21,7 +22,8 @@ interface PostCardProps {
 
 export default function PostCard({ post, onEdit, onDelete, compact = false }: PostCardProps) {
   const navigate = useNavigate();
-  const { likePost, currentUser } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const likePost = usePostStore((state) => state.likePost);
   const isOwner = post.userId === currentUser.id;
 
   const initials = post.user.profile.firstName

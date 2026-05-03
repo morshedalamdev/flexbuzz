@@ -6,12 +6,12 @@ import TopBar from '@/components/layout/TopBar';
 import PostCard from '@/components/post/PostCard';
 import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
-import { useApp } from '@/store/AppContext';
+import { usePostStore } from '@/store/post-store';
 import type { Post } from '@/types';
 
 export default function HashtagPage() {
   const { tag } = useParams<{ tag: string }>();
-  const { getPostsByHashtag } = useApp();
+  const getPostsByHashtag = usePostStore((state) => state.getPostsByHashtag);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
 

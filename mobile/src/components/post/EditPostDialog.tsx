@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useApp } from '@/store/AppContext';
+import { usePostStore } from '@/store/post-store';
 import type { Post } from '@/types';
 
 interface EditPostDialogProps {
@@ -18,7 +18,7 @@ interface EditPostDialogProps {
 
 export default function EditPostDialog({ post, open, onOpenChange }: EditPostDialogProps) {
   const [content, setContent] = useState(post?.content ?? '');
-  const { updatePost } = useApp();
+  const updatePost = usePostStore((state) => state.updatePost);
 
   // Sync textarea content whenever the dialog opens or the target post changes
   useEffect(() => {

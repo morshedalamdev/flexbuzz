@@ -10,13 +10,18 @@ import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
 import EditProfileDialog from '@/components/user/EditProfileDialog';
 import { formatCount } from '@/lib/utils';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
+import { usePostStore } from '@/store/post-store';
+import { useUserStore } from '@/store/user-store';
 import type { Post } from '@/types';
 
 export default function UserPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getUserById, getPostsByUser, currentUser, followUser } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const getPostsByUser = usePostStore((state) => state.getPostsByUser);
+  const getUserById = useUserStore((state) => state.getUserById);
+  const followUser = useUserStore((state) => state.followUser);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
