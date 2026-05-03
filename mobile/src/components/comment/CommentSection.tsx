@@ -4,7 +4,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { formatRelativeTime } from '@/lib/utils';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
+import { usePostStore } from '@/store/post-store';
 import type { Comment } from '@/types';
 
 interface CommentListProps {
@@ -12,7 +13,9 @@ interface CommentListProps {
 }
 
 function CommentItem({ comment }: { comment: Comment }) {
-  const { deleteComment, updateComment, currentUser } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const deleteComment = usePostStore((state) => state.deleteComment);
+  const updateComment = usePostStore((state) => state.updateComment);
   const isOwner = comment.userId === currentUser.id;
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.content);
@@ -89,7 +92,9 @@ function CommentItem({ comment }: { comment: Comment }) {
 export default function CommentSection({ postId }: CommentListProps) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
-  const { fetchComments, createComment, currentUser } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const fetchComments = usePostStore((state) => state.fetchComments);
+  const createComment = usePostStore((state) => state.createComment);
 
   const comments = fetchComments(postId);
 

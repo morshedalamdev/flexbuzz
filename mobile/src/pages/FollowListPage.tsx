@@ -4,14 +4,17 @@ import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
+import { useUserStore } from '@/store/user-store';
 import { MOCK_USERS } from '@/lib/mock-data';
 import { useNavigate } from 'react-router-dom';
 
 export default function FollowListPage() {
   const { id, type } = useParams<{ id: string; type: string }>();
   const navigate = useNavigate();
-  const { getUserById, followUser, currentUser } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const getUserById = useUserStore((state) => state.getUserById);
+  const followUser = useUserStore((state) => state.followUser);
 
   const user = getUserById(id ?? '');
   const isFollowers = type === 'followers';

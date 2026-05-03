@@ -17,14 +17,17 @@ import CommentSection from '@/components/comment/CommentSection';
 import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
 import { formatRelativeTime } from '@/lib/utils';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
+import { usePostStore } from '@/store/post-store';
 import { useNavigate } from 'react-router-dom';
 import type { Post } from '@/types';
 
 export default function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { posts, likePost, currentUser } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const posts = usePostStore((state) => state.posts);
+  const likePost = usePostStore((state) => state.likePost);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
 

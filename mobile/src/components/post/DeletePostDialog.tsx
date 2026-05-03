@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useApp } from '@/store/AppContext';
+import { usePostStore } from '@/store/post-store';
 
 interface DeletePostDialogProps {
   postId: string | null;
@@ -14,7 +14,7 @@ interface DeletePostDialogProps {
 }
 
 export default function DeletePostDialog({ postId, open, onOpenChange }: DeletePostDialogProps) {
-  const { deletePost } = useApp();
+  const deletePost = usePostStore((state) => state.deletePost);
 
   const handleDelete = () => {
     if (!postId) return;

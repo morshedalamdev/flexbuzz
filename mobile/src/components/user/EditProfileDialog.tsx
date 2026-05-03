@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -24,7 +24,8 @@ const GENDER_OPTIONS = [
 ];
 
 export default function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps) {
-  const { currentUser, updateProfile } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const updateProfile = useAuthStore((state) => state.updateProfile);
   const [form, setForm] = useState({
     username: currentUser.username,
     email: currentUser.email,

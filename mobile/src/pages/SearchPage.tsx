@@ -8,13 +8,15 @@ import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
 import { Badge } from '@/components/ui/badge';
 import { formatCount } from '@/lib/utils';
-import { useApp } from '@/store/AppContext';
+import { usePostStore } from '@/store/post-store';
+import { useUserStore } from '@/store/user-store';
 import { useNavigate } from 'react-router-dom';
 import type { Post } from '@/types';
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const { searchPosts, trendingHashtags } = useApp();
+  const searchPosts = usePostStore((state) => state.searchPosts);
+  const trendingHashtags = useUserStore((state) => state.trendingHashtags);
   const [query, setQuery] = useState('');
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);

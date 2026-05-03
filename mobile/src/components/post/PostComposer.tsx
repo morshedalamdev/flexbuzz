@@ -3,7 +3,8 @@ import { Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useApp } from '@/store/AppContext';
+import { useAuthStore } from '@/store/auth-store';
+import { usePostStore } from '@/store/post-store';
 
 interface PostComposerProps {
   onSuccess?: () => void;
@@ -15,7 +16,8 @@ const MAX_LENGTH = 280;
 export default function PostComposer({ onSuccess, autoFocus }: PostComposerProps) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const { createPost, currentUser } = useApp();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const createPost = usePostStore((state) => state.createPost);
 
   const initials = currentUser.profile.firstName
     ? `${currentUser.profile.firstName[0]}${currentUser.profile.lastName?.[0] ?? ''}`.toUpperCase()
