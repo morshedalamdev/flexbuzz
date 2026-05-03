@@ -11,7 +11,7 @@ export const SignupSchema = z
         "Username can only contain letters, numbers, and underscores",
       )
       .trim(),
-    email: z.string().email("Please enter a valid email").trim(),
+    email: z.email("Please enter a valid email").trim(),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters long")
@@ -44,9 +44,6 @@ export const LoginSchema = z.object({
     .max(24, "Password must be at most 24 characters long")
     .trim(),
 });
-
-export type SignupSchemaType = z.infer<typeof SignupSchema>;
-export type LoginSchemaType = z.infer<typeof LoginSchema>;
 
 export const ProfileEditSchema = z.object({
   firstName: z
@@ -81,7 +78,9 @@ export const ProfileEditSchema = z.object({
     .string()
     .min(10, "Bio must be at least 10 characters long")
     .max(1500, "Bio must be at most 1500 characters long")
-    .trim(),
+    .trim()
 });
 
+export type SignupSchemaType = z.infer<typeof SignupSchema>;
+export type LoginSchemaType = z.infer<typeof LoginSchema>;
 export type ProfileEditSchemaType = z.infer<typeof ProfileEditSchema>;
