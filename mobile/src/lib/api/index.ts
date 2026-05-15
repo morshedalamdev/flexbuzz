@@ -3,8 +3,8 @@ import {
   getAccessToken,
   getRefreshToken,
   updateAccessToken,
-} from "@/lib/token";
-import { isTokenValid } from "@/lib/token-validator";
+} from "@/lib/token/token";
+import { isTokenValid } from "@/lib/token/token-validator";
 import axios, { type AxiosError, type AxiosRequestConfig, type Method } from "axios";
 
 type OptionsType = {
@@ -152,6 +152,6 @@ export function createFetcher<T = undefined>(url: string) {
 }
 
 // HOOK WRAPPER — for use inside React components/hooks
-export function useFetcher<T = undefined>(url: string) {
+export function api<T = undefined>(url: string) {
   return createFetcher<T>(url);
 }

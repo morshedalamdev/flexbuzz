@@ -1,5 +1,5 @@
 import { createFetcher } from "@/hooks/use-fetcher";
-import { deleteToken, storeToken } from "@/lib/token";
+import { deleteToken, storeToken } from "@/lib/token/token";
 import { LoginSchema, SignupSchema } from "@/lib/validation";
 
 type LoginResponse = {

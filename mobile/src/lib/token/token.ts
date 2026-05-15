@@ -62,11 +62,3 @@ export const deleteToken = (): void => {
   deleteCookie(TOKEN_KEY.ACCESS);
   deleteCookie(TOKEN_KEY.REFRESH);
 };
-
-export const deleteAccessToken = (): void => {
-  deleteCookie(TOKEN_KEY.ACCESS);
-};
-
-export const deleteRefreshToken = (): void => {
-  deleteCookie(TOKEN_KEY.REFRESH);
-};

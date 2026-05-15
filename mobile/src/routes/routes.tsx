@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from '@/store/auth-store';
 import LoginPage from '@/pages/LoginPage';
 import SignupPage from '@/pages/SignupPage';
 import HomePage from '@/pages/HomePage';
@@ -11,15 +10,16 @@ import SearchPage from '@/pages/SearchPage';
 import HashtagPage from '@/pages/HashtagPage';
 import ActivityPage from '@/pages/ActivityPage';
 import FollowListPage from '@/pages/FollowListPage';
+import { getRefreshToken } from '@/lib/token/token';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+  const isTokenExist = getRefreshToken();
+  return isTokenExist ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
+  const isTokenExist = getRefreshToken();
+  return isTokenExist ? <Navigate to="/" replace /> : <>{children}</>;
 }
 
 export default function AppRoutes() {
