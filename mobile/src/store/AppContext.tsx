@@ -9,8 +9,8 @@ import {
 } from '@/lib/mock-data';
 import type { Hashtag } from '@/types';
 import { login as authLogin, logout as authLogout, signup as authSignup, type LoginInput, type SignupInput } from '@/lib/auth';
-import { getRefreshToken } from '@/lib/token';
-import { getUser } from '@/lib/token-validator';
+import { getRefreshToken } from '@/lib/token/token';
+import { getUser } from '@/lib/token/token-validator';
 
 interface AppState {
   currentUser: User;

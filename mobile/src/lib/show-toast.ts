@@ -1,8 +1,8 @@
+import { StatusType } from "@/types";
 import type React from "react";
-import { StatusType } from "@/lib/types";
 import { toast } from "sonner";
 
-export function useShowToast(
+export function showToast(
   status: StatusType = StatusType.DEFAULT,
   message: string,
 ) {

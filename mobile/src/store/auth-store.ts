@@ -1,104 +1,100 @@
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { create } from 'zustand';
-import type { User } from '@/types';
-import { CURRENT_USER } from '@/lib/mock-data';
-import {
-  login as authLogin,
-  logout as authLogout,
-  signup as authSignup,
-  type LoginInput,
-  type SignupInput,
-} from '@/lib/auth';
-import { getRefreshToken } from '@/lib/token';
-import { getUser } from '@/lib/token-validator';
+import type { LoginRequest, LoginResponse, SignupRequest, SignupResponse } from '@/types/auth';
+import { deleteToken, storeToken, type TokenType as APIResponse } from '@/lib/token/token';
+import { StatusType } from '@/types';
+import { api } from '@/lib/api';
+import { getUser, type RootUserType } from '@/lib/token/token-validator';
+import { showToast } from '@/lib/show-toast';
 
-interface AuthState {
-  currentUser: User;
-  isAuthenticated: boolean;
-  authError: string | null;
-  login: (input: LoginInput) => Promise<boolean>;
-  signup: (input: SignupInput) => Promise<boolean>;
+interface AuthStateType {
+  user: RootUserType | null;
+  isPending: boolean;
+  signup: ({ username, email, password }: SignupRequest) => Promise<SignupResponse>;
+  login: ({ username, password }: LoginRequest) => Promise<LoginResponse>;
   logout: () => void;
-  updateProfile: (updates: Partial<User['profile']> & { username?: string; email?: string }) => void;
 }
 
-function resolveInitialUser(): User {
-  const refreshToken = getRefreshToken();
-  if (refreshToken) {
-    const decoded = getUser(refreshToken);
-    if (decoded) {
-      return {
-        ...CURRENT_USER,
-        id: decoded.sub,
-        username: decoded.username,
-        email: decoded.email,
-      };
-    }
-  }
-  return CURRENT_USER;
-}
+export const useAuthStore = create<AuthStateType>()(
+  persist(
+    (set) => ({
+      user: null,
+      isPending: false,
 
-export const useAuthStore = create<AuthState>((set) => ({
-  currentUser: resolveInitialUser(),
-  isAuthenticated: !!getRefreshToken(),
-  authError: null,
 
-  login: async (input: LoginInput): Promise<boolean> => {
-    set({ authError: null });
-    const result = await authLogin(input);
-    if (!result.success) {
-      set({ authError: result.message });
-      return false;
-    }
-    const decoded = getUser(result.accessToken);
-    if (decoded) {
-      set((state) => ({
-        currentUser: {
-          ...state.currentUser,
-          id: decoded.sub,
-          username: decoded.username,
-          email: decoded.email,
-        },
-      }));
-    }
-    set({ isAuthenticated: true });
-    return true;
-  },
+      signup: async ({ username, email, password }: SignupRequest): Promise<SignupResponse> => {
+        const { fetcher } = api<APIResponse>("/auth/register");
+        set({ isPending: true });
 
-  signup: async (input: SignupInput): Promise<boolean> => {
-    set({ authError: null });
-    const result = await authSignup(input);
-    if (!result.success) {
-      set({ authError: result.message });
-      return false;
-    }
-    const decoded = getUser(result.accessToken);
-    if (decoded) {
-      set((state) => ({
-        currentUser: {
-          ...state.currentUser,
-          id: decoded.sub,
-          username: decoded.username,
-          email: decoded.email,
-        },
-      }));
-    }
-    set({ isAuthenticated: true });
-    return true;
-  },
+        const res = await fetcher({
+          method: "POST",
+          payload: { username, email, password }
+        });
 
-  logout: () => {
-    authLogout();
-    set({ isAuthenticated: false, currentUser: CURRENT_USER, authError: null });
-  },
+        set({ isPending: false });
+        if (!res.success || !res.data) {
+          return {
+            status: StatusType.ERROR,
+            message: res?.message as unknown as string
+          };
+        }
+        // Store tokens and set user
+        storeToken({
+          accessToken: res.data.accessToken,
+          refreshToken: res.data.refreshToken,
+        });
+        // Store user info in state
+        const user = getUser(res.data.accessToken);
+        set({ user });
 
-  updateProfile: (updates: Partial<User['profile']> & { username?: string; email?: string }) => {
-    set((state) => ({
-      currentUser: {
-        ...state.currentUser,
-        username: updates.username ?? state.currentUser.username,
-        email: updates.email ?? state.currentUser.email,
-        profile: { ...state.currentUser.profile, ...updates },
+        return {
+          status: StatusType.SUCCESS,
+          message: "Signup successful!",
+        };
       },
-    }));
-  },
-}));
+
+      login: async ({ username, password }: LoginRequest): Promise<LoginResponse> => {
+        const { fetcher } = api<APIResponse>("/auth/login");
+        set({ isPending: true });
+
+        const res = await fetcher({
+          method: "POST",
+          payload: { username, password }
+        });
+
+        set({ isPending: false });
+        if (!res.success || !res.data) {
+          return {
+            status: StatusType.ERROR,
+            message: res?.message as unknown as string
+          };
+        }
+        // Store tokens and set user
+        storeToken({
+          accessToken: res.data.accessToken,
+          refreshToken: res.data.refreshToken,
+        });
+        // Store user info in state
+        const user = getUser(res.data.accessToken);
+        set({ user });
+
+        return {
+          status: StatusType.SUCCESS,
+          message: "Login successful!",
+        };
+      },
+
+      logout: () => {
+        deleteToken();
+        set({ user: null });
+        showToast(StatusType.SUCCESS, "Logged out successfully.");
+
+      }
+    }),
+    {
+      name: 'flexbuzz-auth-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ user: state.user })
+    }
+  )
+);
