@@ -4,11 +4,12 @@ import type { LoginRequest, LoginResponse, SignupRequest, SignupResponse } from 
 import { deleteToken, storeToken, type TokenType as APIResponse } from '@/lib/token/token';
 import { StatusType } from '@/types';
 import { api } from '@/lib/api';
-import { getUser, type RootUserType } from '@/lib/token/token-validator';
+import { getRootUser, type RootUserType } from '@/lib/token/token-validator';
 import { showToast } from '@/lib/show-toast';
+import { useUserStore } from './user-store';
 
 interface AuthStateType {
-  user: RootUserType | null;
+  rootUser: RootUserType | null;
   isPending: boolean;
   signup: ({ username, email, password }: SignupRequest) => Promise<SignupResponse>;
   login: ({ username, password }: LoginRequest) => Promise<LoginResponse>;
@@ -18,7 +19,7 @@ interface AuthStateType {
 export const useAuthStore = create<AuthStateType>()(
   persist(
     (set) => ({
-      user: null,
+      rootUser: null,
       isPending: false,
 
 
@@ -44,8 +45,8 @@ export const useAuthStore = create<AuthStateType>()(
           refreshToken: res.data.refreshToken,
         });
         // Store user info in state
-        const user = getUser(res.data.accessToken);
-        set({ user });
+        const rootUser = getRootUser(res.data.accessToken);
+        set({ rootUser });
 
         return {
           status: StatusType.SUCCESS,
@@ -75,8 +76,8 @@ export const useAuthStore = create<AuthStateType>()(
           refreshToken: res.data.refreshToken,
         });
         // Store user info in state
-        const user = getUser(res.data.accessToken);
-        set({ user });
+        const rootUser = getRootUser(res.data.accessToken);
+        set({ rootUser });
 
         return {
           status: StatusType.SUCCESS,
@@ -85,8 +86,9 @@ export const useAuthStore = create<AuthStateType>()(
       },
 
       logout: () => {
-        deleteToken();
-        set({ user: null });
+        deleteToken(); // Clear tokens from storage
+        useUserStore.getState().clearCache(); // Clear user cache on logout
+        set({ rootUser: null }); // Clear user info from state
         showToast(StatusType.SUCCESS, "Logged out successfully.");
 
       }
@@ -94,7 +96,7 @@ export const useAuthStore = create<AuthStateType>()(
     {
       name: 'flexbuzz-auth-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ user: state.user })
+      partialize: (state) => ({ rootUser: state.rootUser })
     }
   )
 );

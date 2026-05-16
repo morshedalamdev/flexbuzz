@@ -1,25 +1,51 @@
-import { create } from 'zustand';
-import type { Hashtag, User } from '@/types';
-import { MOCK_HASHTAGS, MOCK_USERS } from '@/lib/mock-data';
-import { useAuthStore } from '@/store/auth-store';
-import { usePostStore } from '@/store/post-store';
+import { api } from "@/lib/api";
+import { showToast } from "@/lib/show-toast";
+import { StatusType } from "@/types";
+import type { UserType } from "@/types/user";
+import { create } from "zustand";
 
-interface UserStoreState {
-  trendingHashtags: Hashtag[];
-  getUserById: (id: string) => User | undefined;
-  followUser: (userId: string) => void;
+interface UserStateType {
+  users: Map<string, UserType>;
+  isLoading: boolean;
+  getUserById: (userId: string) => Promise<UserType | null>;
+  clearCache: () => void;
 }
 
-export const useUserStore = create<UserStoreState>()(() => ({
-  trendingHashtags: MOCK_HASHTAGS,
+export const useUserStore = create<UserStateType>((set, get) => ({
+  users: new Map(),
+  isLoading: false,
 
-  getUserById: (id: string) => {
-    const currentUser = useAuthStore.getState().currentUser;
-    if (currentUser && (id === currentUser.id || id === 'me')) return currentUser;
-    return MOCK_USERS.find((u) => u.id === id);
+  getUserById: async (userId: string): Promise<UserType | null> => {
+    // Check cache first
+    const cached = get().users.get(userId);
+    if (cached) return cached;
+
+    // Fetch from API if not in cache
+    const { fetcher } = api<UserType>(`/user/${userId}`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher();
+
+      if (!res.success) {
+        showToast(StatusType.ERROR, res.message || "Failed to fetch user");
+        return null;
+      }
+
+      // Cache the user
+      set((state) => ({
+        users: new Map(state.users).set(userId, res.data!),
+      }));
+
+      return res.data;
+    } catch (error) {
+      showToast(StatusType.ERROR, "Failed to fetch user");
+      console.error("Error fetching user:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
   },
 
-  followUser: (userId: string) => {
-    usePostStore.getState().toggleFollowUserInPosts(userId);
-  },
-}));
+  clearCache: () => set({ users: new Map() }),
+}))

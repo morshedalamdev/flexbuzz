@@ -12,6 +12,7 @@ import { Spinner } from '../ui/spinner';
 export default function Signup() {
     const navigate = useNavigate();
     const { signup, isPending } = useAuthStore();
+
     const [form, setForm] = useState({
         username: '',
         email: '',

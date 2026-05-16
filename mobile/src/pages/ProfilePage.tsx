@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pencil, LogOut } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
@@ -9,35 +9,48 @@ import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
 import EditProfileDialog from '@/components/user/EditProfileDialog';
 import { formatCount } from '@/lib/utils';
-import { useAuthStore } from '@/store/auth-store';
 import { usePostStore } from '@/store/post-store';
 import { useNavigate } from 'react-router-dom';
 import type { Post } from '@/types';
+import { useAuthStore } from '@/store/auth-store';
+import { useUserStore } from '@/store/user-store';
+import type { UserType } from '@/types/user';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const logout = useAuthStore((state) => state.logout);
-  const getPostsByUser = usePostStore((state) => state.getPostsByUser);
-  const [editPost, setEditPost] = useState<Post | null>(null);
-  const [deletePostId, setDeletePostId] = useState<string | null>(null);
-  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const { logout, rootUser } = useAuthStore();
+  const { getUserById } = useUserStore();
 
-  const userPosts = getPostsByUser(currentUser.id);
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  // const getPostsByUser = usePostStore((state) => state.getPostsByUser);
+  // const [editPost, setEditPost] = useState<Post | null>(null);
+  // const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  // const [editProfileOpen, setEditProfileOpen] = useState(false);
 
-  const initials = currentUser.profile.firstName
+  // const userPosts = getPostsByUser(currentUser.id);
+
+  const initials = currentUser?.profile.firstName
     ? `${currentUser.profile.firstName[0]}${currentUser.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : currentUser.username.slice(0, 2).toUpperCase();
+    : currentUser?.username.slice(0, 2).toUpperCase();
 
-  const displayName = currentUser.profile.firstName
-    ? `${currentUser.profile.firstName} ${currentUser.profile.lastName}`
-    : currentUser.username;
+  // const displayName = currentUser.profile.firstName
+  //   ? `${currentUser.profile.firstName} ${currentUser.profile.lastName}`
+  //   : currentUser.username;
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getUserById(rootUser!.sub);
+      setCurrentUser(user);
+    }
+
+    fetchUser();
+  }, [rootUser?.sub]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
-
+  console.log({ currentUser });
   return (
     <MobileShell>
       <TopBar
@@ -45,7 +58,7 @@ export default function ProfilePage() {
         rightAction={
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setEditProfileOpen(true)}
+              // onClick={() => setEditProfileOpen(true)}
               className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600"
               aria-label="Edit profile"
             >
@@ -72,7 +85,7 @@ export default function ProfilePage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setEditProfileOpen(true)}
+            // onClick={() => setEditProfileOpen(true)}
             className="rounded-full gap-1.5"
           >
             <Pencil size={13} />
@@ -80,10 +93,10 @@ export default function ProfilePage() {
           </Button>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 leading-tight">{displayName}</h2>
-        <p className="text-gray-400 text-sm mb-2">@{currentUser.username}</p>
+        <h2 className="text-xl font-bold text-gray-900 leading-tight">{currentUser?.profile.firstName} {currentUser?.profile.lastName}</h2>
+        <p className="text-gray-400 text-sm mb-2">@{currentUser?.username}</p>
 
-        {currentUser.profile.bio && (
+        {currentUser?.profile.bio && (
           <p className="text-sm text-gray-700 leading-relaxed mb-3">
             {currentUser.profile.bio}
           </p>
@@ -91,18 +104,18 @@ export default function ProfilePage() {
 
         <div className="flex gap-5">
           <button className="flex items-center gap-1.5 text-sm">
-            <span className="font-bold text-gray-900">{formatCount(currentUser.followerCount)}</span>
+            <span className="font-bold text-gray-900">{formatCount(currentUser?.followerCount)}</span>
             <span className="text-gray-400">Followers</span>
           </button>
           <button className="flex items-center gap-1.5 text-sm">
-            <span className="font-bold text-gray-900">{formatCount(currentUser.followingCount)}</span>
+            <span className="font-bold text-gray-900">{formatCount(currentUser?.followingCount)}</span>
             <span className="text-gray-400">Following</span>
           </button>
         </div>
       </div>
 
       {/* Posts */}
-      <div className="p-3 space-y-2">
+      {/* <div className="p-3 space-y-2">
         <h3 className="text-sm font-semibold text-gray-500 px-1">Your Posts</h3>
         {userPosts.length === 0 ? (
           <div className="py-12 text-center">
@@ -118,9 +131,9 @@ export default function ProfilePage() {
             />
           ))
         )}
-      </div>
+      </div> */}
 
-      <EditPostDialog
+      {/* <EditPostDialog
         post={editPost}
         open={!!editPost}
         onOpenChange={(open) => !open && setEditPost(null)}
@@ -130,7 +143,7 @@ export default function ProfilePage() {
         open={!!deletePostId}
         onOpenChange={(open) => !open && setDeletePostId(null)}
       />
-      <EditProfileDialog open={editProfileOpen} onOpenChange={setEditProfileOpen} />
+      <EditProfileDialog open={editProfileOpen} onOpenChange={setEditProfileOpen} /> */}
     </MobileShell>
   );
 }

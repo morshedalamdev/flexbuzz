@@ -14,19 +14,13 @@ export default function HomePage() {
   // const posts = usePostStore((state) => state.posts);
   // const [editPost, setEditPost] = useState<Post | null>(null);
   // const [deletePostId, setDeletePostId] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const { logout } = useAuthStore();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
   return (
     <MobileShell>
       <TopBar
         title=""
         rightAction={
-          <div onClick={handleLogout} className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <div className="bg-blue-500 rounded-lg p-1">
               <Zap size={14} className="text-white" fill="white" />
             </div>

@@ -17,7 +17,8 @@ export function formatRelativeTime(dateString: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-export function formatCount(n: number): string {
+export function formatCount(n: number | undefined): string {
+  if (n === undefined) return '0';
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
   return String(n);
 }
