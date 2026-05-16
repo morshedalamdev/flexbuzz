@@ -10,7 +10,7 @@ import { useUserStore } from './user-store';
 
 interface AuthStateType {
   rootUser: RootUserType | null;
-  isPending: boolean;
+  isLoading: boolean;
   signup: ({ username, email, password }: SignupRequest) => Promise<SignupResponse>;
   login: ({ username, password }: LoginRequest) => Promise<LoginResponse>;
   logout: () => void;
@@ -20,19 +20,19 @@ export const useAuthStore = create<AuthStateType>()(
   persist(
     (set) => ({
       rootUser: null,
-      isPending: false,
+      isLoading: false,
 
 
       signup: async ({ username, email, password }: SignupRequest): Promise<SignupResponse> => {
         const { fetcher } = api<APIResponse>("/auth/register");
-        set({ isPending: true });
+        set({ isLoading: true });
 
         const res = await fetcher({
           method: "POST",
           payload: { username, email, password }
         });
 
-        set({ isPending: false });
+        set({ isLoading: false });
         if (!res.success || !res.data) {
           return {
             status: StatusType.ERROR,
@@ -56,14 +56,14 @@ export const useAuthStore = create<AuthStateType>()(
 
       login: async ({ username, password }: LoginRequest): Promise<LoginResponse> => {
         const { fetcher } = api<APIResponse>("/auth/login");
-        set({ isPending: true });
+        set({ isLoading: true });
 
         const res = await fetcher({
           method: "POST",
           payload: { username, password }
         });
 
-        set({ isPending: false });
+        set({ isLoading: false });
         if (!res.success || !res.data) {
           return {
             status: StatusType.ERROR,

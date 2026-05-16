@@ -27,7 +27,7 @@ export default function UserEdit({
 }) {
   const user = userStore((state) => state.user);
   const fetchUser = userStore((state) => state.fetchUser);
-  const [state, action, isPending] = useActionState(updateProfile, undefined);
+  const [state, action, isLoading] = useActionState(updateProfile, undefined);
   const [date, setDate] = useState<Date | undefined>(
     user?.profile.dob || state?.dob || undefined,
   );
@@ -141,8 +141,8 @@ export default function UserEdit({
           {state?.errors?.bio && <FieldError>{state.errors.bio}</FieldError>}
         </Field>
         <Field>
-          <Button type="submit" disabled={isPending}>
-            {isPending ? <Spinner /> : ""}Save changes
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? <Spinner /> : ""}Save changes
           </Button>
         </Field>
       </FieldGroup>

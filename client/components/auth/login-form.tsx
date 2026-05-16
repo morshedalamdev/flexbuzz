@@ -19,17 +19,17 @@ import { authStore } from "@/stores/auth-store";
 
 export function LoginForm() {
   const setUser = authStore((state) => state.setUser);
-  const [state, action, isPending] = useActionState(login, undefined);
-  
-    useEffect(() => {
-      if (state?.message) {
-        useShowToast(state.status, state.message);
-      }
-      if (state?.status === "success" && state.token) {
-        setUser(state.token as string);
-        redirect("/");
-      }
-    }, [state]);
+  const [state, action, isLoading] = useActionState(login, undefined);
+
+  useEffect(() => {
+    if (state?.message) {
+      useShowToast(state.status, state.message);
+    }
+    if (state?.status === "success" && state.token) {
+      setUser(state.token as string);
+      redirect("/");
+    }
+  }, [state]);
 
   return (
     <form action={action}>
@@ -78,8 +78,8 @@ export function LoginForm() {
           )}
         </Field>
         <Field>
-          <Button type="submit" disabled={isPending}>
-            {isPending ? <Spinner /> : ""}Login
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? <Spinner /> : ""}Login
           </Button>
         </Field>
         <Field>

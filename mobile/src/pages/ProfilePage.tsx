@@ -35,7 +35,7 @@ export default function ProfilePage() {
     }
 
     fetchUser();
-  }, [userId, rootUser?.sub]);
+  }, [getUserById, rootUser?.sub, userId]);
 
   const isCurrentUser = rootUser?.sub === currentUser?.id;
 
@@ -50,6 +50,14 @@ export default function ProfilePage() {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const refreshCurrentUser = async () => {
+    const idToFetch = userId || rootUser?.sub;
+    if (!idToFetch) return;
+
+    const user = await getUserById(idToFetch);
+    setCurrentUser(user);
   };
 
 
@@ -81,7 +89,7 @@ export default function ProfilePage() {
 
       {/* Profile header */}
       <div className="bg-white border-b border-gray-100 px-4 pb-5">
-        <div className="h-20 -mx-4 mb-0 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-b-2xl" />
+        <div className="h-20 -mx-4 mb-0 bg-linear-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-b-2xl" />
         <div className="-mt-10 mb-3 flex items-end justify-between">
           <Avatar className="w-20 h-20 border-4 border-white shadow-md">
             <AvatarFallback className="text-xl">{initials}</AvatarFallback>
@@ -166,7 +174,12 @@ export default function ProfilePage() {
         open={!!deletePostId}
         onOpenChange={(open) => !open && setDeletePostId(null)}
       /> */}
-      <EditProfileDialog open={editProfileOpen} onOpenChange={setEditProfileOpen} />
+      <EditProfileDialog
+        open={editProfileOpen}
+        onOpenChange={setEditProfileOpen}
+        user={currentUser}
+        onSaved={refreshCurrentUser}
+      />
     </MobileShell>
   );
 }

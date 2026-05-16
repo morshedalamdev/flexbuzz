@@ -8,6 +8,7 @@ interface UserStateType {
   users: Map<string, UserType>;
   isLoading: boolean;
   getUserById: (userId: string) => Promise<UserType | null>;
+  updateProfile: (profile: Partial<UserType>) => Promise<void>;
   clearCache: () => void;
 }
 
@@ -41,6 +42,38 @@ export const useUserStore = create<UserStateType>((set, get) => ({
     } catch (error) {
       showToast(StatusType.ERROR, "Failed to fetch user");
       console.error("Error fetching user:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updateProfile: async (profile: Partial<UserType>) => {
+    const { fetcher } = api<UserType>(`/user/me`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "PATCH",
+        payload: profile,
+      })
+
+      if (!res.success || !res.data) {
+        showToast(StatusType.ERROR, res.message || "Failed to update profile");
+        throw new Error(res.message || "Failed to update profile");
+      }
+
+      showToast(StatusType.SUCCESS, "Profile updated successfully");
+      // Update cache with new profile data
+      set((state) => {
+        const updatedUser = { ...state.users.get(res.data!.id), ...res.data } as UserType;
+        return {
+          users: new Map(state.users).set(res.data!.id, updatedUser),
+        };
+      });
+    } catch (error) {
+      showToast(StatusType.ERROR, "Failed to update profile");
+      console.error("Error updating profile:", error);
       throw error;
     } finally {
       set({ isLoading: false });

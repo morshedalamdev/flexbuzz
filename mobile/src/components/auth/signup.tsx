@@ -11,7 +11,7 @@ import { Spinner } from '../ui/spinner';
 
 export default function Signup() {
     const navigate = useNavigate();
-    const { signup, isPending } = useAuthStore();
+    const { signup, isLoading } = useAuthStore();
 
     const [form, setForm] = useState({
         username: '',
@@ -126,8 +126,8 @@ export default function Signup() {
                 )}
             </div>
 
-            <Button type="submit" className="w-full h-12 text-base mt-2" disabled={isPending}>
-                {isPending ? <Spinner /> : ""}Sign Up
+            <Button type="submit" className="w-full h-12 text-base mt-2" disabled={isLoading}>
+                {isLoading ? <Spinner /> : ""}Sign Up
             </Button>
         </form>
     );

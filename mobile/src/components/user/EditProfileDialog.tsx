@@ -8,12 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuthStore } from '@/store/auth-store';
-import { usePostStore } from '@/store/post-store';
+import type { UserType } from '@/types/user';
+import { useUserStore } from '@/store/user-store';
+import { Spinner } from '../ui/spinner';
 
 interface EditProfileDialogProps {
+  user: UserType
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSaved?: () => void | Promise<void>;
 }
 
 const GENDER_OPTIONS = [
@@ -21,39 +24,39 @@ const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
   { value: 'other', label: 'Other' },
-  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
 ];
 
-export default function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps) {
-  // const currentUser = useAuthStore((state) => state.currentUser);
-  // const updateProfile = useAuthStore((state) => state.updateProfile);
-  // const syncUserInPosts = usePostStore((state) => state.syncUserInPosts);
-  // const [form, setForm] = useState({
-  //   username: currentUser.username,
-  //   email: currentUser.email,
-  //   firstName: currentUser.profile.firstName,
-  //   lastName: currentUser.profile.lastName,
-  //   gender: currentUser.profile.gender ?? '',
-  //   dob: currentUser.profile.dob ?? '',
-  //   bio: currentUser.profile.bio,
-  // });
+export default function EditProfileDialog({ user, open, onOpenChange, onSaved }: EditProfileDialogProps) {
+  const { isLoading, updateProfile } = useUserStore();
 
-  // const update = (field: string, value: string) =>
-  //   setForm((f) => ({ ...f, [field]: value }));
+  const [form, setForm] = useState({
+    username: user.username,
+    email: user.email,
+    firstName: user.profile.firstName,
+    lastName: user.profile.lastName,
+    gender: user.profile.gender ?? '',
+    dob: user.profile.dob ?? '',
+    bio: user.profile.bio,
+  });
 
-  const handleSave = () => {
-    //   const profileUpdates = {
-    //     username: form.username,
-    //     email: form.email,
-    //     firstName: form.firstName,
-    //     lastName: form.lastName,
-    //     gender: form.gender,
-    //     dob: form.dob,
-    //     bio: form.bio,
-    //   };
-    //   updateProfile(profileUpdates);
-    //   syncUserInPosts(currentUser.id, profileUpdates);
-    //   onOpenChange(false);
+  const update = (field: string, value: string) =>
+    setForm((f) => ({ ...f, [field]: value }));
+
+  const handleSave = async () => {
+    const profileUpdates = {
+      username: form.username,
+      email: form.email,
+      profile: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        gender: form.gender,
+        dob: form.dob,
+        bio: form.bio,
+      }
+    };
+    await updateProfile(profileUpdates);
+    await onSaved?.();
+    onOpenChange(false);
   };
 
   return (
@@ -67,8 +70,8 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Username</label>
             <Input
-              // value={form.username}
-              // onChange={(e) => update('username', e.target.value)}
+              value={form.username}
+              onChange={(e) => update('username', e.target.value)}
               placeholder="@username"
             />
           </div>
@@ -78,8 +81,8 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Email</label>
             <Input
               type="email"
-              // value={form.email}
-              // onChange={(e) => update('email', e.target.value)}
+              value={form.email}
+              onChange={(e) => update('email', e.target.value)}
               placeholder="you@example.com"
             />
           </div>
@@ -89,16 +92,16 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1.5">First name</label>
               <Input
-                // value={form.firstName}
-                // onChange={(e) => update('firstName', e.target.value)}
+                value={form.firstName}
+                onChange={(e) => update('firstName', e.target.value)}
                 placeholder="Jane"
               />
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1.5">Last name</label>
               <Input
-                // value={form.lastName}
-                // onChange={(e) => update('lastName', e.target.value)}
+                value={form.lastName}
+                onChange={(e) => update('lastName', e.target.value)}
                 placeholder="Doe"
               />
             </div>
@@ -108,8 +111,8 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Gender</label>
             <select
-              // value={form.gender}
-              // onChange={(e) => update('gender', e.target.value)}
+              value={form.gender}
+              onChange={(e) => update('gender', e.target.value)}
               className="flex h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               {GENDER_OPTIONS.map((opt) => (
@@ -125,8 +128,8 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Date of Birth</label>
             <Input
               type="date"
-              // value={form.dob}
-              // onChange={(e) => update('dob', e.target.value)}
+              value={form.dob}
+              onChange={(e) => update('dob', e.target.value)}
               max={new Date().toISOString().split('T')[0]}
             />
           </div>
@@ -135,10 +138,10 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Bio</label>
             <Textarea
-              // value={form.bio}
-              // onChange={(e) => update('bio', e.target.value)}
+              value={form.bio}
+              onChange={(e) => update('bio', e.target.value)}
               placeholder="Tell the world about yourself..."
-              className="min-h-[80px]"
+              className="min-h-20"
             />
           </div>
         </div>
@@ -146,8 +149,8 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
           <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button className="flex-1" onClick={handleSave}>
-            Save
+          <Button className="flex-1" onClick={handleSave} disabled={isLoading}>
+            {isLoading ? <Spinner /> : ""}Save
           </Button>
         </div>
       </DialogContent>
