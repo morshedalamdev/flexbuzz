@@ -16,7 +16,6 @@ interface EditProfileDialogProps {
   user: UserType
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSaved?: () => void | Promise<void>;
 }
 
 const GENDER_OPTIONS = [
@@ -26,7 +25,7 @@ const GENDER_OPTIONS = [
   { value: 'other', label: 'Other' },
 ];
 
-export default function EditProfileDialog({ user, open, onOpenChange, onSaved }: EditProfileDialogProps) {
+export default function EditProfileDialog({ user, open, onOpenChange }: EditProfileDialogProps) {
   const { isLoading, updateProfile } = useUserStore();
 
   const [form, setForm] = useState({
@@ -55,7 +54,6 @@ export default function EditProfileDialog({ user, open, onOpenChange, onSaved }:
       }
     };
     await updateProfile(profileUpdates);
-    await onSaved?.();
     onOpenChange(false);
   };
 

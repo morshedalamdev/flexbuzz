@@ -9,6 +9,7 @@ interface UserStateType {
   isLoading: boolean;
   getUserById: (userId: string) => Promise<UserType | null>;
   updateProfile: (profile: Partial<UserType>) => Promise<void>;
+  followUser: (userId: string, isFollowed: boolean) => Promise<void>;
   clearCache: () => void;
 }
 
@@ -63,7 +64,6 @@ export const useUserStore = create<UserStateType>((set, get) => ({
         throw new Error(res.message || "Failed to update profile");
       }
 
-      showToast(StatusType.SUCCESS, "Profile updated successfully");
       // Update cache with new profile data
       set((state) => {
         const updatedUser = { ...state.users.get(res.data!.id), ...res.data } as UserType;
@@ -74,6 +74,47 @@ export const useUserStore = create<UserStateType>((set, get) => ({
     } catch (error) {
       showToast(StatusType.ERROR, "Failed to update profile");
       console.error("Error updating profile:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  followUser: async (userId: string, isFollowed: boolean) => {
+    const { fetcher } = api(`/user/${userId}/${isFollowed ? "unfollow" : "follow"}`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: isFollowed ? "DELETE" : "POST",
+      });
+
+      if (!res.success || !res.data) {
+        showToast(StatusType.ERROR, res.message || "Failed to follow/unfollow user");
+        throw new Error(res.message || "Failed to follow/unfollow user");
+      }
+
+      // Update cache with new follower status
+      set((state) => {
+        const existingUser = state.users.get(userId);
+
+        if (!existingUser) return state;
+
+        const followerCount = existingUser.followerCount ?? 0;
+
+        const updatedUser: UserType = {
+          ...existingUser,
+          isFollowed: !isFollowed,
+          followerCount: isFollowed ? followerCount - 1 : followerCount + 1,
+        };
+
+        return {
+          users: new Map(state.users).set(userId, updatedUser),
+        };
+      });
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while following/unfollowing user");
+      console.error("Error following/unfollowing user:", error);
       throw error;
     } finally {
       set({ isLoading: false });

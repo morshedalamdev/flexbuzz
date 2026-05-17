@@ -5,19 +5,20 @@ import TopBar from '@/components/layout/TopBar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { formatCount } from '@/lib/utils';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth-store';
 import { useUserStore } from '@/store/user-store';
-import type { UserType } from '@/types/user';
 import EditProfileDialog from '@/components/user/EditProfileDialog';
 
 export default function ProfilePage() {
   const { userId } = useParams<{ userId: string }>();
-  const navigate = useNavigate();
   const { logout, rootUser } = useAuthStore();
-  const { getUserById } = useUserStore();
-
-  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  const { getUserById, followUser } = useUserStore();
+  // --- USER DATA
+  const currentUserId = userId || rootUser?.sub;
+  const currentUser = useUserStore((state) => currentUserId ? state.users.get(currentUserId) : null);
+  const isRootUser = rootUser?.sub === currentUser?.id;
+  // ---
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   // const getPostsByUser = usePostStore((state) => state.getPostsByUser);
   // const [editPost, setEditPost] = useState<Post | null>(null);
@@ -26,19 +27,11 @@ export default function ProfilePage() {
   // const userPosts = getPostsByUser(currentUser.id);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const idToFetch = userId || rootUser?.sub;
-      if (!idToFetch) return;
+    if (!currentUserId) return;
+    getUserById(currentUserId);
+  }, [currentUserId, getUserById]);
 
-      const user = await getUserById(idToFetch);
-      setCurrentUser(user);
-    }
-
-    fetchUser();
-  }, [getUserById, rootUser?.sub, userId]);
-
-  const isCurrentUser = rootUser?.sub === currentUser?.id;
-
+  // --- UI HELPERS
   const initials = currentUser?.profile.firstName
     ? `${currentUser.profile.firstName[0]}${currentUser.profile.lastName?.[0] ?? ''}`.toUpperCase()
     : currentUser?.username.slice(0, 2).toUpperCase();
@@ -46,20 +39,7 @@ export default function ProfilePage() {
   const displayName = currentUser?.profile.firstName
     ? `${currentUser.profile.firstName} ${currentUser.profile.lastName}`
     : currentUser?.username;
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  const refreshCurrentUser = async () => {
-    const idToFetch = userId || rootUser?.sub;
-    if (!idToFetch) return;
-
-    const user = await getUserById(idToFetch);
-    setCurrentUser(user);
-  };
-
+  // ---
 
   if (!currentUser) {
     return (
@@ -76,9 +56,9 @@ export default function ProfilePage() {
       <TopBar
         title="Profile"
         rightAction={
-          isCurrentUser && (
+          isRootUser && (
             <button
-              onClick={handleLogout}
+              onClick={logout}
               className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600"
               aria-label="Logout"
             >
@@ -94,7 +74,7 @@ export default function ProfilePage() {
           <Avatar className="w-20 h-20 border-4 border-white shadow-md">
             <AvatarFallback className="text-xl">{initials}</AvatarFallback>
           </Avatar>
-          {isCurrentUser ? (
+          {isRootUser ? (
             <Button
               variant="outline"
               size="sm"
@@ -108,7 +88,7 @@ export default function ProfilePage() {
             <Button
               variant={currentUser.isFollowed ? 'outline' : 'default'}
               size="sm"
-              // onClick={() => followUser(user.id)}
+              onClick={() => followUser(currentUser.id, currentUser?.isFollowed ?? false)}
               className="rounded-full gap-1.5"
             >
               {currentUser.isFollowed ? (
@@ -178,7 +158,6 @@ export default function ProfilePage() {
         open={editProfileOpen}
         onOpenChange={setEditProfileOpen}
         user={currentUser}
-        onSaved={refreshCurrentUser}
       />
     </MobileShell>
   );
