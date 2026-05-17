@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import { getRootUser, type RootUserType } from '@/lib/token/token-validator';
 import { showToast } from '@/lib/show-toast';
 import { useUserStore } from './user-store';
+import { usePostStore } from './post-store';
 
 interface AuthStateType {
   rootUser: RootUserType | null;
@@ -88,6 +89,7 @@ export const useAuthStore = create<AuthStateType>()(
       logout: () => {
         deleteToken(); // Clear tokens from storage
         useUserStore.getState().clearCache(); // Clear user cache on logout
+        usePostStore.getState().clearCache(); // Clear post cache on logout
         set({ rootUser: null }); // Clear user info from state
         showToast(StatusType.SUCCESS, "Logged out successfully.");
 

@@ -22,9 +22,9 @@ interface PostCardProps {
 
 export default function PostCard({ post, onEdit, onDelete, compact = false }: PostCardProps) {
   const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.currentUser);
+  const rootUser = useAuthStore((state) => state.rootUser);
   const likePost = usePostStore((state) => state.likePost);
-  const isOwner = post.userId === currentUser.id;
+  const isOwner = post.userId === rootUser?.sub;
 
   const initials = post.user.profile.firstName
     ? `${post.user.profile.firstName[0]}${post.user.profile.lastName?.[0] ?? ''}`.toUpperCase()
@@ -134,11 +134,10 @@ export default function PostCard({ post, onEdit, onDelete, compact = false }: Po
       <div className="flex items-center gap-4 pt-2 border-t border-gray-50">
         <button
           onClick={handleLike}
-          className={`flex items-center gap-1.5 text-sm transition-colors ${
-            post.isLikedByCurrentUser
+          className={`flex items-center gap-1.5 text-sm transition-colors ${post.isLikedByCurrentUser
               ? 'text-red-500 font-medium'
               : 'text-gray-400 hover:text-red-400'
-          }`}
+            }`}
         >
           <Heart
             size={18}

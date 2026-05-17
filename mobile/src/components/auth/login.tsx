@@ -11,10 +11,11 @@ import { Spinner } from '../ui/spinner';
 export default function Login() {
     const navigate = useNavigate();
     const { login, isLoading } = useAuthStore();
-
+    // --- FORM STATE
     const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    // ---
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
