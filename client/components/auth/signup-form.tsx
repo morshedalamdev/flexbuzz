@@ -19,7 +19,7 @@ import { authStore } from "@/stores/auth-store";
 
 export function SignupForm() {
   const setUser = authStore((state) => state.setUser);
-  const [state, action, isPending] = useActionState(signup, undefined);
+  const [state, action, isLoading] = useActionState(signup, undefined);
 
   useEffect(() => {
     if (state?.message) {
@@ -108,8 +108,8 @@ export function SignupForm() {
           )}
         </Field>
         <Field>
-          <Button type="submit" disabled={isPending}>
-            {isPending ? <Spinner /> : ""}Create Account
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? <Spinner /> : ""}Create Account
           </Button>
         </Field>
         <Field>

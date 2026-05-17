@@ -8,10 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuthStore } from '@/store/auth-store';
-import { usePostStore } from '@/store/post-store';
+import type { UserType } from '@/types/user';
+import { useUserStore } from '@/store/user-store';
+import { Spinner } from '../ui/spinner';
 
 interface EditProfileDialogProps {
+  user: UserType
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -21,38 +23,37 @@ const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
   { value: 'other', label: 'Other' },
-  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
 ];
 
-export default function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps) {
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const updateProfile = useAuthStore((state) => state.updateProfile);
-  const syncUserInPosts = usePostStore((state) => state.syncUserInPosts);
+export default function EditProfileDialog({ user, open, onOpenChange }: EditProfileDialogProps) {
+  const { isLoading, updateProfile } = useUserStore();
+
   const [form, setForm] = useState({
-    username: currentUser.username,
-    email: currentUser.email,
-    firstName: currentUser.profile.firstName,
-    lastName: currentUser.profile.lastName,
-    gender: currentUser.profile.gender ?? '',
-    dob: currentUser.profile.dob ?? '',
-    bio: currentUser.profile.bio,
+    username: user.username,
+    email: user.email,
+    firstName: user.profile.firstName,
+    lastName: user.profile.lastName,
+    gender: user.profile.gender ?? '',
+    dob: user.profile.dob ?? '',
+    bio: user.profile.bio,
   });
 
   const update = (field: string, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const profileUpdates = {
       username: form.username,
       email: form.email,
-      firstName: form.firstName,
-      lastName: form.lastName,
-      gender: form.gender,
-      dob: form.dob,
-      bio: form.bio,
+      profile: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        gender: form.gender,
+        dob: form.dob,
+        bio: form.bio,
+      }
     };
-    updateProfile(profileUpdates);
-    syncUserInPosts(currentUser.id, profileUpdates);
+    await updateProfile(profileUpdates);
     onOpenChange(false);
   };
 
@@ -138,7 +139,7 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
               value={form.bio}
               onChange={(e) => update('bio', e.target.value)}
               placeholder="Tell the world about yourself..."
-              className="min-h-[80px]"
+              className="min-h-20"
             />
           </div>
         </div>
@@ -146,8 +147,8 @@ export default function EditProfileDialog({ open, onOpenChange }: EditProfileDia
           <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button className="flex-1" onClick={handleSave}>
-            Save
+          <Button className="flex-1" onClick={handleSave} disabled={isLoading}>
+            {isLoading ? <Spinner /> : ""}Save
           </Button>
         </div>
       </DialogContent>

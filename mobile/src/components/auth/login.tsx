@@ -10,7 +10,7 @@ import { Spinner } from '../ui/spinner';
 
 export default function Login() {
     const navigate = useNavigate();
-    const { login, isPending } = useAuthStore();
+    const { login, isLoading } = useAuthStore();
 
     const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState('');
@@ -68,8 +68,8 @@ export default function Login() {
                 </div>
             </div>
 
-            <Button type="submit" className="w-full h-12 text-base" disabled={isPending}>
-                {isPending ? <Spinner /> : ""}Login
+            <Button type="submit" className="w-full h-12 text-base" disabled={isLoading}>
+                {isLoading ? <Spinner /> : ""}Login
             </Button>
         </form>
     );

@@ -1,89 +1,113 @@
-import { useState } from 'react';
-import { Pencil, LogOut } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Pencil, LogOut, UserCheck, UserPlus } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import PostCard from '@/components/post/PostCard';
-import EditPostDialog from '@/components/post/EditPostDialog';
-import DeletePostDialog from '@/components/post/DeletePostDialog';
-import EditProfileDialog from '@/components/user/EditProfileDialog';
 import { formatCount } from '@/lib/utils';
+import { useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth-store';
-import { usePostStore } from '@/store/post-store';
-import { useNavigate } from 'react-router-dom';
-import type { Post } from '@/types';
+import { useUserStore } from '@/store/user-store';
+import EditProfileDialog from '@/components/user/EditProfileDialog';
 
 export default function ProfilePage() {
-  const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const logout = useAuthStore((state) => state.logout);
-  const getPostsByUser = usePostStore((state) => state.getPostsByUser);
-  const [editPost, setEditPost] = useState<Post | null>(null);
-  const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const { userId } = useParams<{ userId: string }>();
+  const { logout, rootUser } = useAuthStore();
+  const { getUserById, followUser } = useUserStore();
+  // --- USER DATA
+  const currentUserId = userId || rootUser?.sub;
+  const currentUser = useUserStore((state) => currentUserId ? state.users.get(currentUserId) : null);
+  const isRootUser = rootUser?.sub === currentUser?.id;
+  // ---
   const [editProfileOpen, setEditProfileOpen] = useState(false);
+  // const getPostsByUser = usePostStore((state) => state.getPostsByUser);
+  // const [editPost, setEditPost] = useState<Post | null>(null);
+  // const [deletePostId, setDeletePostId] = useState<string | null>(null);
 
-  const userPosts = getPostsByUser(currentUser.id);
+  // const userPosts = getPostsByUser(currentUser.id);
 
-  const initials = currentUser.profile.firstName
+  useEffect(() => {
+    if (!currentUserId) return;
+    getUserById(currentUserId);
+  }, [currentUserId, getUserById]);
+
+  // --- UI HELPERS
+  const initials = currentUser?.profile.firstName
     ? `${currentUser.profile.firstName[0]}${currentUser.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : currentUser.username.slice(0, 2).toUpperCase();
+    : currentUser?.username.slice(0, 2).toUpperCase();
 
-  const displayName = currentUser.profile.firstName
+  const displayName = currentUser?.profile.firstName
     ? `${currentUser.profile.firstName} ${currentUser.profile.lastName}`
-    : currentUser.username;
+    : currentUser?.username;
+  // ---
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
+  if (!currentUser) {
+    return (
+      <MobileShell>
+        <TopBar title="Profile" showBack />
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-gray-400">User not found.</p>
+        </div>
+      </MobileShell>
+    );
+  }
   return (
     <MobileShell>
       <TopBar
         title="Profile"
         rightAction={
-          <div className="flex items-center gap-1">
+          isRootUser && (
             <button
-              onClick={() => setEditProfileOpen(true)}
-              className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600"
-              aria-label="Edit profile"
-            >
-              <Pencil size={18} />
-            </button>
-            <button
-              onClick={handleLogout}
+              onClick={logout}
               className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600"
               aria-label="Logout"
             >
               <LogOut size={18} />
-            </button>
-          </div>
+            </button>)
         }
       />
 
       {/* Profile header */}
       <div className="bg-white border-b border-gray-100 px-4 pb-5">
-        <div className="h-20 -mx-4 mb-0 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-b-2xl" />
+        <div className="h-20 -mx-4 mb-0 bg-linear-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-b-2xl" />
         <div className="-mt-10 mb-3 flex items-end justify-between">
           <Avatar className="w-20 h-20 border-4 border-white shadow-md">
             <AvatarFallback className="text-xl">{initials}</AvatarFallback>
           </Avatar>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setEditProfileOpen(true)}
-            className="rounded-full gap-1.5"
-          >
-            <Pencil size={13} />
-            Edit profile
-          </Button>
+          {isRootUser ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEditProfileOpen(true)}
+              className="rounded-full gap-1.5"
+            >
+              <Pencil size={13} />
+              Edit profile
+            </Button>
+          ) : (
+            <Button
+              variant={currentUser.isFollowed ? 'outline' : 'default'}
+              size="sm"
+              onClick={() => followUser(currentUser.id, currentUser?.isFollowed ?? false)}
+              className="rounded-full gap-1.5"
+            >
+              {currentUser.isFollowed ? (
+                <>
+                  <UserCheck size={14} /> Following
+                </>
+              ) : (
+                <>
+                  <UserPlus size={14} /> Follow
+                </>
+              )}
+            </Button>
+          )}
         </div>
 
         <h2 className="text-xl font-bold text-gray-900 leading-tight">{displayName}</h2>
-        <p className="text-gray-400 text-sm mb-2">@{currentUser.username}</p>
+        <p className="text-gray-400 text-sm mb-2">@{currentUser?.username}</p>
 
-        {currentUser.profile.bio && (
+        {currentUser?.profile.bio && (
           <p className="text-sm text-gray-700 leading-relaxed mb-3">
             {currentUser.profile.bio}
           </p>
@@ -91,18 +115,18 @@ export default function ProfilePage() {
 
         <div className="flex gap-5">
           <button className="flex items-center gap-1.5 text-sm">
-            <span className="font-bold text-gray-900">{formatCount(currentUser.followerCount)}</span>
+            <span className="font-bold text-gray-900">{formatCount(currentUser?.followerCount)}</span>
             <span className="text-gray-400">Followers</span>
           </button>
           <button className="flex items-center gap-1.5 text-sm">
-            <span className="font-bold text-gray-900">{formatCount(currentUser.followingCount)}</span>
+            <span className="font-bold text-gray-900">{formatCount(currentUser?.followingCount)}</span>
             <span className="text-gray-400">Following</span>
           </button>
         </div>
       </div>
 
       {/* Posts */}
-      <div className="p-3 space-y-2">
+      {/* <div className="p-3 space-y-2">
         <h3 className="text-sm font-semibold text-gray-500 px-1">Your Posts</h3>
         {userPosts.length === 0 ? (
           <div className="py-12 text-center">
@@ -118,9 +142,9 @@ export default function ProfilePage() {
             />
           ))
         )}
-      </div>
+      </div> */}
 
-      <EditPostDialog
+      {/* <EditPostDialog
         post={editPost}
         open={!!editPost}
         onOpenChange={(open) => !open && setEditPost(null)}
@@ -129,8 +153,12 @@ export default function ProfilePage() {
         postId={deletePostId}
         open={!!deletePostId}
         onOpenChange={(open) => !open && setDeletePostId(null)}
+      /> */}
+      <EditProfileDialog
+        open={editProfileOpen}
+        onOpenChange={setEditProfileOpen}
+        user={currentUser}
       />
-      <EditProfileDialog open={editProfileOpen} onOpenChange={setEditProfileOpen} />
     </MobileShell>
   );
 }

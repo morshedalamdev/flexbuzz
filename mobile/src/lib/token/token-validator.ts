@@ -21,7 +21,7 @@ export interface RootUserType {
   email: string;
 }
 
-export function getUser(token: string): RootUserType | null {
+export function getRootUser(token: string): RootUserType | null {
   try {
     const decoded = jwtDecode<RootUserType>(token);
     if (!decoded) return null;
