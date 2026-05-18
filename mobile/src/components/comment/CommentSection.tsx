@@ -7,6 +7,9 @@ import { displayInitial, formatRelativeTime } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
 import { usePostStore } from '@/store/post-store';
 import type { CommentType } from '@/types/post';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+const PAGE_SIZE = 10;
 
 interface CommentListProps {
   postId: string;
@@ -88,8 +91,16 @@ const CommentItem = memo(function CommentItem({ comment }: { comment: CommentTyp
 });
 
 export default function CommentSection({ postId, rootUserInitial, onCommentCreated }: CommentListProps) {
-  const { isLoading, comments, createComment } = usePostStore();
+  const {
+    isLoading,
+    comments,
+    createComment,
+    commentsByPostId,
+    hasMoreComments,
+    currentCommentsPage,
+  } = usePostStore();
   const [text, setText] = useState('');
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
@@ -98,14 +109,42 @@ export default function CommentSection({ postId, rootUserInitial, onCommentCreat
     setText('');
   };
 
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMoreComments) return;
+    setIsLoadingMore(true);
+    try {
+      await commentsByPostId(postId, currentCommentsPage + 1, PAGE_SIZE);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
   return (
     <div className="bg-white">
       {/* Comments */}
       <div className="px-4">
-        {comments.length === 0 ? (
+        {isLoading && comments.length === 0 ? (
+          <p className="text-center text-sm text-gray-400 py-6">Loading comments...</p>
+        ) : comments.length === 0 ? (
           <p className="text-center text-sm text-gray-400 py-6">No comments yet. Be the first!</p>
         ) : (
-          comments.map((c) => <CommentItem key={c.id} comment={c} />)
+          <InfiniteScroll
+            dataLength={comments.length}
+            next={handleLoadMore}
+            hasMore={hasMoreComments}
+            loader={
+              <p className="text-center text-sm text-gray-400 py-4">
+                Loading more comments...
+              </p>
+            }
+            endMessage={
+              <p className="text-center text-sm text-gray-300 py-4">
+                You're all caught up.
+              </p>
+            }
+          >
+            {comments.map((c) => <CommentItem key={c.id} comment={c} />)}
+          </InfiniteScroll>
         )}
       </div>
 
