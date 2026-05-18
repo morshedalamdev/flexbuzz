@@ -11,6 +11,7 @@ import {
 import { displayInitial, displayName, formatRelativeTime } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
 import type { PostType } from '@/types/post';
+import { usePostStore } from '@/store/post-store';
 
 interface PostCardProps {
   post: PostType;
@@ -21,13 +22,14 @@ interface PostCardProps {
 
 export default function PostCard({ post, onEdit, onDelete, compact = false }: PostCardProps) {
   const navigate = useNavigate();
+  const likePost = usePostStore((state) => state.likePost);
   const rootUser = useAuthStore((state) => state.rootUser);
   const isOwner = post.userId === rootUser?.sub;
 
-  // const handleLike = (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   likePost(post.id);
-  // };
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    likePost(post.id, post.isLikedByCurrentUser);
+  };
 
   const handleComments = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -125,7 +127,7 @@ export default function PostCard({ post, onEdit, onDelete, compact = false }: Po
       {/* Actions */}
       <div className="flex items-center gap-4 pt-2 border-t border-gray-50">
         <button
-          // onClick={handleLike}
+          onClick={handleLike}
           className={`flex items-center gap-1.5 text-sm transition-colors ${post.isLikedByCurrentUser
             ? 'text-red-500 font-medium'
             : 'text-gray-400 hover:text-red-400'

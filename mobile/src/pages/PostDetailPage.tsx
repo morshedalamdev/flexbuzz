@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Heart, MessageCircle, MoreHorizontal, Trash2, Pencil } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -25,9 +24,32 @@ export default function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const rootUser = useAuthStore((state) => state.rootUser);
-  const post = usePostStore((state) => (id ? state.getPostById(id) : undefined));
+  const { isLoading, getPostById } = usePostStore();
+  const [post, setPost] = useState<PostType | null>(null);
   const [editPost, setEditPost] = useState<PostType | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (id) {
+        const post = await getPostById(id)
+        setPost(post);
+      }
+    };
+
+    fetchPost();
+  }, [id, getPostById]);
+
+  if (isLoading) {
+    return (
+      <MobileShell>
+        <TopBar title="Post" showBack />
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </MobileShell>
+    );
+  }
 
   if (!post) {
     return (
@@ -107,20 +129,6 @@ export default function PostDetailPage() {
         <p className="text-gray-800 text-base leading-relaxed mb-4">
           {renderContent(post.content)}
         </p>
-
-        {post.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {post.hashtags.map((h) => (
-              <Badge
-                key={h.id}
-                variant="hashtag"
-                onClick={() => navigate(`/hashtag/${h.tag}`)}
-              >
-                #{h.tag}
-              </Badge>
-            ))}
-          </div>
-        )}
 
         <p className="text-xs text-gray-400 mb-4">{formatRelativeTime(post.createdAt)}</p>
 
