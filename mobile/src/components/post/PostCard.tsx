@@ -8,14 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { formatRelativeTime } from '@/lib/utils';
+import { displayInitial, displayName, formatRelativeTime } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
-import { usePostStore } from '@/store/post-store';
-import type { Post } from '@/types';
+import type { PostType } from '@/types/post';
 
 interface PostCardProps {
-  post: Post;
-  onEdit?: (post: Post) => void;
+  post: PostType;
+  onEdit?: (post: PostType) => void;
   onDelete?: (id: string) => void;
   compact?: boolean;
 }
@@ -23,17 +22,12 @@ interface PostCardProps {
 export default function PostCard({ post, onEdit, onDelete, compact = false }: PostCardProps) {
   const navigate = useNavigate();
   const rootUser = useAuthStore((state) => state.rootUser);
-  const likePost = usePostStore((state) => state.likePost);
   const isOwner = post.userId === rootUser?.sub;
 
-  const initials = post.user.profile.firstName
-    ? `${post.user.profile.firstName[0]}${post.user.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : post.user.username.slice(0, 2).toUpperCase();
-
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    likePost(post.id);
-  };
+  // const handleLike = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   likePost(post.id);
+  // };
 
   const handleComments = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -72,17 +66,15 @@ export default function PostCard({ post, onEdit, onDelete, compact = false }: Po
           className="flex items-center gap-3 min-w-0"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/user/${post.userId}`);
+            navigate(`/profile/${post.userId}`);
           }}
         >
           <Avatar className="w-10 h-10 shrink-0">
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback>{displayInitial(post.user)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
             <p className="font-semibold text-gray-900 text-sm leading-tight">
-              {post.user.profile.firstName
-                ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
-                : post.user.username}
+              {displayName(post.user)}
             </p>
             <p className="text-xs text-gray-400">
               @{post.user.username} · {formatRelativeTime(post.createdAt)}
@@ -133,10 +125,10 @@ export default function PostCard({ post, onEdit, onDelete, compact = false }: Po
       {/* Actions */}
       <div className="flex items-center gap-4 pt-2 border-t border-gray-50">
         <button
-          onClick={handleLike}
+          // onClick={handleLike}
           className={`flex items-center gap-1.5 text-sm transition-colors ${post.isLikedByCurrentUser
-              ? 'text-red-500 font-medium'
-              : 'text-gray-400 hover:text-red-400'
+            ? 'text-red-500 font-medium'
+            : 'text-gray-400 hover:text-red-400'
             }`}
         >
           <Heart

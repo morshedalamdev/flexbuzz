@@ -4,7 +4,7 @@ import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { formatCount } from '@/lib/utils';
+import { displayInitial, displayName, formatCount } from '@/lib/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth-store';
 import PostCard from '@/components/post/PostCard';
@@ -37,19 +37,12 @@ export default function ProfilePage() {
     getUserById(userId);
     getPostsByUser(userId);
   }, [userId, getUserById, getPostsByUser]);
-  // --- UI HELPERS
-  const initials = userProfile?.profile.firstName
-    ? `${userProfile.profile.firstName[0]}${userProfile.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : userProfile?.username.slice(0, 2).toUpperCase();
 
-  const displayName = userProfile?.profile.firstName
-    ? `${userProfile.profile.firstName} ${userProfile.profile.lastName}`
-    : userProfile?.username;
-  // ---
   const handleLogout = () => {
     logout();
     navigate("/login");
   }
+
   if (!userProfile) {
     return (
       <MobileShell>
@@ -81,7 +74,7 @@ export default function ProfilePage() {
         <div className="h-20 -mx-4 mb-0 bg-linear-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-b-2xl" />
         <div className="-mt-10 mb-3 flex items-end justify-between">
           <Avatar className="w-20 h-20 border-4 border-white shadow-md">
-            <AvatarFallback className="text-xl">{initials}</AvatarFallback>
+            <AvatarFallback className="text-xl">{displayInitial(userProfile)}</AvatarFallback>
           </Avatar>
           {isRootUser ? (
             <Button
@@ -113,7 +106,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 leading-tight">{displayName}</h2>
+        <h2 className="text-xl font-bold text-gray-900 leading-tight">{displayName(userProfile)}</h2>
         <p className="text-gray-400 text-sm mb-2">@{userProfile?.username}</p>
 
         {userProfile?.profile.bio && (
