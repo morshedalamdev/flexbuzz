@@ -14,7 +14,6 @@ const PAGE_SIZE = 10;
 interface CommentListProps {
   postId: string;
   rootUserInitial: string;
-  onCommentCreated?: () => void;
 }
 
 const CommentItem = memo(function CommentItem({ comment }: { comment: CommentType }) {
@@ -91,21 +90,13 @@ const CommentItem = memo(function CommentItem({ comment }: { comment: CommentTyp
 });
 
 export default function CommentSection({ postId, rootUserInitial, onCommentCreated }: CommentListProps) {
-  const {
-    isLoading,
-    comments,
-    createComment,
-    commentsByPostId,
-    hasMoreComments,
-    currentCommentsPage,
-  } = usePostStore();
+  const { isLoading, comments, createComment } = usePostStore();
   const [text, setText] = useState('');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
     await createComment(postId, text.trim());
-    onCommentCreated?.();
     setText('');
   };
 
