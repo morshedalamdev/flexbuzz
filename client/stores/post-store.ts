@@ -12,12 +12,16 @@ interface PostStoreType {
   posts: PostType[];
   comments: CommentType[];
   isLoading: boolean;
-  fetchPosts: (userId?: string) => Promise<void>;
+  hasMorePosts: boolean;
+  currentPostsPage: number;
+  hasMoreComments: boolean;
+  currentCommentsPage: number;
+  fetchPosts: (userId?: string, page?: number, limit?: number) => Promise<void>;
   createPost: (content: string) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
   likePost: (id: string, isLiked: boolean) => Promise<void>;
-  fetchComments: (postId: string) => Promise<void>;
+  fetchComments: (postId: string, page?: number, limit?: number) => Promise<void>;
   createComment: (postId: string, content: string) => Promise<void>;
   updateComment: (id: string, content: string) => Promise<void>;
   deleteComment: (id: string) => Promise<void>;
@@ -27,14 +31,18 @@ export const postStore = create<PostStoreType>((set, get) => ({
   posts: [],
   comments: [],
   isLoading: true,
+  hasMorePosts: true,
+  currentPostsPage: 1,
+  hasMoreComments: true,
+  currentCommentsPage: 1,
 
   setLoading: (isLoading: boolean) => set({ isLoading }),
   // POST OPERATIONS
-  fetchPosts: async (userId?: string) => {
+  fetchPosts: async (userId?: string, page: number = 1, limit: number = 10) => {
     const { fetcher } = useFetcher<PaginationInterface<PostType>>(
-      `/note${userId ? `?userId=${userId}` : ""}`,
+      `/note${userId ? `?userId=${userId}&page=${page}&limit=${limit}` : `?page=${page}&limit=${limit}`}`,
     );
-    set({ isLoading: true });
+    set({ isLoading: page === 1 });
     try {
       const res = await fetcher();
 
@@ -44,9 +52,17 @@ export const postStore = create<PostStoreType>((set, get) => ({
         throw new Error(res.message || "Failed to fetch posts");
       }
 
-      set({ posts: res.data?.data, isLoading: false });
+      const hasMore = res.data?.meta?.currentPage ? res.data.meta.currentPage < res.data.meta.totalPages : false;
+      
+      set((state) => ({
+        posts: page === 1 ? res.data?.data : [...state.posts, ...(res.data?.data || [])],
+        isLoading: false,
+        hasMorePosts: hasMore,
+        currentPostsPage: page,
+      }));
     } catch (error) {
       console.error("Error fetching posts:", error);
+      set({ isLoading: false });
     }
   },
 
@@ -209,9 +225,9 @@ export const postStore = create<PostStoreType>((set, get) => ({
     }
   },
   // COMMENT OPERATIONS
-  fetchComments: async (postId: string) => {
-    const { fetcher } = useFetcher<PaginationInterface<CommentType>>(`/note/${postId}/comments`);
-    set({ isLoading: true });
+  fetchComments: async (postId: string, page: number = 1, limit: number = 10) => {
+    const { fetcher } = useFetcher<PaginationInterface<CommentType>>(`/note/${postId}/comments?page=${page}&limit=${limit}`);
+    set({ isLoading: page === 1 });
 
     try {
       const res = await fetcher();
@@ -222,9 +238,17 @@ export const postStore = create<PostStoreType>((set, get) => ({
         throw new Error(res.message || "Failed to fetch comments");
       }
 
-      set({ comments: res.data?.data, isLoading: false });
+      const hasMore = res.data?.meta?.currentPage ? res.data.meta.currentPage < res.data.meta.totalPages : false;
+      
+      set((state) => ({
+        comments: page === 1 ? res.data?.data : [...state.comments, ...(res.data?.data || [])],
+        isLoading: false,
+        hasMoreComments: hasMore,
+        currentCommentsPage: page,
+      }));
     } catch (error) {
       console.error("Error fetching comments:", error);
+      set({ isLoading: false });
     }
   },
 
@@ -243,7 +267,7 @@ export const postStore = create<PostStoreType>((set, get) => ({
 
       if (!res.success || !res.data) {
         set({ isLoading: false });
-        useShowToast(StatusType.ERROR,res.message || "Failed to create comment");
+        useShowToast(StatusType.ERROR, res.message || "Failed to create comment");
         throw new Error(res.message || "Failed to create comment");
       }
 
@@ -274,10 +298,10 @@ export const postStore = create<PostStoreType>((set, get) => ({
 
       if (!res.success || !res.data) {
         set({ isLoading: false });
-        useShowToast(StatusType.ERROR,res.message || "Failed to update comment");
+        useShowToast(StatusType.ERROR, res.message || "Failed to update comment");
         throw new Error(res.message || "Failed to update comment");
       }
-      
+
       set((state) => ({
         comments: state.comments.map((comment) =>
           comment.id === id

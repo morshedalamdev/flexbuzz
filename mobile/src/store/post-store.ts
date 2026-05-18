@@ -9,9 +9,13 @@ interface PostStateType {
   comments: CommentType[];
   postsByUser: Record<string, PostType[]>;
   isLoading: boolean;
+  hasMorePosts: boolean;
+  currentPostsPage: number;
+  hasMoreComments: boolean;
+  currentCommentsPage: number;
   // -- POST OPERATIONS
-  getPostsInRoot: () => Promise<PostType[]>;
-  getPostsByUser: (userId: string) => Promise<PostType[]>;
+  getPostsInRoot: (page?: number, limit?: number) => Promise<PostType[]>;
+  getPostsByUser: (userId: string, page?: number, limit?: number) => Promise<PostType[]>;
   getPostById: (postId: string) => Promise<PostType>;
   createPost: (content: string) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
@@ -19,7 +23,7 @@ interface PostStateType {
   // --- LIKE OPERATIONS
   likePost: (postId: string, isLiked: boolean) => Promise<void>;
   // --- COMMENT OPERATIONS
-  commentsByPostId: (postId: string) => Promise<CommentType[]>;
+  commentsByPostId: (postId: string, page?: number, limit?: number) => Promise<CommentType[]>;
   createComment: (postId: string, content: string) => Promise<CommentType>;
   updateComment: (commentId: string, content: string) => Promise<void>;
   deleteComment: (commentId: string) => Promise<void>;
@@ -32,6 +36,10 @@ export const usePostStore = create<PostStateType>((set, get) => ({
   comments: [],
   postsByUser: {},
   isLoading: false,
+  hasMorePosts: true,
+  currentPostsPage: 1,
+  hasMoreComments: true,
+  currentCommentsPage: 1,
 
   // --- LIKE, COMMENT OPERATIONS
   likePost: async (postId: string, isLiked: boolean) => {
@@ -87,9 +95,9 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     }
   },
   // --- COMMENT OPERATIONS
-  commentsByPostId: async (postId: string) => {
-    const { fetcher } = api<PaginationInterface<CommentType>>(`/note/${postId}/comments`);
-    set({ isLoading: true });
+  commentsByPostId: async (postId: string, page: number = 1, limit: number = 10) => {
+    const { fetcher } = api<PaginationInterface<CommentType>>(`/note/${postId}/comments?page=${page}&limit=${limit}`);
+    set({ isLoading: page === 1 });
 
     try {
       const res = await fetcher();
@@ -98,7 +106,13 @@ export const usePostStore = create<PostStateType>((set, get) => ({
         throw new Error(res.message || "Failed to fetch comments");
       }
 
-      set({ comments: res.data?.data ?? [] });
+      const hasMore = res.data?.meta?.currentPage ? res.data.meta.currentPage < res.data.meta.totalPages : false;
+      
+      set((state) => ({
+        comments: page === 1 ? res.data?.data ?? [] : [...state.comments, ...(res.data?.data ?? [])],
+        hasMoreComments: hasMore,
+        currentCommentsPage: page,
+      }));
       return res.data?.data ?? [];
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while fetching comments");
@@ -203,9 +217,9 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     }
   },
   // --- POST OPERATIONS
-  getPostsInRoot: async () => {
-    const { fetcher } = api<PaginationInterface<PostType>>(`/note`);
-    set({ isLoading: true });
+  getPostsInRoot: async (page: number = 1, limit: number = 10) => {
+    const { fetcher } = api<PaginationInterface<PostType>>(`/note?page=${page}&limit=${limit}`);
+    set({ isLoading: page === 1 });
 
     try {
       const res = await fetcher();
@@ -214,8 +228,15 @@ export const usePostStore = create<PostStateType>((set, get) => ({
         throw new Error(res.message || "Failed to fetch posts");
       }
 
-      set({ posts: res.data?.data ?? [] });
-      return res.data?.data ?? [];
+      const hasMore = res.data?.meta?.currentPage ? res.data.meta.currentPage < res.data.meta.totalPages : false;
+      const newPosts = res.data?.data ?? [];
+
+      set((state) => ({
+        posts: page === 1 ? newPosts : [...state.posts, ...newPosts],
+        hasMorePosts: hasMore,
+        currentPostsPage: page,
+      }));
+      return newPosts;
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while fetching posts");
       console.error("Error fetching posts:", error);
@@ -225,15 +246,15 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     }
   },
 
-  getPostsByUser: async (userId: string) => {
-    const cachedPosts = get().postsByUser[userId];
-    if (cachedPosts) {
+  getPostsByUser: async (userId: string, page: number = 1, limit: number = 10) => {
+    const cachedPosts = page === 1 ? get().postsByUser[userId] : undefined;
+    if (cachedPosts && page === 1) {
       set({ posts: cachedPosts });
       return cachedPosts;
     }
 
-    const { fetcher } = api<PaginationInterface<PostType>>(`/note?userId=${userId}`);
-    set({ isLoading: true });
+    const { fetcher } = api<PaginationInterface<PostType>>(`/note?userId=${userId}&page=${page}&limit=${limit}`);
+    set({ isLoading: page === 1 });
 
     try {
       const res = await fetcher();
@@ -242,14 +263,23 @@ export const usePostStore = create<PostStateType>((set, get) => ({
         throw new Error(res.message || "Failed to fetch posts");
       }
 
+      const hasMore = res.data?.meta?.currentPage ? res.data.meta.currentPage < res.data.meta.totalPages : false;
       const userPosts = res.data?.data ?? [];
 
-      set((state) => ({
-        postsByUser: {
-          ...state.postsByUser,
-          [userId]: userPosts,
-        },
-      }));
+      set((state) => {
+        const cachedUserPosts = state.postsByUser[userId] || [];
+        const combinedPosts = page === 1 ? userPosts : [...cachedUserPosts, ...userPosts];
+        
+        return {
+          postsByUser: {
+            ...state.postsByUser,
+            [userId]: combinedPosts,
+          },
+          posts: combinedPosts,
+          hasMorePosts: hasMore,
+          currentPostsPage: page,
+        };
+      });
 
       return userPosts;
     } catch (error) {
