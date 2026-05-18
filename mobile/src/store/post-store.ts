@@ -11,6 +11,7 @@ interface PostStateType {
   getPostsInRoot: () => Promise<PostType[]>;
   getPostsByUser: (userId: string) => Promise<PostType[]>;
   getPostById: (postId: string) => PostType | undefined;
+  createPost: (content: string) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
   clearCache: () => void;
@@ -21,6 +22,7 @@ export const usePostStore = create<PostStateType>((set, get) => ({
   postsByUser: {},
   isLoading: false,
 
+  // --- POST OPERATIONS
   getPostsInRoot: async () => {
     const { fetcher } = api<PaginationInterface<PostType>>(`/note`);
     set({ isLoading: true });
@@ -41,19 +43,6 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     } finally {
       set({ isLoading: false });
     }
-  },
-
-  getPostById: (postId: string) => {
-    const state = get();
-    // Search in flat posts array first
-    const found = state.posts.find((p) => p.id === postId);
-    if (found) return found;
-    // Search in all postsByUser caches
-    for (const userPosts of Object.values(state.postsByUser)) {
-      const post = userPosts.find((p) => p.id === postId);
-      if (post) return post;
-    }
-    return undefined;
   },
 
   getPostsByUser: async (userId: string) => {
@@ -92,8 +81,43 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     }
   },
 
+  getPostById: (postId: string) => {
+    const state = get();
+    // Search in flat posts array first
+    const found = state.posts.find((p) => p.id === postId);
+    if (found) return found;
+    // Search in all postsByUser caches
+    for (const userPosts of Object.values(state.postsByUser)) {
+      const post = userPosts.find((p) => p.id === postId);
+      if (post) return post;
+    }
+    return undefined;
+  },
+
+  createPost: async (content: string) => {
+    const { fetcher } = api<PostType>(`/note`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "POST",
+        payload: { content },
+      });
+      if (!res.success || !res.data) {
+        showToast(StatusType.ERROR, res.message || "Failed to create post");
+        throw new Error(res.message || "Failed to create post");
+      }
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while creating the post");
+      console.error("Error creating post:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   updatePost: async (id: string, content: string) => {
-    const { fetcher } = api(`/note`);
+    const { fetcher } = api<PostType>(`/note`);
     set({ isLoading: true });
 
     try {
@@ -158,6 +182,8 @@ export const usePostStore = create<PostStateType>((set, get) => ({
       set({ isLoading: false });
     }
   },
+  // --- LIKE, COMMENT OPERATIONS
 
+  // --- CACHE OPERATIONS
   clearCache: () => set({ posts: [], postsByUser: {} }),
 }));
