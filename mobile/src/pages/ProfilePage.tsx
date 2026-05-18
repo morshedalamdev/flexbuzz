@@ -14,6 +14,9 @@ import { usePostStore } from '@/store/post-store';
 import type { PostType } from '@/types/post';
 import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+const PAGE_SIZE = 10;
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -25,23 +28,39 @@ export default function ProfilePage() {
   const userProfile = useUserStore((state) => userId ? state.users.get(userId) : null);
   const isRootUser = rootUser?.sub === userProfile?.id;
   // --- USER POSTS
-  const { isLoading: isPostsLoading, getPostsByUser } = usePostStore();
+  const {
+    isLoading: isPostsLoading,
+    getPostsByUser,
+    hasMorePosts,
+    currentPostsPage,
+  } = usePostStore();
   const userPosts = usePostStore((state) => (userId ? state.postsByUser[userId] : null));
   // --- UI STATE
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [editPost, setEditPost] = useState<PostType | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   // ---
   useEffect(() => {
     if (!userId) return;
     getUserById(userId);
-    getPostsByUser(userId);
+    getPostsByUser(userId, 1, PAGE_SIZE);
   }, [userId, getUserById, getPostsByUser]);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   }
+
+  const handleLoadMore = async () => {
+    if (!userId || isLoadingMore || !hasMorePosts) return;
+    setIsLoadingMore(true);
+    try {
+      await getPostsByUser(userId, currentPostsPage + 1, PAGE_SIZE);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   if (!userProfile) {
     return (
@@ -127,9 +146,9 @@ export default function ProfilePage() {
         </div>
       </div>
       {/* Feed */}
-      <div className="p-3 space-y-2">
+      <div className="p-3">
         <h3 className="text-sm font-semibold text-gray-500 px-1">Posts</h3>
-        {isPostsLoading ? (
+        {isPostsLoading && (!userPosts || userPosts.length === 0) ? (
           <div className="py-12 text-center">
             <p className="text-gray-400 text-sm">Loading posts...</p>
           </div>
@@ -138,12 +157,32 @@ export default function ProfilePage() {
             <p className="text-gray-400 text-sm">This user hasn't posted anything yet.</p>
           </div>
         ) : (
-          userPosts.map((post) => <PostCard
-            key={post.id}
-            post={post}
-            onEdit={setEditPost}
-            onDelete={setDeletePostId}
-          />)
+          <InfiniteScroll
+            dataLength={userPosts.length}
+            next={handleLoadMore}
+            hasMore={hasMorePosts}
+            loader={
+              <div className="py-4 text-center text-gray-400 text-sm">
+                Loading more posts...
+              </div>
+            }
+            endMessage={
+              <div className="py-4 text-center text-gray-300 text-sm">
+                You're all caught up.
+              </div>
+            }
+          >
+            <div className="mt-2 space-y-2">
+              {userPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onEdit={setEditPost}
+                  onDelete={setDeletePostId}
+                />
+              ))}
+            </div>
+          </InfiniteScroll>
         )}
       </div>
 

@@ -8,6 +8,7 @@ interface PostStateType {
   posts: PostType[];
   comments: CommentType[];
   postsByUser: Record<string, PostType[]>;
+  postsByUserMeta: Record<string, { currentPage: number; hasMore: boolean }>;
   isLoading: boolean;
   hasMorePosts: boolean;
   currentPostsPage: number;
@@ -35,6 +36,7 @@ export const usePostStore = create<PostStateType>((set, get) => ({
   posts: [],
   comments: [],
   postsByUser: {},
+  postsByUserMeta: {},
   isLoading: false,
   hasMorePosts: true,
   currentPostsPage: 1,
@@ -107,7 +109,7 @@ export const usePostStore = create<PostStateType>((set, get) => ({
       }
 
       const hasMore = res.data?.meta?.currentPage ? res.data.meta.currentPage < res.data.meta.totalPages : false;
-      
+
       set((state) => ({
         comments: page === 1 ? res.data?.data ?? [] : [...state.comments, ...(res.data?.data ?? [])],
         hasMoreComments: hasMore,
@@ -248,8 +250,13 @@ export const usePostStore = create<PostStateType>((set, get) => ({
 
   getPostsByUser: async (userId: string, page: number = 1, limit: number = 10) => {
     const cachedPosts = page === 1 ? get().postsByUser[userId] : undefined;
+    const cachedMeta = page === 1 ? get().postsByUserMeta[userId] : undefined;
     if (cachedPosts && page === 1) {
-      set({ posts: cachedPosts });
+      set({
+        posts: cachedPosts,
+        hasMorePosts: cachedMeta?.hasMore ?? true,
+        currentPostsPage: cachedMeta?.currentPage ?? 1,
+      });
       return cachedPosts;
     }
 
@@ -269,11 +276,15 @@ export const usePostStore = create<PostStateType>((set, get) => ({
       set((state) => {
         const cachedUserPosts = state.postsByUser[userId] || [];
         const combinedPosts = page === 1 ? userPosts : [...cachedUserPosts, ...userPosts];
-        
+
         return {
           postsByUser: {
             ...state.postsByUser,
             [userId]: combinedPosts,
+          },
+          postsByUserMeta: {
+            ...state.postsByUserMeta,
+            [userId]: { currentPage: page, hasMore },
           },
           posts: combinedPosts,
           hasMorePosts: hasMore,
@@ -418,5 +429,5 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     }
   },
   // --- CACHE OPERATIONS
-  clearCache: () => set({ posts: [], postsByUser: {} }),
+  clearCache: () => set({ posts: [], postsByUser: {}, postsByUserMeta: {} }),
 }));

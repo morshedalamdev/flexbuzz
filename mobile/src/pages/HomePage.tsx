@@ -7,15 +7,35 @@ import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
 import { usePostStore } from '@/store/post-store';
 import type { PostType } from '@/types/post';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+const PAGE_SIZE = 10;
 
 export default function HomePage() {
-  const { isLoading, posts, getPostsInRoot } = usePostStore();
+  const {
+    isLoading,
+    posts,
+    getPostsInRoot,
+    hasMorePosts,
+    currentPostsPage,
+  } = usePostStore();
   const [editPost, setEditPost] = useState<PostType | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
-    getPostsInRoot();
+    getPostsInRoot(1, PAGE_SIZE);
   }, [getPostsInRoot]);
+
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMorePosts) return;
+    setIsLoadingMore(true);
+    try {
+      await getPostsInRoot(currentPostsPage + 1, PAGE_SIZE);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   return (
     <MobileShell>
@@ -32,8 +52,8 @@ export default function HomePage() {
       />
 
       {/* Feed */}
-      <div className="flex-1 space-y-2 p-3">
-        {isLoading ? (
+      <div className="flex-1 p-3">
+        {isLoading && posts.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-gray-400 text-sm">Loading posts...</p>
           </div>
@@ -44,14 +64,32 @@ export default function HomePage() {
             <p className="text-gray-300 text-sm">Be the first to share something!</p>
           </div>
         ) : (
-          posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onEdit={setEditPost}
-              onDelete={setDeletePostId}
-            />
-          ))
+          <InfiniteScroll
+            dataLength={posts.length}
+            next={handleLoadMore}
+            hasMore={hasMorePosts}
+            loader={
+              <div className="py-4 text-center text-gray-400 text-sm">
+                Loading more posts...
+              </div>
+            }
+            endMessage={
+              <div className="py-4 text-center text-gray-300 text-sm">
+                You're all caught up.
+              </div>
+            }
+          >
+            <div className="space-y-2">
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onEdit={setEditPost}
+                  onDelete={setDeletePostId}
+                />
+              ))}
+            </div>
+          </InfiniteScroll>
         )}
       </div>
 
