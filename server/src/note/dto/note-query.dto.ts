@@ -1,5 +1,5 @@
 import { IntersectionType } from "@nestjs/mapped-types";
-import { IsOptional, IsString, IsUUID } from "class-validator";
+import { IsOptional, IsUUID, IsString } from "class-validator";
 import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
 
 class NoteBaseDto {

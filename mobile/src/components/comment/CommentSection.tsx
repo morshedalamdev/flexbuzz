@@ -14,6 +14,7 @@ const PAGE_SIZE = 10;
 interface CommentListProps {
   postId: string;
   rootUserInitial: string;
+  onCommentCreated?: (comment: CommentType) => void;
 }
 
 const CommentItem = memo(function CommentItem({ comment }: { comment: CommentType }) {
@@ -90,14 +91,19 @@ const CommentItem = memo(function CommentItem({ comment }: { comment: CommentTyp
 });
 
 export default function CommentSection({ postId, rootUserInitial, onCommentCreated }: CommentListProps) {
-  const { isLoading, comments, createComment } = usePostStore();
+  const { isLoading, comments, createComment, hasMoreComments, commentsByPostId, currentCommentsPage } = usePostStore();
   const [text, setText] = useState('');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
-    await createComment(postId, text.trim());
-    setText('');
+    try {
+      const newComment = await createComment(postId, text.trim());
+      setText('');
+      if (onCommentCreated && newComment) onCommentCreated(newComment);
+    } catch (error) {
+      console.error('Failed to create comment', error);
+    }
   };
 
   const handleLoadMore = async () => {
@@ -105,6 +111,8 @@ export default function CommentSection({ postId, rootUserInitial, onCommentCreat
     setIsLoadingMore(true);
     try {
       await commentsByPostId(postId, currentCommentsPage + 1, PAGE_SIZE);
+    } catch (error) {
+      console.error('Failed to load more comments', error);
     } finally {
       setIsLoadingMore(false);
     }

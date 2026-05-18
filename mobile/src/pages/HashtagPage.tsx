@@ -36,6 +36,7 @@ export default function HashtagPage() {
 
     loadPosts();
   }, [tag, getPostsByHashtag]);
+  console.log(posts);
 
   return (
     <MobileShell>
