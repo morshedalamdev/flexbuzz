@@ -16,10 +16,13 @@ interface PostStateType {
   createPost: (content: string) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
-  // --- LIKE, COMMENT OPERATIONS
+  // --- LIKE OPERATIONS
   likePost: (postId: string, isLiked: boolean) => Promise<void>;
+  // --- COMMENT OPERATIONS
   commentsByPostId: (postId: string) => Promise<CommentType[]>;
   createComment: (postId: string, content: string) => Promise<void>;
+  updateComment: (commentId: string, content: string) => Promise<void>;
+  deleteComment: (commentId: string) => Promise<void>;
   // --- CACHE OPERATIONS
   clearCache: () => void;
 }
@@ -83,7 +86,7 @@ export const usePostStore = create<PostStateType>((set, get) => ({
       set({ isLoading: false });
     }
   },
-
+  // --- COMMENT OPERATIONS
   commentsByPostId: async (postId: string) => {
     const { fetcher } = api<PaginationInterface<CommentType>>(`/note/${postId}/comments`);
     set({ isLoading: true });
@@ -126,6 +129,57 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while creating the comment");
       console.error("Error creating comment:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updateComment: async (commentId: string, content: string) => {
+    const { fetcher } = api<CommentType>(`/note/comment`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "PATCH",
+        payload: { id: commentId, content },
+      });
+      if (!res.success || !res.data) {
+        showToast(StatusType.ERROR, res.message || "Failed to update comment");
+        throw new Error(res.message || "Failed to update comment");
+      }
+
+      set((state) => ({
+        comments: state.comments.map((comment) =>
+          comment.id === commentId ? { ...comment, content } : comment
+        ),
+      }));
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while updating the comment");
+      console.error("Error updating comment:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  deleteComment: async (commentId: string) => {
+    const { fetcher } = api(`/note/comment/${commentId}`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({ method: "DELETE" });
+      if (!res.success) {
+        showToast(StatusType.ERROR, res.message || "Failed to delete comment");
+        throw new Error(res.message || "Failed to delete comment");
+      }
+
+      set((state) => ({
+        comments: state.comments.filter((comment) => comment.id !== commentId),
+      }));
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while deleting the comment");
+      console.error("Error deleting comment:", error);
       throw error;
     } finally {
       set({ isLoading: false });

@@ -15,8 +15,8 @@ interface CommentListProps {
 
 const CommentItem = memo(function CommentItem({ comment }: { comment: CommentType }) {
   const rootUser = useAuthStore((state) => state.rootUser);
-  // const deleteComment = usePostStore((state) => state.deleteComment);
-  // const updateComment = usePostStore((state) => state.updateComment);
+  const deleteComment = usePostStore((state) => state.deleteComment);
+  const updateComment = usePostStore((state) => state.updateComment);
   const isOwner = comment.userId === rootUser?.sub;
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.content);
@@ -24,7 +24,7 @@ const CommentItem = memo(function CommentItem({ comment }: { comment: CommentTyp
   const handleSaveEdit = () => {
     const trimmed = editText.trim();
     if (!trimmed) return;
-    // updateComment(comment.id, trimmed);
+    updateComment(comment.id, trimmed);
     setIsEditing(false);
   };
 
@@ -75,7 +75,7 @@ const CommentItem = memo(function CommentItem({ comment }: { comment: CommentTyp
             <Pencil size={14} />
           </button>
           <button
-            // onClick={() => deleteComment(comment.id)}
+            onClick={() => deleteComment(comment.id)}
             className="p-1 text-gray-300 hover:text-red-400 transition-colors"
           >
             <Trash2 size={14} />
