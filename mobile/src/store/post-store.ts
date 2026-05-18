@@ -20,7 +20,7 @@ interface PostStateType {
   likePost: (postId: string, isLiked: boolean) => Promise<void>;
   // --- COMMENT OPERATIONS
   commentsByPostId: (postId: string) => Promise<CommentType[]>;
-  createComment: (postId: string, content: string) => Promise<void>;
+  createComment: (postId: string, content: string) => Promise<CommentType>;
   updateComment: (commentId: string, content: string) => Promise<void>;
   deleteComment: (commentId: string) => Promise<void>;
   // --- CACHE OPERATIONS
@@ -125,7 +125,24 @@ export const usePostStore = create<PostStateType>((set, get) => ({
 
       set((state) => ({
         comments: [res.data!, ...state.comments],
+        posts: state.posts.map((post) =>
+          post.id === postId
+            ? { ...post, commentCount: post.commentCount + 1 }
+            : post
+        ),
+        postsByUser: Object.fromEntries(
+          Object.entries(state.postsByUser).map(([userId, posts]) => [
+            userId,
+            posts.map((post) =>
+              post.id === postId
+                ? { ...post, commentCount: post.commentCount + 1 }
+                : post
+            ),
+          ])
+        ),
       }));
+
+      return res.data!;
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while creating the comment");
       console.error("Error creating comment:", error);

@@ -11,6 +11,7 @@ import type { CommentType } from '@/types/post';
 interface CommentListProps {
   postId: string;
   rootUserInitial: string;
+  onCommentCreated?: () => void;
 }
 
 const CommentItem = memo(function CommentItem({ comment }: { comment: CommentType }) {
@@ -86,13 +87,14 @@ const CommentItem = memo(function CommentItem({ comment }: { comment: CommentTyp
   );
 });
 
-export default function CommentSection({ postId, rootUserInitial }: CommentListProps) {
+export default function CommentSection({ postId, rootUserInitial, onCommentCreated }: CommentListProps) {
   const { isLoading, comments, createComment } = usePostStore();
   const [text, setText] = useState('');
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
     await createComment(postId, text.trim());
+    onCommentCreated?.();
     setText('');
   };
 

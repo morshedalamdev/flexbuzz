@@ -163,7 +163,15 @@ export default function PostDetailPage() {
       </div>
 
       {/* Comments */}
-      <CommentSection postId={post.id} rootUserInitial={userInitial} />
+      <CommentSection
+        postId={post.id}
+        rootUserInitial={userInitial}
+        onCommentCreated={() => {
+          setPost((currentPost) =>
+            currentPost ? { ...currentPost, commentCount: currentPost.commentCount + 1 } : currentPost
+          );
+        }}
+      />
 
       <EditPostDialog
         post={editPost}
