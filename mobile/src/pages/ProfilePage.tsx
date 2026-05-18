@@ -126,7 +126,7 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
-
+      {/* Feed */}
       <div className="p-3 space-y-2">
         <h3 className="text-sm font-semibold text-gray-500 px-1">Posts</h3>
         {isPostsLoading ? (
