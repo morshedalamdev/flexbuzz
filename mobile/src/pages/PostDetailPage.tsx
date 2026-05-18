@@ -19,28 +19,33 @@ import { useAuthStore } from '@/store/auth-store';
 import { useNavigate } from 'react-router-dom';
 import type { PostType } from '@/types/post';
 import { usePostStore } from '@/store/post-store';
+import CommentSection from '@/components/comment/CommentSection';
 
 export default function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const rootUser = useAuthStore((state) => state.rootUser);
-  const { isLoading, getPostById } = usePostStore();
+  const getPostById = usePostStore((state) => state.getPostById);
   const [post, setPost] = useState<PostType | null>(null);
+  const [loading, setLoading] = useState(!!id);
   const [editPost, setEditPost] = useState<PostType | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
       if (id) {
-        const post = await getPostById(id)
+        setLoading(true);
+        const post = await getPostById(id);
         setPost(post);
+        setLoading(false);
       }
     };
 
     fetchPost();
-  }, [id, getPostById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <MobileShell>
         <TopBar title="Post" showBack />
@@ -63,6 +68,8 @@ export default function PostDetailPage() {
   }
 
   const isOwner = post.userId === rootUser?.sub;
+  const userName = displayName(post.user);
+  const userInitial = displayInitial(post.user);
 
   const renderContent = (content: string) => {
     const parts = content.split(/(#\w+)/g);
@@ -94,10 +101,10 @@ export default function PostDetailPage() {
             onClick={() => navigate(`/profile/${post.userId}`)}
           >
             <Avatar className="w-12 h-12">
-              <AvatarFallback>{displayInitial(post.user)}</AvatarFallback>
+              <AvatarFallback>{userInitial}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-bold text-gray-900">{displayName(post.user)}</p>
+              <p className="font-bold text-gray-900">{userName}</p>
               <p className="text-sm text-gray-400">@{post.user.username}</p>
             </div>
           </div>
@@ -156,7 +163,7 @@ export default function PostDetailPage() {
       </div>
 
       {/* Comments */}
-      {/* <CommentSection postId={post.id} /> */}
+      <CommentSection postId={post.id} rootUserInitial={userInitial} />
 
       <EditPostDialog
         post={editPost}

@@ -1,11 +1,12 @@
 import { api } from "@/lib/api";
 import { showToast } from "@/lib/show-toast";
 import { StatusType, type PaginationInterface } from "@/types";
-import type { PostType } from "@/types/post";
+import type { CommentType, PostType } from "@/types/post";
 import { create } from "zustand";
 
 interface PostStateType {
   posts: PostType[];
+  comments: CommentType[];
   postsByUser: Record<string, PostType[]>;
   isLoading: boolean;
   // -- POST OPERATIONS
@@ -17,15 +18,119 @@ interface PostStateType {
   deletePost: (postId: string) => Promise<void>;
   // --- LIKE, COMMENT OPERATIONS
   likePost: (postId: string, isLiked: boolean) => Promise<void>;
+  commentsByPostId: (postId: string) => Promise<CommentType[]>;
+  createComment: (postId: string, content: string) => Promise<void>;
   // --- CACHE OPERATIONS
   clearCache: () => void;
 }
 
 export const usePostStore = create<PostStateType>((set, get) => ({
   posts: [],
+  comments: [],
   postsByUser: {},
   isLoading: false,
 
+  // --- LIKE, COMMENT OPERATIONS
+  likePost: async (postId: string, isLiked: boolean) => {
+    const { fetcher } = api(`/note/${postId}/like`);
+
+    try {
+      const res = await fetcher({
+        method: isLiked ? "DELETE" : "POST",
+      });
+      if (!res.success) {
+        showToast(StatusType.ERROR, res.message || "Failed to update like");
+        throw new Error(res.message || "Failed to update like");
+      }
+
+      // Update only the specific post in both caches with minimal mutations
+      set((state) => {
+        const updatePost = (post: PostType) =>
+          post.id === postId
+            ? {
+              ...post,
+              isLikedByCurrentUser: !isLiked,
+              likeCount: post.likeCount + (isLiked ? -1 : 1),
+            }
+            : post;
+
+        // Update posts array only if post exists there
+        const updatedPosts = state.posts.some((p) => p.id === postId)
+          ? state.posts.map(updatePost)
+          : state.posts;
+
+        // Update postsByUser only for caches containing this post
+        let updatedPostsByUser = state.postsByUser;
+        for (const [userId, posts] of Object.entries(state.postsByUser)) {
+          if (posts.some((p) => p.id === postId)) {
+            updatedPostsByUser = {
+              ...updatedPostsByUser,
+              [userId]: posts.map(updatePost),
+            };
+          }
+        }
+
+        return {
+          posts: updatedPosts,
+          postsByUser: updatedPostsByUser,
+        };
+      });
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while updating the like");
+      console.error("Error updating like:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  commentsByPostId: async (postId: string) => {
+    const { fetcher } = api<PaginationInterface<CommentType>>(`/note/${postId}/comments`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher();
+      if (!res.success) {
+        showToast(StatusType.ERROR, res.message || "Failed to fetch comments");
+        throw new Error(res.message || "Failed to fetch comments");
+      }
+
+      set({ comments: res.data?.data ?? [] });
+      return res.data?.data ?? [];
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while fetching comments");
+      console.error("Error fetching comments:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  createComment: async (postId: string, content: string) => {
+    const { fetcher } = api<CommentType>(`/note/comment`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "POST",
+        payload: { id: postId, content },
+      });
+      if (!res.success || !res.data) {
+        showToast(StatusType.ERROR, res.message || "Failed to create comment");
+        throw new Error(res.message || "Failed to create comment");
+      }
+
+      set((state) => ({
+        comments: [res.data!, ...state.comments],
+      }));
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while creating the comment");
+      console.error("Error creating comment:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
   // --- POST OPERATIONS
   getPostsInRoot: async () => {
     const { fetcher } = api<PaginationInterface<PostType>>(`/note`);
@@ -93,11 +198,17 @@ export const usePostStore = create<PostStateType>((set, get) => ({
       const state = get();
       // Search in flat posts array first
       const found = state.posts.find((p) => p.id === postId);
-      if (found) return found;
+      if (found) {
+        state.commentsByPostId(postId); // Preload comments for this post
+        return found;
+      }
       // Search in all postsByUser caches
       for (const userPosts of Object.values(state.postsByUser)) {
         const post = userPosts.find((p) => p.id === postId);
-        if (post) return post;
+        if (post) {
+          state.commentsByPostId(postId); // Preload comments for this post
+          return post;
+        }
       }
       // If not found in cache, fetch from API
       const res = await fetcher();
@@ -105,6 +216,8 @@ export const usePostStore = create<PostStateType>((set, get) => ({
         showToast(StatusType.ERROR, res.message || "Failed to fetch post");
         throw new Error(res.message || "Failed to fetch post");
       }
+
+      state.commentsByPostId(postId); // Preload comments for this post
       return res.data;
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while fetching the post");
@@ -198,59 +311,6 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while deleting the post");
       console.error("Error deleting post:", error);
-      throw error;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-  // --- LIKE, COMMENT OPERATIONS
-  likePost: async (postId: string, isLiked: boolean) => {
-    const { fetcher } = api(`/note/${postId}/like`);
-
-    try {
-      const res = await fetcher({
-        method: isLiked ? "DELETE" : "POST",
-      });
-      if (!res.success) {
-        showToast(StatusType.ERROR, res.message || "Failed to update like");
-        throw new Error(res.message || "Failed to update like");
-      }
-
-      // Update only the specific post in both caches with minimal mutations
-      set((state) => {
-        const updatePost = (post: PostType) =>
-          post.id === postId
-            ? {
-              ...post,
-              isLikedByCurrentUser: !isLiked,
-              likeCount: post.likeCount + (isLiked ? -1 : 1),
-            }
-            : post;
-
-        // Update posts array only if post exists there
-        const updatedPosts = state.posts.some((p) => p.id === postId)
-          ? state.posts.map(updatePost)
-          : state.posts;
-
-        // Update postsByUser only for caches containing this post
-        let updatedPostsByUser = state.postsByUser;
-        for (const [userId, posts] of Object.entries(state.postsByUser)) {
-          if (posts.some((p) => p.id === postId)) {
-            updatedPostsByUser = {
-              ...updatedPostsByUser,
-              [userId]: posts.map(updatePost),
-            };
-          }
-        }
-
-        return {
-          posts: updatedPosts,
-          postsByUser: updatedPostsByUser,
-        };
-      });
-    } catch (error) {
-      showToast(StatusType.ERROR, "An error occurred while updating the like");
-      console.error("Error updating like:", error);
       throw error;
     } finally {
       set({ isLoading: false });
