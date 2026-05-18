@@ -137,11 +137,6 @@ export default function CommentSection({ postId, rootUserInitial, onCommentCreat
                 Loading more comments...
               </p>
             }
-            endMessage={
-              <p className="text-center text-sm text-gray-300 py-4">
-                You're all caught up.
-              </p>
-            }
           >
             {comments.map((c) => <CommentItem key={c.id} comment={c} />)}
           </InfiniteScroll>

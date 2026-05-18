@@ -73,11 +73,6 @@ export default function HomePage() {
                 Loading more posts...
               </div>
             }
-            endMessage={
-              <div className="py-4 text-center text-gray-300 text-sm">
-                You're all caught up.
-              </div>
-            }
           >
             <div className="space-y-2">
               {posts.map((post) => (

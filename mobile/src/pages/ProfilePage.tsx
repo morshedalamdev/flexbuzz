@@ -166,11 +166,6 @@ export default function ProfilePage() {
                 Loading more posts...
               </div>
             }
-            endMessage={
-              <div className="py-4 text-center text-gray-300 text-sm">
-                You're all caught up.
-              </div>
-            }
           >
             <div className="mt-2 space-y-2">
               {userPosts.map((post) => (
