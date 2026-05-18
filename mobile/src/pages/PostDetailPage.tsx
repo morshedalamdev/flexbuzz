@@ -25,11 +25,9 @@ export default function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const rootUser = useAuthStore((state) => state.rootUser);
-  const posts = usePostStore((state) => state.posts);
+  const post = usePostStore((state) => (id ? state.getPostById(id) : undefined));
   const [editPost, setEditPost] = useState<PostType | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
-
-  const post = posts.find((p) => p.id === id);
 
   if (!post) {
     return (

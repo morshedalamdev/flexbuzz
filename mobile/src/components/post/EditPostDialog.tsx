@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -8,21 +8,23 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { usePostStore } from '@/store/post-store';
-import type { Post } from '@/types';
+import type { PostType } from '@/types/post';
 
 interface EditPostDialogProps {
-  post: Post | null;
+  post: PostType | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export default function EditPostDialog({ post, open, onOpenChange }: EditPostDialogProps) {
-  const [content, setContent] = useState(post?.content ?? '');
+  const [content, setContent] = useState<string>('');
   const updatePost = usePostStore((state) => state.updatePost);
+  const prevPostIdRef = useRef<string | null>(null);
 
-  // Sync textarea content whenever the dialog opens or the target post changes
+  // Sync post content when dialog opens with a different post
   useEffect(() => {
-    if (open && post) {
+    if (open && post && post.id !== prevPostIdRef.current) {
+      prevPostIdRef.current = post.id;
       setContent(post.content);
     }
   }, [open, post]);
@@ -33,8 +35,7 @@ export default function EditPostDialog({ post, open, onOpenChange }: EditPostDia
     onOpenChange(false);
   };
 
-  if (!post) return null;
-
+  if (!post || !open) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -44,7 +45,7 @@ export default function EditPostDialog({ post, open, onOpenChange }: EditPostDia
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="min-h-[120px]"
+          className="min-h-30"
           autoFocus
         />
         <div className="flex gap-2 mt-2">

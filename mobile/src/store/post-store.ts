@@ -10,6 +10,8 @@ interface PostStateType {
   isLoading: boolean;
   getPostsInRoot: () => Promise<PostType[]>;
   getPostsByUser: (userId: string) => Promise<PostType[]>;
+  getPostById: (postId: string) => PostType | undefined;
+  updatePost: (id: string, content: string) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
   clearCache: () => void;
 }
@@ -19,7 +21,7 @@ export const usePostStore = create<PostStateType>((set, get) => ({
   postsByUser: {},
   isLoading: false,
 
-  getPostsInRoot: async (): Promise<PostType[]> => {
+  getPostsInRoot: async () => {
     const { fetcher } = api<PaginationInterface<PostType>>(`/note`);
     set({ isLoading: true });
 
@@ -41,7 +43,20 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     }
   },
 
-  getPostsByUser: async (userId: string): Promise<PostType[]> => {
+  getPostById: (postId: string) => {
+    const state = get();
+    // Search in flat posts array first
+    const found = state.posts.find((p) => p.id === postId);
+    if (found) return found;
+    // Search in all postsByUser caches
+    for (const userPosts of Object.values(state.postsByUser)) {
+      const post = userPosts.find((p) => p.id === postId);
+      if (post) return post;
+    }
+    return undefined;
+  },
+
+  getPostsByUser: async (userId: string) => {
     const cachedPosts = get().postsByUser[userId];
     if (cachedPosts) {
       set({ posts: cachedPosts });
@@ -71,6 +86,41 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while fetching posts");
       console.error("Error fetching posts:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updatePost: async (id: string, content: string) => {
+    const { fetcher } = api(`/note`);
+    set({ isLoading: true });
+
+    try {
+      const res = await fetcher({
+        method: "PATCH",
+        payload: { id, content },
+      });
+      if (!res.success || !res.data) {
+        showToast(StatusType.ERROR, res.message || "Failed to update post");
+        throw new Error(res.message || "Failed to update post");
+      }
+
+      // Update the post in state
+      set((state) => ({
+        posts: state.posts.map((post) => (post.id === id ? { ...post, content } : post)),
+        postsByUser: Object.fromEntries(
+          Object.entries(state.postsByUser).map(([userId, posts]) => [
+            userId,
+            posts.map((post) => (post.id === id ? { ...post, content } : post)),
+          ])
+        ),
+      }));
+
+      showToast(StatusType.SUCCESS, "Post updated successfully");
+    } catch (error) {
+      showToast(StatusType.ERROR, "An error occurred while updating the post");
+      console.error("Error updating post:", error);
       throw error;
     } finally {
       set({ isLoading: false });

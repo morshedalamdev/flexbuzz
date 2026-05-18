@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthStateType>()(
       isLoading: false,
 
 
-      signup: async ({ username, email, password }: SignupRequest): Promise<SignupResponse> => {
+      signup: async ({ username, email, password }: SignupRequest) => {
         const { fetcher } = api<APIResponse>("/auth/register");
         set({ isLoading: true });
 
@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthStateType>()(
         };
       },
 
-      login: async ({ username, password }: LoginRequest): Promise<LoginResponse> => {
+      login: async ({ username, password }: LoginRequest) => {
         const { fetcher } = api<APIResponse>("/auth/login");
         set({ isLoading: true });
 

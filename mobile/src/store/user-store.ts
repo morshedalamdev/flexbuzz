@@ -17,7 +17,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
   users: new Map(),
   isLoading: false,
 
-  getUserById: async (userId: string): Promise<UserType> => {
+  getUserById: async (userId: string) => {
     // Check cache first
     const cached = get().users.get(userId);
     if (cached) return cached;
@@ -47,7 +47,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
     }
   },
 
-  updateProfile: async (profile: Partial<UserType>): Promise<UserType> => {
+  updateProfile: async (profile: Partial<UserType>) => {
     const { fetcher } = api<UserType>(`/user/me`);
     set({ isLoading: true });
 
@@ -79,7 +79,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
     }
   },
 
-  followUser: async (userId: string, isFollowed: boolean): Promise<void> => {
+  followUser: async (userId: string, isFollowed: boolean) => {
     const { fetcher } = api(`/user/${userId}/${isFollowed ? "unfollow" : "follow"}`);
     set({ isLoading: true });
 
