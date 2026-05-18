@@ -17,33 +17,74 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("@nestjs/typeorm");
 const hashtag_entity_1 = require("./hashtag.entity");
+const normalizeHashtagTag = (tag) => {
+    const trimmedTag = tag.trim();
+    if (trimmedTag.length === 0) {
+        return trimmedTag;
+    }
+    return `${trimmedTag.slice(0, 1).toLowerCase()}${trimmedTag.slice(1)}`;
+};
 let HashtagService = class HashtagService {
     hashtagRepository;
     constructor(hashtagRepository) {
         this.hashtagRepository = hashtagRepository;
     }
     async create(hashtagDto) {
-        const isExist = await this.hashtagRepository.findOne({
-            where: { tag: hashtagDto.tag },
-        });
-        if (isExist) {
-            throw new common_1.ConflictException("Hashtag already exists");
-        }
+        const createdHashtags = [];
+        const existingHashtags = [];
         try {
-            const hashtag = this.hashtagRepository.create(hashtagDto);
-            return await this.hashtagRepository.save(hashtag);
+            for (const tag of hashtagDto.tags) {
+                const normalizedTag = normalizeHashtagTag(tag);
+                const isExist = await this.hashtagRepository
+                    .createQueryBuilder("hashtag")
+                    .where("CONCAT(LOWER(LEFT(hashtag.tag, 1)), SUBSTRING(hashtag.tag, 2)) = :tag", { tag: normalizedTag })
+                    .getOne();
+                if (isExist) {
+                    existingHashtags.push(isExist);
+                }
+                else {
+                    const hashtag = this.hashtagRepository.create({ tag: normalizedTag });
+                    const savedHashtag = await this.hashtagRepository.save(hashtag);
+                    createdHashtags.push(savedHashtag);
+                }
+            }
+            return {
+                created: createdHashtags,
+                existing: existingHashtags,
+                total: [...createdHashtags, ...existingHashtags],
+            };
         }
         catch (error) {
             console.error("Error @hashtag-create:", error);
             throw new common_1.RequestTimeoutException();
         }
     }
+    async incrementCounts(hashtagIds) {
+        try {
+            const uniqueIds = [...new Set(hashtagIds)].filter(Boolean);
+            if (uniqueIds.length === 0) {
+                return;
+            }
+            await this.hashtagRepository
+                .createQueryBuilder()
+                .update(hashtag_entity_1.Hashtag)
+                .set({ count: () => "count + 1" })
+                .where("id IN (:...ids)", { ids: uniqueIds })
+                .execute();
+        }
+        catch (error) {
+            console.error("Error @incrementCounts:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
     async getHashtags(search) {
         try {
             if (search) {
-                const response = await this.hashtagRepository.findOne({
-                    where: { tag: search },
-                });
+                const normalizedSearch = normalizeHashtagTag(search);
+                const response = await this.hashtagRepository
+                    .createQueryBuilder("hashtag")
+                    .where("CONCAT(LOWER(LEFT(hashtag.tag, 1)), SUBSTRING(hashtag.tag, 2)) = :tag", { tag: normalizedSearch })
+                    .getOne();
                 if (!response) {
                     throw new common_1.NotFoundException("Hashtag not found");
                 }

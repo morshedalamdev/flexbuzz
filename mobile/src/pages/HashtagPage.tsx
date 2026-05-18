@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Hash } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
@@ -6,20 +6,41 @@ import TopBar from '@/components/layout/TopBar';
 import PostCard from '@/components/post/PostCard';
 import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
+import { Spinner } from '@/components/ui/spinner';
 import { usePostStore } from '@/store/post-store';
-import type { Post } from '@/types';
+import type { PostType } from '@/types/post';
 
 export default function HashtagPage() {
   const { tag } = useParams<{ tag: string }>();
-  const getPostsByHashtag = usePostStore((state) => state.getPostsByHashtag);
-  const [editPost, setEditPost] = useState<Post | null>(null);
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [editPost, setEditPost] = useState<PostType | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const { getPostsByHashtag } = usePostStore();
 
-  const posts = tag ? getPostsByHashtag(tag) : [];
+  useEffect(() => {
+    if (!tag) return;
+
+    const loadPosts = async () => {
+      setIsLoading(true);
+      try {
+        const fetchedPosts = await getPostsByHashtag(tag);
+        setPosts(fetchedPosts);
+      } catch (error) {
+        console.error('Error loading hashtag posts:', error);
+        setPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, [tag, getPostsByHashtag]);
+  console.log(posts);
 
   return (
     <MobileShell>
-      <TopBar title={`#${tag}`} showBack />
+      <TopBar title={`#${tag || 'hashtag'}`} showBack />
 
       {/* Header */}
       <div className="bg-white border-b border-gray-100 px-4 py-5">
@@ -35,7 +56,11 @@ export default function HashtagPage() {
       </div>
 
       <div className="p-3 space-y-2">
-        {posts.length === 0 ? (
+        {isLoading ? (
+          <div className="py-16 flex justify-center">
+            <Spinner />
+          </div>
+        ) : posts.length === 0 ? (
           <div className="py-16 text-center">
             <Hash size={40} className="text-gray-200 mx-auto mb-3" />
             <p className="text-gray-400 font-medium">No posts with #{tag}</p>

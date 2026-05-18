@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Heart, MessageCircle, MoreHorizontal, Trash2, Pencil } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,25 +12,49 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import CommentSection from '@/components/comment/CommentSection';
 import EditPostDialog from '@/components/post/EditPostDialog';
 import DeletePostDialog from '@/components/post/DeletePostDialog';
-import { formatRelativeTime } from '@/lib/utils';
+import { displayInitial, displayName, formatRelativeTime } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
-import { usePostStore } from '@/store/post-store';
 import { useNavigate } from 'react-router-dom';
-import type { Post } from '@/types';
+import type { PostType } from '@/types/post';
+import { usePostStore } from '@/store/post-store';
+import CommentSection from '@/components/comment/CommentSection';
 
 export default function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const posts = usePostStore((state) => state.posts);
-  const likePost = usePostStore((state) => state.likePost);
-  const [editPost, setEditPost] = useState<Post | null>(null);
+  const rootUser = useAuthStore((state) => state.rootUser);
+  const getPostById = usePostStore((state) => state.getPostById);
+  const [post, setPost] = useState<PostType | null>(null);
+  const [loading, setLoading] = useState(!!id);
+  const [editPost, setEditPost] = useState<PostType | null>(null);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
 
-  const post = posts.find((p) => p.id === id);
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (id) {
+        setLoading(true);
+        const post = await getPostById(id);
+        setPost(post);
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  if (loading) {
+    return (
+      <MobileShell>
+        <TopBar title="Post" showBack />
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </MobileShell>
+    );
+  }
 
   if (!post) {
     return (
@@ -44,10 +67,9 @@ export default function PostDetailPage() {
     );
   }
 
-  const isOwner = post.userId === currentUser.id;
-  const initials = post.user.profile.firstName
-    ? `${post.user.profile.firstName[0]}${post.user.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : post.user.username.slice(0, 2).toUpperCase();
+  const isOwner = post.userId === rootUser?.sub;
+  const userName = displayName(post.user);
+  const userInitial = displayInitial(post.user);
 
   const renderContent = (content: string) => {
     const parts = content.split(/(#\w+)/g);
@@ -76,17 +98,13 @@ export default function PostDetailPage() {
         <div className="flex items-start justify-between gap-3 mb-4">
           <div
             className="flex items-center gap-3 cursor-pointer"
-            onClick={() => navigate(`/user/${post.userId}`)}
+            onClick={() => navigate(`/profile/${post.userId}`)}
           >
             <Avatar className="w-12 h-12">
-              <AvatarFallback>{initials}</AvatarFallback>
+              <AvatarFallback>{userInitial}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-bold text-gray-900">
-                {post.user.profile.firstName
-                  ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
-                  : post.user.username}
-              </p>
+              <p className="font-bold text-gray-900">{userName}</p>
               <p className="text-sm text-gray-400">@{post.user.username}</p>
             </div>
           </div>
@@ -119,20 +137,6 @@ export default function PostDetailPage() {
           {renderContent(post.content)}
         </p>
 
-        {post.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {post.hashtags.map((h) => (
-              <Badge
-                key={h.id}
-                variant="hashtag"
-                onClick={() => navigate(`/hashtag/${h.tag}`)}
-              >
-                #{h.tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-
         <p className="text-xs text-gray-400 mb-4">{formatRelativeTime(post.createdAt)}</p>
 
         {/* Actions */}
@@ -140,10 +144,9 @@ export default function PostDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => likePost(post.id)}
-            className={`gap-2 rounded-full ${
-              post.isLikedByCurrentUser ? 'text-red-500' : 'text-gray-500'
-            }`}
+            // onClick={() => likePost(post.id)}
+            className={`gap-2 rounded-full ${post.isLikedByCurrentUser ? 'text-red-500' : 'text-gray-500'
+              }`}
           >
             <Heart
               size={20}
@@ -160,7 +163,15 @@ export default function PostDetailPage() {
       </div>
 
       {/* Comments */}
-      <CommentSection postId={post.id} />
+      <CommentSection
+        postId={post.id}
+        rootUserInitial={userInitial}
+        onCommentCreated={() => {
+          setPost((currentPost) =>
+            currentPost ? { ...currentPost, commentCount: currentPost.commentCount + 1 } : currentPost
+          );
+        }}
+      />
 
       <EditPostDialog
         post={editPost}

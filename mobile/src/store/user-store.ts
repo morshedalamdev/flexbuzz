@@ -7,8 +7,8 @@ import { create } from "zustand";
 interface UserStateType {
   users: Map<string, UserType>;
   isLoading: boolean;
-  getUserById: (userId: string) => Promise<UserType | null>;
-  updateProfile: (profile: Partial<UserType>) => Promise<void>;
+  getUserById: (userId: string) => Promise<UserType>;
+  updateProfile: (profile: Partial<UserType>) => Promise<UserType>;
   followUser: (userId: string, isFollowed: boolean) => Promise<void>;
   clearCache: () => void;
 }
@@ -17,7 +17,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
   users: new Map(),
   isLoading: false,
 
-  getUserById: async (userId: string): Promise<UserType | null> => {
+  getUserById: async (userId: string) => {
     // Check cache first
     const cached = get().users.get(userId);
     if (cached) return cached;
@@ -28,18 +28,16 @@ export const useUserStore = create<UserStateType>((set, get) => ({
 
     try {
       const res = await fetcher();
-
       if (!res.success) {
         showToast(StatusType.ERROR, res.message || "Failed to fetch user");
-        return null;
+        throw new Error(res.message || "Failed to fetch user");
       }
 
       // Cache the user
       set((state) => ({
         users: new Map(state.users).set(userId, res.data!),
       }));
-
-      return res.data;
+      return res.data!;
     } catch (error) {
       showToast(StatusType.ERROR, "Failed to fetch user");
       console.error("Error fetching user:", error);
@@ -59,7 +57,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
         payload: profile,
       })
 
-      if (!res.success || !res.data) {
+      if (!res.success) {
         showToast(StatusType.ERROR, res.message || "Failed to update profile");
         throw new Error(res.message || "Failed to update profile");
       }
@@ -71,6 +69,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
           users: new Map(state.users).set(res.data!.id, updatedUser),
         };
       });
+      return res.data!;
     } catch (error) {
       showToast(StatusType.ERROR, "Failed to update profile");
       console.error("Error updating profile:", error);
@@ -89,7 +88,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
         method: isFollowed ? "DELETE" : "POST",
       });
 
-      if (!res.success || !res.data) {
+      if (!res.success) {
         showToast(StatusType.ERROR, res.message || "Failed to follow/unfollow user");
         throw new Error(res.message || "Failed to follow/unfollow user");
       }

@@ -1,28 +1,49 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, TrendingUp, X } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Input } from '@/components/ui/input';
-import PostCard from '@/components/post/PostCard';
-import EditPostDialog from '@/components/post/EditPostDialog';
-import DeletePostDialog from '@/components/post/DeletePostDialog';
 import { Badge } from '@/components/ui/badge';
 import { formatCount } from '@/lib/utils';
-import { usePostStore } from '@/store/post-store';
-import { useUserStore } from '@/store/user-store';
 import { useNavigate } from 'react-router-dom';
-import type { Post } from '@/types';
+import type { HashtagType } from '@/types/post';
+import { usePostStore } from '@/store/post-store';
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const searchPosts = usePostStore((state) => state.searchPosts);
-  const trendingHashtags = useUserStore((state) => state.trendingHashtags);
   const [query, setQuery] = useState('');
-  const [editPost, setEditPost] = useState<Post | null>(null);
-  const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const [trendingHashtags, setTrendingHashtags] = useState<HashtagType[]>([]);
+  const [searchResults, setSearchResults] = useState<HashtagType[]>([]);
+  const { searchHashtags, getAllHashtags } = usePostStore();
 
-  const results = query.trim() ? searchPosts(query) : [];
+  // Load trending hashtags on mount
+  useEffect(() => {
+    const loadTrendingHashtags = async () => {
+      const hashtags = await getAllHashtags();
+      setTrendingHashtags(hashtags);
+    };
+
+    loadTrendingHashtags();
+  }, [getAllHashtags]);
+
+  // Search hashtags when query changes
+  useEffect(() => {
+    const handleSearch = async () => {
+      if (query.trim().length === 0) {
+        setSearchResults([]);
+        return;
+      }
+
+      const results = await searchHashtags(query.trim());
+      setSearchResults(results);
+    };
+
+    const debounceTimer = window.setTimeout(handleSearch, 300);
+    return () => window.clearTimeout(debounceTimer);
+  }, [query, searchHashtags]);
+
   const showResults = query.trim().length > 0;
+  const displayedResults = showResults ? searchResults : [];
 
   return (
     <MobileShell>
@@ -53,24 +74,30 @@ export default function SearchPage() {
         {showResults ? (
           <>
             <p className="text-xs font-medium text-gray-400 px-1">
-              {results.length} result{results.length !== 1 ? 's' : ''} for "{query}"
+              {displayedResults.length} result{displayedResults.length !== 1 ? 's' : ''} for "{query}"
             </p>
-            {results.length === 0 ? (
+            {displayedResults.length === 0 ? (
               <div className="py-12 text-center">
                 <Search size={36} className="text-gray-200 mx-auto mb-3" />
-                <p className="text-gray-400 font-medium">No results found</p>
+                <p className="text-gray-400 font-medium">No hashtags found</p>
                 <p className="text-gray-300 text-sm">Try different keywords</p>
               </div>
             ) : (
-              results.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  compact
-                  onEdit={setEditPost}
-                  onDelete={setDeletePostId}
-                />
-              ))
+              <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
+                {displayedResults.map((hashtag) => (
+                  <button
+                    key={hashtag.id}
+                    onClick={() => navigate(`/hashtag/${hashtag.tag}`)}
+                    className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                  >
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-gray-900">#{hashtag.tag}</p>
+                      <p className="text-xs text-gray-400">{formatCount(hashtag.count)} posts</p>
+                    </div>
+                    <Badge variant="hashtag">Hashtag</Badge>
+                  </button>
+                ))}
+              </div>
             )}
           </>
         ) : (
@@ -84,6 +111,7 @@ export default function SearchPage() {
               <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
                 {trendingHashtags
                   .sort((a, b) => b.count - a.count)
+                  .slice(0, 10)
                   .map((hashtag, index) => (
                     <button
                       key={hashtag.id}
@@ -108,16 +136,7 @@ export default function SearchPage() {
         )}
       </div>
 
-      <EditPostDialog
-        post={editPost}
-        open={!!editPost}
-        onOpenChange={(open) => !open && setEditPost(null)}
-      />
-      <DeletePostDialog
-        postId={deletePostId}
-        open={!!deletePostId}
-        onOpenChange={(open) => !open && setDeletePostId(null)}
-      />
+      {/* Dialogs removed - Search now shows hashtags only */}
     </MobileShell>
   );
 }

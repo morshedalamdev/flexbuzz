@@ -1,28 +1,29 @@
-import { useState } from 'react';
-import { Trash2, Pencil, Check, X } from 'lucide-react';
+import { useState, memo } from 'react';
+import { Trash2, Pencil, Check, X, SendHorizontal } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { formatRelativeTime } from '@/lib/utils';
+import { displayInitial, formatRelativeTime } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
 import { usePostStore } from '@/store/post-store';
-import type { Comment } from '@/types';
+import type { CommentType } from '@/types/post';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+const PAGE_SIZE = 10;
 
 interface CommentListProps {
   postId: string;
+  rootUserInitial: string;
+  onCommentCreated?: (comment: CommentType) => void;
 }
 
-function CommentItem({ comment }: { comment: Comment }) {
-  const currentUser = useAuthStore((state) => state.currentUser);
+const CommentItem = memo(function CommentItem({ comment }: { comment: CommentType }) {
+  const rootUser = useAuthStore((state) => state.rootUser);
   const deleteComment = usePostStore((state) => state.deleteComment);
   const updateComment = usePostStore((state) => state.updateComment);
-  const isOwner = comment.userId === currentUser.id;
+  const isOwner = comment.userId === rootUser?.sub;
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.content);
-
-  const initials = comment.user.profile.firstName
-    ? `${comment.user.profile.firstName[0]}${comment.user.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : comment.user.username.slice(0, 2).toUpperCase();
 
   const handleSaveEdit = () => {
     const trimmed = editText.trim();
@@ -39,7 +40,7 @@ function CommentItem({ comment }: { comment: Comment }) {
   return (
     <div className="flex gap-3 py-3 border-b border-gray-50 last:border-0">
       <Avatar className="w-8 h-8 shrink-0">
-        <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+        <AvatarFallback className="text-xs">{displayInitial(comment.user)}</AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
@@ -53,7 +54,7 @@ function CommentItem({ comment }: { comment: Comment }) {
             <Textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="min-h-[60px] text-sm py-1.5"
+              className="min-h-15 text-sm py-1.5"
               autoFocus
             />
             <div className="flex gap-2">
@@ -87,61 +88,80 @@ function CommentItem({ comment }: { comment: Comment }) {
       )}
     </div>
   );
-}
+});
 
-export default function CommentSection({ postId }: CommentListProps) {
+export default function CommentSection({ postId, rootUserInitial, onCommentCreated }: CommentListProps) {
+  const { isLoading, comments, createComment, hasMoreComments, commentsByPostId, currentCommentsPage } = usePostStore();
   const [text, setText] = useState('');
-  const [loading, setLoading] = useState(false);
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const fetchComments = usePostStore((state) => state.fetchComments);
-  const createComment = usePostStore((state) => state.createComment);
-
-  const comments = fetchComments(postId);
-
-  const initials = currentUser.profile.firstName
-    ? `${currentUser.profile.firstName[0]}${currentUser.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : currentUser.username.slice(0, 2).toUpperCase();
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 300));
-    createComment(postId, text.trim(), currentUser);
-    setText('');
-    setLoading(false);
+    try {
+      const newComment = await createComment(postId, text.trim());
+      setText('');
+      if (onCommentCreated && newComment) onCommentCreated(newComment);
+    } catch (error) {
+      console.error('Failed to create comment', error);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMoreComments) return;
+    setIsLoadingMore(true);
+    try {
+      await commentsByPostId(postId, currentCommentsPage + 1, PAGE_SIZE);
+    } catch (error) {
+      console.error('Failed to load more comments', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   return (
     <div className="bg-white">
       {/* Comments */}
       <div className="px-4">
-        {comments.length === 0 ? (
+        {isLoading && comments.length === 0 ? (
+          <p className="text-center text-sm text-gray-400 py-6">Loading comments...</p>
+        ) : comments.length === 0 ? (
           <p className="text-center text-sm text-gray-400 py-6">No comments yet. Be the first!</p>
         ) : (
-          comments.map((c) => <CommentItem key={c.id} comment={c} />)
+          <InfiniteScroll
+            dataLength={comments.length}
+            next={handleLoadMore}
+            hasMore={hasMoreComments}
+            loader={
+              <p className="text-center text-sm text-gray-400 py-4">
+                Loading more comments...
+              </p>
+            }
+          >
+            {comments.map((c) => <CommentItem key={c.id} comment={c} />)}
+          </InfiniteScroll>
         )}
       </div>
 
       {/* Input */}
-      <div className="sticky bottom-16 bg-white border-t border-gray-100 p-3 flex gap-3 items-end">
+      <div className="sticky bottom-16 bg-white border-t border-gray-100 p-3 flex gap-3 items-center">
         <Avatar className="w-8 h-8 shrink-0">
-          <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+          <AvatarFallback className="text-xs">{rootUserInitial}</AvatarFallback>
         </Avatar>
-        <div className="flex-1 flex gap-2 items-end">
+        <div className="flex-1 flex gap-2 items-center">
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Add a comment..."
-            className="min-h-[40px] max-h-[120px] text-sm py-2"
+            className="min-h-8 max-h-30 text-sm py-2"
             rows={1}
           />
           <Button
             size="sm"
             onClick={handleSubmit}
-            disabled={!text.trim() || loading}
+            disabled={!text.trim() || isLoading}
             className="shrink-0"
           >
-            Post
+            <SendHorizontal size={20} />
           </Button>
         </div>
       </div>

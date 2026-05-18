@@ -10,3 +10,5 @@ export const IMAGES = {
 export const ICONS = {
   logo: logoIcon,
 };
+
+export const MAX_LENGTH = 240;

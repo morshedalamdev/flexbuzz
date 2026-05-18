@@ -17,7 +17,7 @@ import { ActiveUser } from "src/auth/decorator/active-user.decorator";
 
 @Controller("note")
 export class NoteController {
-  constructor(private readonly noteService: NoteService) {}
+  constructor(private readonly noteService: NoteService) { }
 
   // LIKES
   @Get(":id/likes")
@@ -42,7 +42,7 @@ export class NoteController {
     @Query() pageQueryDto: NoteQueryDto,
   ) {
     return this.noteService.getComments(id, pageQueryDto);
-  } 
+  }
 
   @Post("comment")
   async AddComment(

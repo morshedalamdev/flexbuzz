@@ -1,29 +1,31 @@
-import type { User } from "./user";
+import type { UserType } from "./user";
 
-export interface Hashtag {
+export interface HashtagType {
   id: string;
   tag: string;
   count: number;
+  createAt: string;
 }
 
-export interface Post {
+export interface PostType {
   id: string;
   userId: string;
   content: string;
   likeCount: number;
   commentCount: number;
   isLikedByCurrentUser: boolean;
-  user: User;
-  hashtags: Hashtag[];
+  user: UserType;
+  hashtags: HashtagType[];
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Comment {
+export interface CommentType {
   id: string;
   content: string;
   userId: string;
-  postId: string;
+  noteId: string;
   createdAt: string;
-  user: User;
+  updatedAt: string;
+  user: UserType;
 }

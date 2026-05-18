@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import { getRootUser, type RootUserType } from '@/lib/token/token-validator';
 import { showToast } from '@/lib/show-toast';
 import { useUserStore } from './user-store';
+import { usePostStore } from './post-store';
 
 interface AuthStateType {
   rootUser: RootUserType | null;
@@ -23,7 +24,7 @@ export const useAuthStore = create<AuthStateType>()(
       isLoading: false,
 
 
-      signup: async ({ username, email, password }: SignupRequest): Promise<SignupResponse> => {
+      signup: async ({ username, email, password }: SignupRequest) => {
         const { fetcher } = api<APIResponse>("/auth/register");
         set({ isLoading: true });
 
@@ -54,7 +55,7 @@ export const useAuthStore = create<AuthStateType>()(
         };
       },
 
-      login: async ({ username, password }: LoginRequest): Promise<LoginResponse> => {
+      login: async ({ username, password }: LoginRequest) => {
         const { fetcher } = api<APIResponse>("/auth/login");
         set({ isLoading: true });
 
@@ -88,6 +89,7 @@ export const useAuthStore = create<AuthStateType>()(
       logout: () => {
         deleteToken(); // Clear tokens from storage
         useUserStore.getState().clearCache(); // Clear user cache on logout
+        usePostStore.getState().clearCache(); // Clear post cache on logout
         set({ rootUser: null }); // Clear user info from state
         showToast(StatusType.SUCCESS, "Logged out successfully.");
 

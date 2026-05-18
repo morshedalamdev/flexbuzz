@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 class CreateNoteDto {
     content;
     hashtags;
+    existingHashtags;
 }
 exports.CreateNoteDto = CreateNoteDto;
 __decorate([
@@ -27,4 +28,10 @@ __decorate([
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
 ], CreateNoteDto.prototype, "hashtags", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUUID)("4", { each: true }),
+    (0, class_validator_1.IsArray)(),
+    __metadata("design:type", Array)
+], CreateNoteDto.prototype, "existingHashtags", void 0);
 //# sourceMappingURL=create-note.dto.js.map

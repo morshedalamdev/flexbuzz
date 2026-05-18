@@ -27,7 +27,7 @@ export class NoteService {
     private readonly paginationProvider: PaginationProvider,
     @InjectRepository(Note)
     private readonly noteRepository: Repository<Note>,
-  ) {}
+  ) { }
 
   public async create(noteDto: CreateNoteDto, userId: string) {
     try {
@@ -41,7 +41,13 @@ export class NoteService {
         user,
         hashtags,
       });
-      return await this.noteRepository.save(newNote);
+      const savedNote = await this.noteRepository.save(newNote);
+
+      if (noteDto.existingHashtags?.length) {
+        await this.hashtagService.incrementCounts(noteDto.existingHashtags);
+      }
+
+      return savedNote;
     } catch (error) {
       console.error("Error @note-create:", error);
       throw new RequestTimeoutException();
@@ -53,12 +59,64 @@ export class NoteService {
     userId: string,
   ): Promise<PaginationInterface<Note>> {
     try {
+      // If a hashtag filter is provided, we need to join hashtags and paginate via query builder
+      if (pageQueryDto.hashtag) {
+        const page = pageQueryDto.page || 1;
+        const limit = pageQueryDto.limit || 10;
+        const tag = pageQueryDto.hashtag;
+
+        const qb = this.noteRepository.createQueryBuilder('note')
+          .leftJoinAndSelect('note.hashtags', 'hashtag')
+          .leftJoinAndSelect('note.user', 'user')
+          .leftJoinAndSelect('user.profile', 'profile')
+          .where('hashtag.tag = :tag', { tag })
+          .orderBy('note.createdAt', 'DESC');
+
+        const totalItems = await qb.getCount();
+        const totalPages = totalItems === 0 ? 1 : Math.ceil(totalItems / limit);
+
+        const rawNotes = await qb.skip((page - 1) * limit).take(limit).getMany();
+
+        const notesWithCounts = await Promise.all(
+          rawNotes.map(async (note) => {
+            const likeCount = await this.likeService.likeCount(note.id);
+            const commentCount = await this.commentService.commentCount(note.id);
+            const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
+            return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+          }),
+        );
+
+        const nextPage = page < totalPages ? page + 1 : null;
+        const prevPage = page > 1 ? page - 1 : null;
+        const baseUrl = `/note?hashtag=${encodeURIComponent(tag)}`;
+
+        const response: PaginationInterface<Note> = {
+          data: notesWithCounts,
+          meta: {
+            totalItems,
+            itemsPerPage: limit,
+            currentPage: page,
+            totalPages,
+          },
+          links: {
+            firstPage: `${baseUrl}&page=1&limit=${limit}`,
+            prevPage: `${baseUrl}&page=${prevPage}&limit=${limit}`,
+            nextPage: `${baseUrl}&page=${nextPage}&limit=${limit}`,
+            lastPage: `${baseUrl}&page=${totalPages}&limit=${limit}`,
+          },
+        };
+
+        return response;
+      }
+
+      // Fallback: normal pagination (no hashtag filter)
       const notes = await this.paginationProvider.paginateQuery(
         pageQueryDto,
         this.noteRepository,
         pageQueryDto.userId ? { userId: pageQueryDto.userId } : undefined,
         ["hashtags", "user"],
       );
+
       const notesWithCounts = await Promise.all(
         notes.data.map(async (note) => {
           const likeCount = await this.likeService.likeCount(note.id);
@@ -69,7 +127,7 @@ export class NoteService {
       );
       return { ...notes, data: notesWithCounts };
     } catch (error) {
-      if (error.code === "ECONNREFUSED") {
+      if (error instanceof Error && "code" in error && (error as { code?: string }).code === "ECONNREFUSED") {
         throw new RequestTimeoutException(
           "Failed to fetch notes. Please try again later.",
           {
@@ -97,7 +155,7 @@ export class NoteService {
 
       const likeCount = await this.likeService.likeCount(id);
       const commentCount = await this.commentService.commentCount(id);
-      const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id,userId,);
+      const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id, userId,);
       return { ...note, likeCount, commentCount, isLikedByCurrentUser };
     } catch (error) {
       if (error instanceof NotFoundException) {

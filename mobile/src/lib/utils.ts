@@ -1,3 +1,4 @@
+import type { UserType } from '@/types/user';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -21,4 +22,16 @@ export function formatCount(n: number | undefined): string {
   if (n === undefined) return '0';
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
   return String(n);
+}
+
+export function displayName(profile: UserType) {
+  return profile?.profile.firstName
+    ? `${profile.profile.firstName} ${profile.profile.lastName}`
+    : profile?.username;
+}
+
+export function displayInitial(profile: UserType) {
+  return profile?.profile.firstName
+    ? `${profile.profile.firstName[0]}${profile.profile.lastName?.[0] ?? ''}`.toUpperCase()
+    : profile?.username.slice(0, 2).toUpperCase();
 }

@@ -4,49 +4,70 @@ import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { formatCount } from '@/lib/utils';
-import { useParams } from 'react-router-dom';
+import { displayInitial, displayName, formatCount } from '@/lib/utils';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth-store';
+import PostCard from '@/components/post/PostCard';
 import { useUserStore } from '@/store/user-store';
 import EditProfileDialog from '@/components/user/EditProfileDialog';
+import { usePostStore } from '@/store/post-store';
+import type { PostType } from '@/types/post';
+import EditPostDialog from '@/components/post/EditPostDialog';
+import DeletePostDialog from '@/components/post/DeletePostDialog';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+const PAGE_SIZE = 10;
 
 export default function ProfilePage() {
-  const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  // --- USER DATA
   const { logout, rootUser } = useAuthStore();
   const { getUserById, followUser } = useUserStore();
-  // --- USER DATA
-  const currentUserId = userId || rootUser?.sub;
-  const currentUser = useUserStore((state) => currentUserId ? state.users.get(currentUserId) : null);
-  const isRootUser = rootUser?.sub === currentUser?.id;
-  // ---
+  const userId = id || rootUser?.sub;
+  const userProfile = useUserStore((state) => userId ? state.users.get(userId) : null);
+  const isRootUser = rootUser?.sub === userProfile?.id;
+  // --- USER POSTS
+  const {
+    isLoading: isPostsLoading,
+    getPostsByUser,
+    hasMorePosts,
+    currentPostsPage,
+  } = usePostStore();
+  const userPosts = usePostStore((state) => (userId ? state.postsByUser[userId] : null));
+  // --- UI STATE
   const [editProfileOpen, setEditProfileOpen] = useState(false);
-  // const getPostsByUser = usePostStore((state) => state.getPostsByUser);
-  // const [editPost, setEditPost] = useState<Post | null>(null);
-  // const [deletePostId, setDeletePostId] = useState<string | null>(null);
-
-  // const userPosts = getPostsByUser(currentUser.id);
-
-  useEffect(() => {
-    if (!currentUserId) return;
-    getUserById(currentUserId);
-  }, [currentUserId, getUserById]);
-
-  // --- UI HELPERS
-  const initials = currentUser?.profile.firstName
-    ? `${currentUser.profile.firstName[0]}${currentUser.profile.lastName?.[0] ?? ''}`.toUpperCase()
-    : currentUser?.username.slice(0, 2).toUpperCase();
-
-  const displayName = currentUser?.profile.firstName
-    ? `${currentUser.profile.firstName} ${currentUser.profile.lastName}`
-    : currentUser?.username;
+  const [editPost, setEditPost] = useState<PostType | null>(null);
+  const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   // ---
+  useEffect(() => {
+    if (!userId) return;
+    getUserById(userId);
+    getPostsByUser(userId, 1, PAGE_SIZE);
+  }, [userId, getUserById, getPostsByUser]);
 
-  if (!currentUser) {
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  }
+
+  const handleLoadMore = async () => {
+    if (!userId || isLoadingMore || !hasMorePosts) return;
+    setIsLoadingMore(true);
+    try {
+      await getPostsByUser(userId, currentPostsPage + 1, PAGE_SIZE);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  if (!userProfile) {
     return (
       <MobileShell>
         <TopBar title="Profile" showBack />
         <div className="flex items-center justify-center flex-1">
-          <p className="text-gray-400">User not found.</p>
+          <p className="text-gray-400">Loading profile...</p>
         </div>
       </MobileShell>
     );
@@ -58,7 +79,7 @@ export default function ProfilePage() {
         rightAction={
           isRootUser && (
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600"
               aria-label="Logout"
             >
@@ -72,7 +93,7 @@ export default function ProfilePage() {
         <div className="h-20 -mx-4 mb-0 bg-linear-to-r from-blue-400 via-indigo-400 to-purple-500 rounded-b-2xl" />
         <div className="-mt-10 mb-3 flex items-end justify-between">
           <Avatar className="w-20 h-20 border-4 border-white shadow-md">
-            <AvatarFallback className="text-xl">{initials}</AvatarFallback>
+            <AvatarFallback className="text-xl">{displayInitial(userProfile)}</AvatarFallback>
           </Avatar>
           {isRootUser ? (
             <Button
@@ -86,12 +107,12 @@ export default function ProfilePage() {
             </Button>
           ) : (
             <Button
-              variant={currentUser.isFollowed ? 'outline' : 'default'}
+              variant={userProfile.isFollowed ? 'outline' : 'default'}
               size="sm"
-              onClick={() => followUser(currentUser.id, currentUser?.isFollowed ?? false)}
+              onClick={() => followUser(userProfile.id, userProfile?.isFollowed ?? false)}
               className="rounded-full gap-1.5"
             >
-              {currentUser.isFollowed ? (
+              {userProfile.isFollowed ? (
                 <>
                   <UserCheck size={14} /> Following
                 </>
@@ -104,47 +125,63 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 leading-tight">{displayName}</h2>
-        <p className="text-gray-400 text-sm mb-2">@{currentUser?.username}</p>
+        <h2 className="text-xl font-bold text-gray-900 leading-tight">{displayName(userProfile)}</h2>
+        <p className="text-gray-400 text-sm mb-2">@{userProfile?.username}</p>
 
-        {currentUser?.profile.bio && (
+        {userProfile?.profile.bio && (
           <p className="text-sm text-gray-700 leading-relaxed mb-3">
-            {currentUser.profile.bio}
+            {userProfile.profile.bio}
           </p>
         )}
 
         <div className="flex gap-5">
           <button className="flex items-center gap-1.5 text-sm">
-            <span className="font-bold text-gray-900">{formatCount(currentUser?.followerCount)}</span>
+            <span className="font-bold text-gray-900">{formatCount(userProfile?.followerCount)}</span>
             <span className="text-gray-400">Followers</span>
           </button>
           <button className="flex items-center gap-1.5 text-sm">
-            <span className="font-bold text-gray-900">{formatCount(currentUser?.followingCount)}</span>
+            <span className="font-bold text-gray-900">{formatCount(userProfile?.followingCount)}</span>
             <span className="text-gray-400">Following</span>
           </button>
         </div>
       </div>
-
-      {/* Posts */}
-      {/* <div className="p-3 space-y-2">
-        <h3 className="text-sm font-semibold text-gray-500 px-1">Your Posts</h3>
-        {userPosts.length === 0 ? (
+      {/* Feed */}
+      <div className="p-3">
+        <h3 className="text-sm font-semibold text-gray-500 px-1">Posts</h3>
+        {isPostsLoading && (!userPosts || userPosts.length === 0) ? (
           <div className="py-12 text-center">
-            <p className="text-gray-400 text-sm">You haven't posted anything yet.</p>
+            <p className="text-gray-400 text-sm">Loading posts...</p>
+          </div>
+        ) : !userPosts || userPosts.length === 0 ? (
+          <div className="py-12 text-center">
+            <p className="text-gray-400 text-sm">This user hasn't posted anything yet.</p>
           </div>
         ) : (
-          userPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onEdit={setEditPost}
-              onDelete={setDeletePostId}
-            />
-          ))
+          <InfiniteScroll
+            dataLength={userPosts.length}
+            next={handleLoadMore}
+            hasMore={hasMorePosts}
+            loader={
+              <div className="py-4 text-center text-gray-400 text-sm">
+                Loading more posts...
+              </div>
+            }
+          >
+            <div className="mt-2 space-y-2">
+              {userPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onEdit={setEditPost}
+                  onDelete={setDeletePostId}
+                />
+              ))}
+            </div>
+          </InfiniteScroll>
         )}
-      </div> */}
+      </div>
 
-      {/* <EditPostDialog
+      <EditPostDialog
         post={editPost}
         open={!!editPost}
         onOpenChange={(open) => !open && setEditPost(null)}
@@ -153,11 +190,11 @@ export default function ProfilePage() {
         postId={deletePostId}
         open={!!deletePostId}
         onOpenChange={(open) => !open && setDeletePostId(null)}
-      /> */}
+      />
       <EditProfileDialog
         open={editProfileOpen}
         onOpenChange={setEditProfileOpen}
-        user={currentUser}
+        user={userProfile}
       />
     </MobileShell>
   );

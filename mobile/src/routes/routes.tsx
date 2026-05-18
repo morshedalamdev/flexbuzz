@@ -33,7 +33,7 @@ export default function AppRoutes() {
       <Route path="/create" element={<ProtectedRoute><CreatePage /></ProtectedRoute>} />
       <Route path="/post/:id" element={<ProtectedRoute><PostDetailPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="/profile/:userId" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/profile/:id" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/user/:id/followers" element={<ProtectedRoute><FollowListPage /></ProtectedRoute>} />
       <Route path="/user/:id/following" element={<ProtectedRoute><FollowListPage /></ProtectedRoute>} />
       <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />

@@ -14,4 +14,18 @@ export const Gender = {
 } as const;
 export type Gender = (typeof Gender)[keyof typeof Gender];
 
-
+export interface PaginationInterface<T> {
+  data: T[];
+  meta: {
+    itemsPerPage: number;
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+  };
+  links: {
+    firstPage: string;
+    prevPage: string;
+    nextPage: string;
+    lastPage: string;
+  };
+}
