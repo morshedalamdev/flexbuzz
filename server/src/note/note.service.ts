@@ -27,7 +27,7 @@ export class NoteService {
     private readonly paginationProvider: PaginationProvider,
     @InjectRepository(Note)
     private readonly noteRepository: Repository<Note>,
-  ) {}
+  ) { }
 
   public async create(noteDto: CreateNoteDto, userId: string) {
     try {
@@ -41,7 +41,13 @@ export class NoteService {
         user,
         hashtags,
       });
-      return await this.noteRepository.save(newNote);
+      const savedNote = await this.noteRepository.save(newNote);
+
+      if (noteDto.existingHashtags?.length) {
+        await this.hashtagService.incrementCounts(noteDto.existingHashtags);
+      }
+
+      return savedNote;
     } catch (error) {
       console.error("Error @note-create:", error);
       throw new RequestTimeoutException();
@@ -69,7 +75,7 @@ export class NoteService {
       );
       return { ...notes, data: notesWithCounts };
     } catch (error) {
-      if (error.code === "ECONNREFUSED") {
+      if (error instanceof Error && "code" in error && (error as { code?: string }).code === "ECONNREFUSED") {
         throw new RequestTimeoutException(
           "Failed to fetch notes. Please try again later.",
           {
@@ -97,7 +103,7 @@ export class NoteService {
 
       const likeCount = await this.likeService.likeCount(id);
       const commentCount = await this.commentService.commentCount(id);
-      const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id,userId,);
+      const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id, userId,);
       return { ...note, likeCount, commentCount, isLikedByCurrentUser };
     } catch (error) {
       if (error instanceof NotFoundException) {

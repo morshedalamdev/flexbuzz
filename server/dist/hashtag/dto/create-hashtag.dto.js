@@ -12,13 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateHashtagDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateHashtagDto {
-    tag;
+    tags = [];
 }
 exports.CreateHashtagDto = CreateHashtagDto;
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(100),
-    __metadata("design:type", String)
-], CreateHashtagDto.prototype, "tag", void 0);
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ArrayNotEmpty)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.MaxLength)(100, { each: true }),
+    __metadata("design:type", Array)
+], CreateHashtagDto.prototype, "tags", void 0);
 //# sourceMappingURL=create-hashtag.dto.js.map

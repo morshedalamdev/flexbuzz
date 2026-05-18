@@ -46,7 +46,11 @@ let NoteService = class NoteService {
                 user,
                 hashtags,
             });
-            return await this.noteRepository.save(newNote);
+            const savedNote = await this.noteRepository.save(newNote);
+            if (noteDto.existingHashtags?.length) {
+                await this.hashtagService.incrementCounts(noteDto.existingHashtags);
+            }
+            return savedNote;
         }
         catch (error) {
             console.error("Error @note-create:", error);
@@ -65,7 +69,7 @@ let NoteService = class NoteService {
             return { ...notes, data: notesWithCounts };
         }
         catch (error) {
-            if (error.code === "ECONNREFUSED") {
+            if (error instanceof Error && "code" in error && error.code === "ECONNREFUSED") {
                 throw new common_1.RequestTimeoutException("Failed to fetch notes. Please try again later.", {
                     description: "Database connection error",
                 });

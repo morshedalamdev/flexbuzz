@@ -1,8 +1,10 @@
-import { IsNotEmpty, IsString, MaxLength } from "class-validator";
+import { IsNotEmpty, IsArray, IsString, MaxLength, ArrayNotEmpty } from "class-validator";
 
 export class CreateHashtagDto {
   @IsNotEmpty()
-  @IsString()
-  @MaxLength(100)
-  tag: string;
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  @MaxLength(100, { each: true })
+  tags: string[] = [];
 }

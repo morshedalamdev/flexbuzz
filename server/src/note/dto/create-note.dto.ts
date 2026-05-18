@@ -9,4 +9,9 @@ export class CreateNoteDto {
   @IsUUID("4", { each: true })
   @IsArray()
   hashtags?: string[];
+
+  @IsOptional()
+  @IsUUID("4", { each: true })
+  @IsArray()
+  existingHashtags?: string[];
 }

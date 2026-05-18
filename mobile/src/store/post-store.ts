@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 import { showToast } from "@/lib/show-toast";
 import { StatusType, type PaginationInterface } from "@/types";
-import type { CommentType, PostType } from "@/types/post";
+import type { CommentType, PostType, HashtagType } from "@/types/post";
 import { create } from "zustand";
 
 interface PostStateType {
@@ -18,7 +18,7 @@ interface PostStateType {
   getPostsInRoot: (page?: number, limit?: number) => Promise<PostType[]>;
   getPostsByUser: (userId: string, page?: number, limit?: number) => Promise<PostType[]>;
   getPostById: (postId: string) => Promise<PostType>;
-  createPost: (content: string) => Promise<void>;
+  createPost: (content: string, hashtags: string[], existingHashtags?: string[]) => Promise<void>;
   updatePost: (id: string, content: string) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
   // --- LIKE OPERATIONS
@@ -28,6 +28,10 @@ interface PostStateType {
   createComment: (postId: string, content: string) => Promise<CommentType>;
   updateComment: (commentId: string, content: string) => Promise<void>;
   deleteComment: (commentId: string) => Promise<void>;
+  // --- HASHTAG OPERATIONS
+  searchHashtags: (search: string) => Promise<HashtagType[]>;
+  getAllHashtags: () => Promise<HashtagType[]>;
+  getPostsByHashtag: (tag: string) => Promise<PostType[]>;
   // --- CACHE OPERATIONS
   clearCache: () => void;
 }
@@ -340,19 +344,25 @@ export const usePostStore = create<PostStateType>((set, get) => ({
     }
   },
 
-  createPost: async (content: string) => {
+  createPost: async (content: string, hashtags: string[], existingHashtags: string[] = []) => {
     const { fetcher } = api<PostType>(`/note`);
     set({ isLoading: true });
 
     try {
       const res = await fetcher({
         method: "POST",
-        payload: { content },
+        payload: {
+          content,
+          hashtags,
+          existingHashtags,
+        },
       });
       if (!res.success || !res.data) {
         showToast(StatusType.ERROR, res.message || "Failed to create post");
         throw new Error(res.message || "Failed to create post");
       }
+
+      showToast(StatusType.SUCCESS, "Post created successfully");
     } catch (error) {
       showToast(StatusType.ERROR, "An error occurred while creating the post");
       console.error("Error creating post:", error);
@@ -428,6 +438,60 @@ export const usePostStore = create<PostStateType>((set, get) => ({
       set({ isLoading: false });
     }
   },
+  // --- HASHTAG OPERATIONS
+  searchHashtags: async (search: string) => {
+    const { fetcher } = api<HashtagType>(`/hashtag?search=${encodeURIComponent(search)}`);
+
+    try {
+      const res = await fetcher();
+      if (!res.success) {
+        return [];
+      }
+
+      // Handle both single result and array results from API
+      if (Array.isArray(res.data)) {
+        return res.data;
+      }
+      return res.data ? [res.data as HashtagType] : [];
+    } catch (error) {
+      console.error("Error searching hashtags:", error);
+      return [];
+    }
+  },
+
+  getAllHashtags: async () => {
+    const { fetcher } = api<HashtagType[]>(`/hashtag`);
+
+    try {
+      const res = await fetcher();
+      if (!res.success || !Array.isArray(res.data)) {
+        return [];
+      }
+
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching hashtags:", error);
+      return [];
+    }
+  },
+
+  getPostsByHashtag: async (tag: string) => {
+    const { fetcher } = api<PaginationInterface<PostType>>(`/note?hashtag=${encodeURIComponent(tag)}`);
+
+    try {
+      const res = await fetcher();
+      if (!res.success) {
+        showToast(StatusType.ERROR, res.message || "Failed to fetch posts");
+        return [];
+      }
+
+      return res.data?.data ?? [];
+    } catch (error) {
+      console.error("Error fetching posts by hashtag:", error);
+      return [];
+    }
+  },
+
   // --- CACHE OPERATIONS
   clearCache: () => set({ posts: [], postsByUser: {}, postsByUserMeta: {} }),
 }));

@@ -15,12 +15,18 @@ const class_validator_1 = require("class-validator");
 const pagination_query_dto_1 = require("../../common/pagination/dto/pagination-query.dto");
 class NoteBaseDto {
     userId;
+    hashtag;
 }
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], NoteBaseDto.prototype, "userId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], NoteBaseDto.prototype, "hashtag", void 0);
 class NoteQueryDto extends (0, mapped_types_1.IntersectionType)(NoteBaseDto, pagination_query_dto_1.PaginationQueryDto) {
 }
 exports.NoteQueryDto = NoteQueryDto;
