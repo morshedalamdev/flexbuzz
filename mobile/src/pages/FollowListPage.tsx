@@ -118,7 +118,7 @@ export default function FollowListPage() {
             return (
               <div key={u.id} className="flex items-center gap-3 px-4 py-3.5">
                 <button
-                  onClick={() => navigate(`/user/${u.id}`)}
+                  onClick={() => navigate(`/profile/${u.id}`)}
                   className="flex items-center gap-3 flex-1 min-w-0"
                 >
                   <Avatar className="w-11 h-11 shrink-0">

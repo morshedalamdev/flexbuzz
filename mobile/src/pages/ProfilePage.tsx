@@ -137,7 +137,7 @@ export default function ProfilePage() {
         <div className="flex gap-5">
           <button onClick={(e) => {
             e.stopPropagation();
-            navigate(`/user/${userId}/followers`);
+            navigate(`/profile/${userId}/followers`);
           }}
             disabled={userProfile?.followerCount === 0}
             className="flex items-center gap-1.5 text-sm">
@@ -146,7 +146,7 @@ export default function ProfilePage() {
           </button>
           <button onClick={(e) => {
             e.stopPropagation();
-            navigate(`/user/${userId}/following`);
+            navigate(`/profile/${userId}/following`);
           }}
             disabled={userProfile?.followingCount === 0}
             className="flex items-center gap-1.5 text-sm">
