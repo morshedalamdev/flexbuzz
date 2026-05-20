@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Zap } from 'lucide-react';
-import Login from '@/components/auth/Login';
+import Login from '@/components/auth/login';
 
 export default function LoginPage() {
 
