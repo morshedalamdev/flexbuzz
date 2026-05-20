@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
@@ -21,12 +21,12 @@ export default function FollowListPage() {
   const followUser = useUserStore((state) => state.followUser);
   const getFollowers = useUserStore((state) => state.getFollowers);
   const getFollowing = useUserStore((state) => state.getFollowing);
-  const [listUsers, setListUsers] = React.useState<UserType[]>([]);
-  const [page, setPage] = React.useState(1);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [initialLoading, setInitialLoading] = React.useState(true);
-  const endOfListRef = React.useRef<HTMLDivElement>(null);
+  const [listUsers, setListUsers] = useState<UserType[]>([]);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const endOfListRef = useRef<HTMLDivElement>(null);
 
   const loadList = useCallback(async () => {
     const targetUserId = id ?? currentUser?.sub;
