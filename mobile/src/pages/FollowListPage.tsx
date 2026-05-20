@@ -7,16 +7,33 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth-store';
 import { useUserStore } from '@/store/user-store';
 import { MOCK_USERS } from '@/lib/mock-data';
+import { useEffect, useState } from 'react';
+import type { UserType } from '@/types/user';
 import { useNavigate } from 'react-router-dom';
 
 export default function FollowListPage() {
   const { id, type } = useParams<{ id: string; type: string }>();
   const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.currentUser);
+  const rootUser = useAuthStore((state) => state.rootUser);
   const getUserById = useUserStore((state) => state.getUserById);
   const followUser = useUserStore((state) => state.followUser);
 
-  const user = getUserById(id ?? '');
+  const [user, setUser] = useState<UserType | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    let mounted = true;
+    (async () => {
+      try {
+        const u = await getUserById(id);
+        if (mounted) setUser(u);
+      } catch (e) {
+        console.error('Failed to load user for follow list', e);
+        if (mounted) setUser(null);
+      }
+    })();
+    return () => { mounted = false };
+  }, [id, getUserById]);
   const isFollowers = type === 'followers';
   const title = isFollowers ? 'Followers' : 'Following';
 
@@ -59,11 +76,11 @@ export default function FollowListPage() {
                     )}
                   </div>
                 </button>
-                {u.id !== currentUser.id && (
+                {u.id !== rootUser?.sub && (
                   <Button
                     variant={u.isFollowed ? 'outline' : 'default'}
                     size="sm"
-                    onClick={() => followUser(u.id)}
+                    onClick={() => followUser(u.id, u.isFollowed ?? false)}
                     className="rounded-full shrink-0"
                   >
                     {u.isFollowed ? 'Following' : 'Follow'}

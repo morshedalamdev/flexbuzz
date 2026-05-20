@@ -1,6 +1,7 @@
-import type { Post, User, Comment, Hashtag } from '@/types';
+import type { PostType, CommentType, HashtagType } from '@/types/post';
+import type { UserType } from '@/types/user';
 
-export const MOCK_USERS: User[] = [
+export const MOCK_USERS: UserType[] = [
   {
     id: '1',
     username: 'alexcode',
@@ -51,7 +52,7 @@ export const MOCK_USERS: User[] = [
   },
 ];
 
-export const CURRENT_USER: User = {
+export const CURRENT_USER: UserType = {
   id: 'me',
   username: 'johndoe',
   email: 'john@example.com',
@@ -68,18 +69,18 @@ export const CURRENT_USER: User = {
   createdAt: '2023-11-20T09:00:00Z',
 };
 
-export const MOCK_HASHTAGS: Hashtag[] = [
-  { id: 'h1', tag: 'nestjs', count: 42 },
-  { id: 'h2', tag: 'react', count: 95 },
-  { id: 'h3', tag: 'typescript', count: 87 },
-  { id: 'h4', tag: 'webdev', count: 210 },
-  { id: 'h5', tag: 'nodejs', count: 63 },
-  { id: 'h6', tag: 'programming', count: 150 },
-  { id: 'h7', tag: 'coding', count: 120 },
-  { id: 'h8', tag: 'tailwindcss', count: 55 },
+export const MOCK_HASHTAGS: HashtagType[] = [
+  { id: 'h1', tag: 'nestjs', count: 42, createAt: new Date().toISOString() },
+  { id: 'h2', tag: 'react', count: 95, createAt: new Date().toISOString() },
+  { id: 'h3', tag: 'typescript', count: 87, createAt: new Date().toISOString() },
+  { id: 'h4', tag: 'webdev', count: 210, createAt: new Date().toISOString() },
+  { id: 'h5', tag: 'nodejs', count: 63, createAt: new Date().toISOString() },
+  { id: 'h6', tag: 'programming', count: 150, createAt: new Date().toISOString() },
+  { id: 'h7', tag: 'coding', count: 120, createAt: new Date().toISOString() },
+  { id: 'h8', tag: 'tailwindcss', count: 55, createAt: new Date().toISOString() },
 ];
 
-export const MOCK_POSTS: Post[] = [
+export const MOCK_POSTS: PostType[] = [
   {
     id: 'p1',
     userId: '2',
@@ -160,37 +161,41 @@ export const MOCK_POSTS: Post[] = [
   },
 ];
 
-export const MOCK_COMMENTS: Comment[] = [
+export const MOCK_COMMENTS: CommentType[] = [
   {
     id: 'c1',
     content: 'Totally agree! TypeScript changed my life.',
     userId: '1',
-    postId: 'p1',
+    noteId: 'p1',
     createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
     user: MOCK_USERS[0],
   },
   {
     id: 'c2',
     content: 'Same! The autocomplete alone is worth it 😄',
     userId: 'me',
-    postId: 'p1',
+    noteId: 'p1',
     createdAt: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
     user: CURRENT_USER,
   },
   {
     id: 'c3',
     content: 'Have you tried Bun with NestJS? Even faster!',
     userId: '3',
-    postId: 'p2',
+    noteId: 'p2',
     createdAt: new Date(Date.now() - 1000 * 60 * 40).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 40).toISOString(),
     user: MOCK_USERS[2],
   },
   {
     id: 'c4',
     content: 'NestJS for the win! 🏆',
     userId: '2',
-    postId: 'p2',
+    noteId: 'p2',
     createdAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
     user: MOCK_USERS[1],
   },
 ];
