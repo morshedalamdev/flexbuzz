@@ -65,15 +65,35 @@ export const ProfileEditSchema = z.object({
   gender: z.enum(["male", "female", "other"], "Please select your gender"),
   dob: z
     .string()
+    .trim()
+    .min(1, "Date of birth is required")
+    .refine((dateStr) => !Number.isNaN(new Date(dateStr).getTime()), {
+      message: "Please enter a valid date of birth",
+    })
     .refine((dateStr) => {
       const dob = new Date(dateStr);
-      const now = new Date();
-      return (
-        !isNaN(dob.getTime()) &&
-        dob > new Date(now.getFullYear() - 120, now.getMonth(), now.getDate()) &&
-        dob < new Date(now.getFullYear() - 12, now.getMonth(), now.getDate())
-      );
-    }, "Please enter a valid date of birth. You must be at least 12 years old."),
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return dob <= today;
+    }, {
+      message: "Date of birth cannot be in the future",
+    })
+    .refine((dateStr) => {
+      const dob = new Date(dateStr);
+      const today = new Date();
+      const oldestAllowedDob = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
+      return dob >= oldestAllowedDob;
+    }, {
+      message: "Please enter a realistic date of birth (not more than 120 years ago)",
+    })
+    .refine((dateStr) => {
+      const dob = new Date(dateStr);
+      const today = new Date();
+      const minimumAgeDob = new Date(today.getFullYear() - 12, today.getMonth(), today.getDate());
+      return dob <= minimumAgeDob;
+    }, {
+      message: "You must be at least 12 years old",
+    }),
   bio: z
     .string()
     .min(10, "Bio must be at least 10 characters long")

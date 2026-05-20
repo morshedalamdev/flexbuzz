@@ -76,6 +76,7 @@ export class CommentService {
         this.commentRepository,
         { noteId },
         ["user"],
+        "ASC",
       );
     } catch (error) {
       console.error("Error @comment-getByNote:", error);

@@ -66,7 +66,7 @@ let CommentService = class CommentService {
     }
     async getCommentsByNote(noteId, pageQueryDto) {
         try {
-            return await this.paginationProvider.paginateQuery(pageQueryDto, this.commentRepository, { noteId }, ["user"]);
+            return await this.paginationProvider.paginateQuery(pageQueryDto, this.commentRepository, { noteId }, ["user"], "ASC");
         }
         catch (error) {
             console.error("Error @comment-getByNote:", error);

@@ -11,6 +11,9 @@ import {
 import type { UserType } from '@/types/user';
 import { useUserStore } from '@/store/user-store';
 import { Spinner } from '../ui/spinner';
+import { ProfileEditSchema } from '@/lib/validation';
+import { showToast } from '@/lib/show-toast';
+import { StatusType } from '@/types';
 
 interface EditProfileDialogProps {
   user: UserType
@@ -27,30 +30,42 @@ const GENDER_OPTIONS = [
 
 export default function EditProfileDialog({ user, open, onOpenChange }: EditProfileDialogProps) {
   const { isLoading, updateProfile } = useUserStore();
+  const normalizedDob = user.profile.dob ? user.profile.dob.split('T')[0] : '';
 
   const [form, setForm] = useState({
     username: user.username,
     email: user.email,
-    firstName: user.profile.firstName,
-    lastName: user.profile.lastName,
+    firstName: user.profile.firstName ?? '',
+    lastName: user.profile.lastName ?? '',
     gender: user.profile.gender ?? '',
-    dob: user.profile.dob ?? '',
-    bio: user.profile.bio,
+    dob: normalizedDob,
+    bio: user.profile.bio ?? '',
   });
 
   const update = (field: string, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
   const handleSave = async () => {
+    const validation = ProfileEditSchema.safeParse(form);
+    if (!validation.success) {
+      const fieldErrors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(fieldErrors).flat().find(Boolean);
+      showToast(
+        StatusType.ERROR,
+        firstError ?? "Please check your profile information and try again.",
+      );
+      return;
+    }
+
     const profileUpdates = {
-      username: form.username,
-      email: form.email,
+      username: validation.data.username,
+      email: validation.data.email,
       profile: {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        gender: form.gender,
-        dob: form.dob,
-        bio: form.bio,
+        firstName: validation.data.firstName,
+        lastName: validation.data.lastName,
+        gender: validation.data.gender,
+        dob: validation.data.dob,
+        bio: validation.data.bio,
       }
     };
     await updateProfile(profileUpdates);
@@ -128,6 +143,7 @@ export default function EditProfileDialog({ user, open, onOpenChange }: EditProf
               type="date"
               value={form.dob}
               onChange={(e) => update('dob', e.target.value)}
+              min={new Date(new Date().getFullYear() - 120, new Date().getMonth(), new Date().getDate()).toISOString().split('T')[0]}
               max={new Date().toISOString().split('T')[0]}
             />
           </div>
