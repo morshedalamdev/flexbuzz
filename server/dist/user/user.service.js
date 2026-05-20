@@ -210,6 +210,18 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
+    async updatePassword(userId, hashedPassword) {
+        try {
+            await this.userRepository.update(userId, {
+                password: hashedPassword,
+            });
+            return { updated: true };
+        }
+        catch (error) {
+            console.error("Error @user-updatePassword:", error);
+            throw new common_1.RequestTimeoutException();
+        }
+    }
     async follow(id, userId) {
         try {
             const userToFollow = await this.findBy(id, undefined, {

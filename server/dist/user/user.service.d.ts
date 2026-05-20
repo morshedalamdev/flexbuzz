@@ -28,6 +28,9 @@ export declare class UserService {
     delete(userId: string): Promise<{
         deleted: boolean;
     }>;
+    updatePassword(userId: string, hashedPassword: string): Promise<{
+        updated: boolean;
+    }>;
     follow(id: string, userId: string): Promise<{
         success: boolean;
     }>;

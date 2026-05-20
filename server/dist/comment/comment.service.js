@@ -77,7 +77,7 @@ let CommentService = class CommentService {
     }
     async getCommentsByNote(noteId, pageQueryDto) {
         try {
-            const comments = await this.paginationProvider.paginateQuery(pageQueryDto, this.commentRepository, { noteId }, ["user"]);
+            const comments = await this.paginationProvider.paginateQuery(pageQueryDto, this.commentRepository, { noteId }, ["user"], "ASC");
             return {
                 ...comments,
                 data: comments.data.map((comment) => this.serializeComment(comment)),
