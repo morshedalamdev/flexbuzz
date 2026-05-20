@@ -88,6 +88,7 @@ export class CommentService {
         this.commentRepository,
         { noteId },
         ["user"],
+        "ASC",
       );
       return {
         ...comments,

@@ -67,13 +67,25 @@ export const ProfileEditSchema = z.object({
     .string()
     .refine((dateStr) => {
       const dob = new Date(dateStr);
-      const now = new Date();
-      return (
-        !isNaN(dob.getTime()) &&
-        dob > new Date(now.getFullYear() - 120, now.getMonth(), now.getDate()) &&
-        dob < new Date(now.getFullYear() - 12, now.getMonth(), now.getDate())
-      );
-    }, "Please enter a valid date of birth. You must be at least 12 years old."),
+      return !isNaN(dob.getTime());
+    }, "Please enter a valid birth date.")
+    .refine((dateStr) => {
+      const dob = new Date(dateStr);
+      const today = new Date();
+      return dob <= today;
+    }, "Birth date cannot be in the future.")
+    .refine((dateStr) => {
+      const dob = new Date(dateStr);
+      const today = new Date();
+      const minDob = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
+      return dob >= minDob;
+    }, "Birth date is too far in the past. Please enter a realistic date.")
+    .refine((dateStr) => {
+      const dob = new Date(dateStr);
+      const today = new Date();
+      const minAgeDob = new Date(today.getFullYear() - 12, today.getMonth(), today.getDate());
+      return dob <= minAgeDob;
+    }, "You must be at least 12 years old."),
   bio: z
     .string()
     .min(10, "Bio must be at least 10 characters long")

@@ -144,7 +144,7 @@ export const usePostStore = create<PostStateType>((set, get) => ({
       }
 
       set((state) => ({
-        comments: [res.data!, ...state.comments],
+        comments: [...state.comments, res.data!],
         posts: state.posts.map((post) =>
           post.id === postId
             ? { ...post, commentCount: post.commentCount + 1 }
