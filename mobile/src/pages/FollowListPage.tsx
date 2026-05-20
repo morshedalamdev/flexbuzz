@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import MobileShell from '@/components/layout/MobileShell';
@@ -6,22 +7,43 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth-store';
 import { useUserStore } from '@/store/user-store';
-import { MOCK_USERS } from '@/lib/mock-data';
 import { useNavigate } from 'react-router-dom';
+import type { UserType } from '@/types/user';
 
 export default function FollowListPage() {
   const { id, type } = useParams<{ id: string; type: string }>();
   const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.currentUser);
+  const currentUser = useAuthStore((state) => state.rootUser);
   const getUserById = useUserStore((state) => state.getUserById);
   const followUser = useUserStore((state) => state.followUser);
+  const getFollowers = useUserStore((state) => state.getFollowers);
+  const getFollowing = useUserStore((state) => state.getFollowing);
+  const [user, setUser] = React.useState<UserType | null>(null);
+  const [listUsers, setListUsers] = React.useState<UserType[]>([]);
 
-  const user = getUserById(id ?? '');
+  useEffect(() => {
+    if (!id) return;
+    getUserById(id)
+      .then((u) => setUser(u))
+      .catch(() => setUser(null));
+  }, [id, getUserById]);
+
+  useEffect(() => {
+    const targetUserId = id ?? currentUser?.sub;
+    if (!targetUserId) return;
+
+    const loadList = async () => {
+      const users = type === 'followers'
+        ? await getFollowers(targetUserId)
+        : await getFollowing(targetUserId);
+      setListUsers(users);
+    };
+
+    loadList().catch(() => setListUsers([]));
+  }, [id, type, currentUser?.sub, getFollowers, getFollowing]);
+
   const isFollowers = type === 'followers';
   const title = isFollowers ? 'Followers' : 'Following';
-
-  // Simulate a follow list by picking mock users
-  const listUsers = MOCK_USERS.slice(0, isFollowers ? 2 : 3);
 
   return (
     <MobileShell>
@@ -59,11 +81,11 @@ export default function FollowListPage() {
                     )}
                   </div>
                 </button>
-                {u.id !== currentUser.id && (
+                {u.id !== currentUser?.sub && (
                   <Button
                     variant={u.isFollowed ? 'outline' : 'default'}
                     size="sm"
-                    onClick={() => followUser(u.id)}
+                    onClick={() => followUser(u.id, !!u.isFollowed)}
                     className="rounded-full shrink-0"
                   >
                     {u.isFollowed ? 'Following' : 'Follow'}

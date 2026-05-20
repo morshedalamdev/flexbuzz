@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Zap } from 'lucide-react';
-import Signup from '@/components/auth/signup';
+import Signup from '@/components/auth/Signup';
 
 export default function SignupPage() {
   return (

@@ -1,4 +1,4 @@
-import { createFetcher } from "@/hooks/use-fetcher";
+import { createFetcher } from "@/lib/api";
 import { deleteToken, storeToken } from "@/lib/token/token";
 import { LoginSchema, SignupSchema } from "@/lib/validation";
 

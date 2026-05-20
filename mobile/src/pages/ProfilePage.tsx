@@ -135,11 +135,21 @@ export default function ProfilePage() {
         )}
 
         <div className="flex gap-5">
-          <button className="flex items-center gap-1.5 text-sm">
+          <button onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/user/${userId}/followers`);
+          }}
+            disabled={userProfile?.followerCount === 0}
+            className="flex items-center gap-1.5 text-sm">
             <span className="font-bold text-gray-900">{formatCount(userProfile?.followerCount)}</span>
             <span className="text-gray-400">Followers</span>
           </button>
-          <button className="flex items-center gap-1.5 text-sm">
+          <button onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/user/${userId}/following`);
+          }}
+            disabled={userProfile?.followingCount === 0}
+            className="flex items-center gap-1.5 text-sm">
             <span className="font-bold text-gray-900">{formatCount(userProfile?.followingCount)}</span>
             <span className="text-gray-400">Following</span>
           </button>

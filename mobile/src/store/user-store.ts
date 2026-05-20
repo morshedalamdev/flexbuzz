@@ -4,11 +4,18 @@ import { StatusType, type PaginationInterface } from "@/types";
 import type { UserType } from "@/types/user";
 import { create } from "zustand";
 
+type FollowRelationType = {
+  follower?: UserType;
+  following?: UserType;
+};
+
 interface UserStateType {
   users: Map<string, UserType>;
   isLoading: boolean;
   getUserById: (userId: string) => Promise<UserType>;
   searchUsers: (search: string) => Promise<UserType[]>;
+  getFollowers: (userId?: string, page?: number, limit?: number) => Promise<UserType[]>;
+  getFollowing: (userId?: string, page?: number, limit?: number) => Promise<UserType[]>;
   updateProfile: (profile: Partial<UserType>) => Promise<UserType>;
   followUser: (userId: string, isFollowed: boolean) => Promise<void>;
   clearCache: () => void;
@@ -66,6 +73,56 @@ export const useUserStore = create<UserStateType>((set, get) => ({
       return res.data.data ?? [];
     } catch (error) {
       console.error("Error searching users:", error);
+      return [];
+    }
+  },
+
+  getFollowers: async (userId?: string, page = 1, limit = 20) => {
+    const query = new URLSearchParams();
+    if (userId) query.set("followingId", userId);
+    query.set("page", String(page));
+    query.set("limit", String(limit));
+
+    const { fetcher } = api<PaginationInterface<FollowRelationType>>(
+      `/user/followers?${query.toString()}`,
+    );
+
+    try {
+      const res = await fetcher();
+      if (!res.success || !res.data) {
+        return [];
+      }
+
+      return (res.data.data ?? [])
+        .map((follow) => follow.follower)
+        .filter((user): user is UserType => Boolean(user));
+    } catch (error) {
+      console.error("Error fetching followers:", error);
+      return [];
+    }
+  },
+
+  getFollowing: async (userId?: string, page = 1, limit = 20) => {
+    const query = new URLSearchParams();
+    if (userId) query.set("followerId", userId);
+    query.set("page", String(page));
+    query.set("limit", String(limit));
+
+    const { fetcher } = api<PaginationInterface<FollowRelationType>>(
+      `/user/following?${query.toString()}`,
+    );
+
+    try {
+      const res = await fetcher();
+      if (!res.success || !res.data) {
+        return [];
+      }
+
+      return (res.data.data ?? [])
+        .map((follow) => follow.following)
+        .filter((user): user is UserType => Boolean(user));
+    } catch (error) {
+      console.error("Error fetching following:", error);
       return [];
     }
   },
