@@ -38,9 +38,12 @@ let AuthService = class AuthService {
         return await this.generateToken(newUser);
     }
     async login(loginDto) {
-        const user = await this.userService.findBy(loginDto.username);
+        const user = await this.userService.findForAuth(loginDto.username);
         if (!user) {
             throw new common_1.NotFoundException("User not found");
+        }
+        if (!user.password) {
+            throw new common_1.UnauthorizedException("Authentication failed");
         }
         const isPasswordValid = await this.hashingProvider.comparePassword(loginDto.password, user.password);
         if (!isPasswordValid) {
@@ -55,7 +58,10 @@ let AuthService = class AuthService {
                 audience: this.authConfiguration.audience,
                 issuer: this.authConfiguration.issuer,
             });
-            const user = await this.userService.findBy(sub);
+            const user = await this.userService.findBy(sub, undefined, {
+                includeStats: false,
+                sanitize: false,
+            });
             if (!user) {
                 throw new common_1.NotFoundException("User not found");
             }

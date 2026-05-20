@@ -15,6 +15,7 @@ export declare class CommentService {
     private readonly commentRepository;
     private readonly paginationProvider;
     constructor(commentRepository: Repository<Comment>, paginationProvider: PaginationProvider);
+    private serializeComment;
     create(props: CreateType): Promise<Comment>;
     update(updateDto: CommentDto): Promise<{
         success: boolean;

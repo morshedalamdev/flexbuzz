@@ -22,6 +22,16 @@ const class_validator_1 = require("class-validator");
 const pagination_provider_1 = require("../common/pagination/pagination.provider");
 const follow_service_1 = require("../follow/follow.service");
 const typeorm_3 = require("typeorm");
+const public_user_util_1 = require("./utils/public-user.util");
+const AUTH_USER_SELECT = {
+    id: true,
+    username: true,
+    email: true,
+    password: true,
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true,
+};
 let UserService = class UserService {
     followService;
     paginationProvider;
@@ -40,7 +50,7 @@ let UserService = class UserService {
                 const followingCount = await this.followService.followingCount(user.id);
                 const isFollowed = await this.followService.isFollowed(user.id, userId);
                 return {
-                    ...user,
+                    ...(0, public_user_util_1.toPublicUser)(user),
                     followerCount,
                     followingCount,
                     isFollowed,
@@ -58,17 +68,24 @@ let UserService = class UserService {
             throw new common_1.RequestTimeoutException();
         }
     }
-    async findBy(identifier, userId) {
+    async findBy(identifier, userId, options = {}) {
+        const { includePassword = false, includeStats = true, sanitize = true, } = options;
         let user = null;
         try {
             if ((0, class_validator_1.isUUID)(identifier)) {
                 user = await this.userRepository.findOne({
                     where: { id: identifier },
+                    ...(includePassword && {
+                        select: AUTH_USER_SELECT,
+                    }),
                 });
             }
             else {
                 user = await this.userRepository.findOne({
                     where: [{ username: identifier }, { email: identifier }],
+                    ...(includePassword && {
+                        select: AUTH_USER_SELECT,
+                    }),
                 });
             }
         }
@@ -79,18 +96,27 @@ let UserService = class UserService {
         if (!user) {
             throw new common_1.NotFoundException(`User with '${identifier}' not found.`);
         }
+        if (!includeStats) {
+            return sanitize ? (0, public_user_util_1.toPublicUser)(user) : user;
+        }
         const followerCount = await this.followService.followerCount(user.id);
         const followingCount = await this.followService.followingCount(user.id);
-        if (userId) {
-            const isFollowed = await this.followService.isFollowed(user.id, userId);
-            return {
+        const userWithStats = userId
+            ? {
                 ...user,
                 followerCount,
                 followingCount,
-                isFollowed,
-            };
-        }
-        return { ...user, followerCount, followingCount };
+                isFollowed: await this.followService.isFollowed(user.id, userId),
+            }
+            : { ...user, followerCount, followingCount };
+        return sanitize ? (0, public_user_util_1.toPublicUser)(userWithStats) : userWithStats;
+    }
+    async findForAuth(identifier) {
+        return (await this.findBy(identifier, undefined, {
+            includePassword: true,
+            includeStats: false,
+            sanitize: false,
+        }));
     }
     async create(userDto) {
         const isUsernameExist = await this.userRepository.findOne({
@@ -160,7 +186,8 @@ let UserService = class UserService {
                 ? new Date(userDto.profile.dob)
                 : user.profile.dob;
             user.profile.bio = userDto.profile?.bio ?? user.profile.bio;
-            return await this.userRepository.save(user);
+            const updatedUser = await this.userRepository.save(user);
+            return (0, public_user_util_1.toPublicUser)(updatedUser);
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
@@ -185,12 +212,19 @@ let UserService = class UserService {
     }
     async follow(id, userId) {
         try {
-            const userToFollow = await this.findBy(id);
-            const currentUser = await this.findBy(userId);
+            const userToFollow = await this.findBy(id, undefined, {
+                includeStats: false,
+                sanitize: false,
+            });
+            const currentUser = await this.findBy(userId, undefined, {
+                includeStats: false,
+                sanitize: false,
+            });
             if (!userToFollow || !currentUser) {
                 throw new common_1.NotFoundException("User not found");
             }
-            return await this.followService.follow(userToFollow, currentUser);
+            await this.followService.follow(userToFollow, currentUser);
+            return { success: true };
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
@@ -223,7 +257,7 @@ let UserService = class UserService {
                 if (!u)
                     return null;
                 const isFollowed = await this.followService.isFollowed(u.id, userId);
-                return { ...u, isFollowed };
+                return { ...(0, public_user_util_1.toPublicUser)(u), isFollowed };
             }));
             return { ...res, data: users.filter((u) => u !== null) };
         }
@@ -243,7 +277,7 @@ let UserService = class UserService {
                 if (!u)
                     return null;
                 const isFollowed = await this.followService.isFollowed(u.id, userId);
-                return { ...u, isFollowed };
+                return { ...(0, public_user_util_1.toPublicUser)(u), isFollowed };
             }));
             return { ...res, data: users.filter((u) => u !== null) };
         }
