@@ -1,5 +1,6 @@
 import {
   Inject,
+  InternalServerErrorException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -101,7 +102,7 @@ export class AuthService {
 
     const resetToken = await this.signInToken<ForgotPasswordTokenPayload>(
       user.id,
-      this.authConfiguration.accessTokenSecret!,
+      this.getAccessTokenSecret(),
       FORGOT_PASSWORD_TOKEN_EXPIRY_SECONDS,
       {
         purpose: "forgot-password",
@@ -122,7 +123,7 @@ export class AuthService {
         sub: string;
         purpose?: string;
       }>(forgotPasswordResetDto.resetToken, {
-        secret: this.authConfiguration.accessTokenSecret,
+        secret: this.getAccessTokenSecret(),
         audience: this.authConfiguration.audience,
         issuer: this.authConfiguration.issuer,
       });
@@ -172,6 +173,13 @@ export class AuthService {
     );
   }
 
+  private getAccessTokenSecret(): string {
+    if (!this.authConfiguration.accessTokenSecret) {
+      throw new InternalServerErrorException("Access token secret is not configured.");
+    }
+    return this.authConfiguration.accessTokenSecret;
+  }
+
   private async generateToken(user: User, refreshToken?: unknown) {
     if (!refreshToken) {
       refreshToken = await this.signInToken(
@@ -182,7 +190,7 @@ export class AuthService {
     }
     const accessToken = await this.signInToken<Partial<ActiveUserType>>(
       user.id,
-      this.authConfiguration.accessTokenSecret!,
+      this.getAccessTokenSecret(),
       this.authConfiguration.accessTokenExpiresIn,
       {
         email: user.email,
