@@ -36,9 +36,16 @@ export class AuthService {
   }
 
   public async login(loginDto: LoginDto) {
-    const user = await this.userService.findBy(loginDto.username);
+    const user = await this.userService.findBy(loginDto.username, undefined, {
+      includePassword: true,
+      includeStats: false,
+      sanitize: false,
+    });
     if (!user) {
       throw new NotFoundException("User not found");
+    }
+    if (!user.password) {
+      throw new UnauthorizedException("Incorrect password");
     }
     const isPasswordValid = await this.hashingProvider.comparePassword(
       loginDto.password,
@@ -60,7 +67,10 @@ export class AuthService {
           issuer: this.authConfiguration.issuer,
         },
       );
-      const user = await this.userService.findBy(sub);
+      const user = await this.userService.findBy(sub, undefined, {
+        includeStats: false,
+        sanitize: false,
+      });
       if (!user) {
         throw new NotFoundException("User not found");
       }

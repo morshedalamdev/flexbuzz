@@ -16,6 +16,13 @@ import { PaginationInterface } from "src/common/pagination/pagination.interface"
 import { FollowQueryDto } from "./dto/follow-query.dto";
 import { FollowService } from "src/follow/follow.service";
 import { ILike } from "typeorm";
+import { toPublicUser } from "./utils/public-user.util";
+
+type FindUserOptions = {
+  includePassword?: boolean;
+  includeStats?: boolean;
+  sanitize?: boolean;
+};
 
 @Injectable()
 export class UserService {
@@ -47,7 +54,7 @@ export class UserService {
           const isFollowed =
             await this.followService.isFollowed(user.id, userId);
           return {
-            ...user,
+            ...toPublicUser(user),
             followerCount,
             followingCount,
             isFollowed,
@@ -69,16 +76,47 @@ export class UserService {
     }
   }
 
-  public async findBy(identifier: string, userId?: string) {
+  public async findBy(
+    identifier: string,
+    userId?: string,
+    options: FindUserOptions = {},
+  ) {
+    const {
+      includePassword = false,
+      includeStats = true,
+      sanitize = true,
+    } = options;
     let user: User | null = null;
     try {
       if (isUUID(identifier)) {
         user = await this.userRepository.findOne({
           where: { id: identifier },
+          ...(includePassword && {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              password: true,
+              createdAt: true,
+              updatedAt: true,
+              deletedAt: true,
+            },
+          }),
         });
       } else {
         user = await this.userRepository.findOne({
           where: [{ username: identifier }, { email: identifier }],
+          ...(includePassword && {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              password: true,
+              createdAt: true,
+              updatedAt: true,
+              deletedAt: true,
+            },
+          }),
         });
       }
     } catch (error) {
@@ -89,20 +127,23 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with '${identifier}' not found.`);
     }
-    const followerCount = await this.followService.followerCount(user.id);
-    const followingCount = await this.followService.followingCount(user.id);
-    if (userId) {
-      const isFollowed =
-        await this.followService.isFollowed(user.id, userId);
-      return {
-        ...user,
-        followerCount,
-        followingCount,
-        isFollowed,
-      };
+
+    if (!includeStats) {
+      return sanitize ? toPublicUser(user) : user;
     }
 
-    return { ...user, followerCount, followingCount };
+    const followerCount = await this.followService.followerCount(user.id);
+    const followingCount = await this.followService.followingCount(user.id);
+    const userWithStats = userId
+      ? {
+          ...user,
+          followerCount,
+          followingCount,
+          isFollowed: await this.followService.isFollowed(user.id, userId),
+        }
+      : { ...user, followerCount, followingCount };
+
+    return sanitize ? toPublicUser(userWithStats) : userWithStats;
   }
 
   // CURRENT USER
@@ -178,7 +219,8 @@ export class UserService {
         ? new Date(userDto.profile.dob)
         : user.profile.dob;
       user.profile.bio = userDto.profile?.bio ?? user.profile.bio;
-      return await this.userRepository.save(user);
+      const updatedUser = await this.userRepository.save(user);
+      return toPublicUser(updatedUser);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -204,12 +246,19 @@ export class UserService {
   // FOLLOW
   public async follow(id: string, userId: string) {
     try {
-      const userToFollow = await this.findBy(id);
-      const currentUser = await this.findBy(userId);
+      const userToFollow = await this.findBy(id, undefined, {
+        includeStats: false,
+        sanitize: false,
+      });
+      const currentUser = await this.findBy(userId, undefined, {
+        includeStats: false,
+        sanitize: false,
+      });
       if (!userToFollow || !currentUser) {
         throw new NotFoundException("User not found");
       }
-      return await this.followService.follow(userToFollow, currentUser);
+      await this.followService.follow(userToFollow, currentUser);
+      return { success: true };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -244,7 +293,7 @@ export class UserService {
           const u = f.follower;
           if (!u) return null;
           const isFollowed = await this.followService.isFollowed(u.id, userId);
-          return { ...u, isFollowed };
+          return { ...toPublicUser(u), isFollowed };
         }),
       );
       return { ...res, data: users.filter((u) => u !== null) };
@@ -266,7 +315,7 @@ export class UserService {
           const u = f.following;
           if (!u) return null;
           const isFollowed = await this.followService.isFollowed(u.id, userId);
-          return { ...u, isFollowed };
+          return { ...toPublicUser(u), isFollowed };
         }),
       );
 

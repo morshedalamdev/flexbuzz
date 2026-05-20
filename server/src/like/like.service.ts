@@ -8,6 +8,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Note } from "src/note/note.entity";
 import { User } from "src/user/user.entity";
+import { toPublicUser } from "src/user/utils/public-user.util";
 
 @Injectable()
 export class LikeService {
@@ -50,7 +51,7 @@ export class LikeService {
         order: { createdAt: "DESC" },
       });
 
-      return likes.map((like) => like.user);
+      return likes.map((like) => toPublicUser(like.user));
     } catch (error) {
       console.error("Error @like-getUsersWhoLiked:", error);
       throw new RequestTimeoutException();

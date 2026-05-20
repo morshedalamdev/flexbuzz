@@ -12,6 +12,7 @@ import { Note } from "src/note/note.entity";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
 import { NoteQueryDto } from "src/note/dto/note-query.dto";
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
+import { toPublicUser } from "src/user/utils/public-user.util";
 
 type CreateType = {
   content: string;
@@ -27,6 +28,16 @@ export class CommentService {
     private readonly paginationProvider: PaginationProvider,
   ) {}
 
+  private serializeComment(comment: Comment) {
+    if (!comment.user) {
+      return comment;
+    }
+    return {
+      ...comment,
+      user: toPublicUser(comment.user),
+    };
+  }
+
   async create(props: CreateType) {
     try {
       const comment = this.commentRepository.create({
@@ -34,7 +45,8 @@ export class CommentService {
         user: props.user,
         note: props.note,
       });
-      return await this.commentRepository.save(comment);
+      const savedComment = await this.commentRepository.save(comment);
+      return this.serializeComment(savedComment);
     } catch (error) {
       console.error("Error @comment-create:", error);
       throw new RequestTimeoutException();
@@ -71,12 +83,16 @@ export class CommentService {
     pageQueryDto: NoteQueryDto,
   ): Promise<PaginationInterface<Comment>> {
     try {
-      return await this.paginationProvider.paginateQuery(
+      const comments = await this.paginationProvider.paginateQuery(
         pageQueryDto,
         this.commentRepository,
         { noteId },
         ["user"],
       );
+      return {
+        ...comments,
+        data: comments.data.map((comment) => this.serializeComment(comment)),
+      };
     } catch (error) {
       console.error("Error @comment-getByNote:", error);
       throw new RequestTimeoutException();
