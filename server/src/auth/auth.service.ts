@@ -88,7 +88,12 @@ export class AuthService {
   public async forgotPasswordVerify(
     forgotPasswordVerifyDto: ForgotPasswordVerifyDto,
   ) {
-    const user = await this.userService.findForAuth(forgotPasswordVerifyDto.username);
+    let user: User;
+    try {
+      user = await this.userService.findForAuth(forgotPasswordVerifyDto.username);
+    } catch {
+      throw new UnauthorizedException("Provided email and username do not match.");
+    }
     if (user.email !== forgotPasswordVerifyDto.email) {
       throw new UnauthorizedException("Provided email and username do not match.");
     }

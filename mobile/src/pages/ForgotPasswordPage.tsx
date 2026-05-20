@@ -133,7 +133,8 @@ export default function ForgotPasswordPage() {
               />
             </div>
             <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
-              {isSubmitting ? <Spinner /> : ""}Verify Identity
+              {isSubmitting ? <Spinner /> : null}
+              Verify Identity
             </Button>
           </form>
         ) : (
@@ -175,7 +176,8 @@ export default function ForgotPasswordPage() {
               />
             </div>
             <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
-              {isSubmitting ? <Spinner /> : ""}Update Password
+              {isSubmitting ? <Spinner /> : null}
+              Update Password
             </Button>
           </form>
         )}
