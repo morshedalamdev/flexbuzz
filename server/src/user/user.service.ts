@@ -245,6 +245,18 @@ export class UserService {
     }
   }
 
+  public async updatePassword(userId: string, hashedPassword: string) {
+    try {
+      await this.userRepository.update(userId, {
+        password: hashedPassword,
+      });
+      return { updated: true };
+    } catch (error) {
+      console.error("Error @user-updatePassword:", error);
+      throw new RequestTimeoutException();
+    }
+  }
+
   // FOLLOW
   public async follow(id: string, userId: string) {
     try {

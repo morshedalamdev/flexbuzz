@@ -20,6 +20,12 @@ export type FetcherResponse<T> = {
 };
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const PUBLIC_ROUTES = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/forgot-password/verify",
+  "/auth/forgot-password/reset",
+];
 
 // REFRESH ACCESS TOKEN API CALL USING REFRESH TOKEN
 const refreshTokenAPI = async (): Promise<string | null> => {
@@ -69,7 +75,8 @@ export function createFetcher<T = undefined>(url: string) {
 
     // CHECK FOR TOKEN, BLOCKING UNAUTHORIZED REQUESTS TO PROTECTED ENDPOINTS
     const token = await getValidToken();
-    if (!token && url !== "/auth/login" && url !== "/auth/register") {
+    const isPublicRoute = PUBLIC_ROUTES.includes(url);
+    if (!token && !isPublicRoute) {
       return {
         success: false,
         message: "Session expired. Please log in again.",

@@ -1,5 +1,4 @@
 import {
-  forwardRef,
   Inject,
   Injectable,
   NotFoundException,
@@ -15,6 +14,12 @@ import type { ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ActiveUserType } from "./interfaces/active-user-type.interface";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { ForgotPasswordVerifyDto } from "./dto/forgot-password-verify.dto";
+import { ForgotPasswordResetDto } from "./dto/forgot-password-reset.dto";
+
+type ForgotPasswordTokenPayload = {
+  purpose: "forgot-password";
+};
 
 @Injectable()
 export class AuthService {
@@ -77,6 +82,67 @@ export class AuthService {
       }
       console.error("Error @refresh-token:", error);
       throw new UnauthorizedException(error);
+    }
+  }
+
+  public async forgotPasswordVerify(
+    forgotPasswordVerifyDto: ForgotPasswordVerifyDto,
+  ) {
+    const user = await this.userService.findForAuth(forgotPasswordVerifyDto.username);
+    if (user.email !== forgotPasswordVerifyDto.email) {
+      throw new UnauthorizedException("Provided email and username do not match.");
+    }
+
+    const resetToken = await this.signInToken<ForgotPasswordTokenPayload>(
+      user.id,
+      this.authConfiguration.accessTokenSecret!,
+      10 * 60,
+      {
+        purpose: "forgot-password",
+      },
+    );
+
+    return {
+      resetToken,
+      message: "Identity verified. You can now reset your password.",
+    };
+  }
+
+  public async forgotPasswordReset(
+    forgotPasswordResetDto: ForgotPasswordResetDto,
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync<{
+        sub: string;
+        purpose?: string;
+      }>(forgotPasswordResetDto.resetToken, {
+        secret: this.authConfiguration.accessTokenSecret,
+        audience: this.authConfiguration.audience,
+        issuer: this.authConfiguration.issuer,
+      });
+
+      if (payload.purpose !== "forgot-password") {
+        throw new UnauthorizedException("Invalid password reset token.");
+      }
+
+      const user = await this.userService.findForAuth(payload.sub);
+      if (!user) {
+        throw new NotFoundException("User not found");
+      }
+
+      const hashedPassword = await this.hashingProvider.hashPassword(
+        forgotPasswordResetDto.newPassword,
+      );
+      await this.userService.updatePassword(user.id, hashedPassword);
+      return { success: true, message: "Password updated successfully." };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException("Invalid or expired password reset token.");
     }
   }
 
