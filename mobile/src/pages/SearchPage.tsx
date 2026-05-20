@@ -4,17 +4,23 @@ import MobileShell from '@/components/layout/MobileShell';
 import TopBar from '@/components/layout/TopBar';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { formatCount } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import type { HashtagType } from '@/types/post';
 import { usePostStore } from '@/store/post-store';
+import { useUserStore } from '@/store/user-store';
+import type { UserType } from '@/types/user';
+import { displayInitial, displayName } from '@/lib/utils';
 
 export default function SearchPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [trendingHashtags, setTrendingHashtags] = useState<HashtagType[]>([]);
   const [searchResults, setSearchResults] = useState<HashtagType[]>([]);
+  const [searchUsers, setSearchUsers] = useState<UserType[]>([]);
   const { searchHashtags, getAllHashtags } = usePostStore();
+  const { searchUsers: searchUsersByUsername } = useUserStore();
 
   // Load trending hashtags on mount
   useEffect(() => {
@@ -26,24 +32,31 @@ export default function SearchPage() {
     loadTrendingHashtags();
   }, [getAllHashtags]);
 
-  // Search hashtags when query changes
+  // Search hashtags and users when query changes
   useEffect(() => {
     const handleSearch = async () => {
       if (query.trim().length === 0) {
         setSearchResults([]);
+        setSearchUsers([]);
         return;
       }
 
-      const results = await searchHashtags(query.trim());
-      setSearchResults(results);
+      const normalizedHashtagSearch = query.trim().replace(/^#/, '');
+      const [hashtags, users] = await Promise.all([
+        searchHashtags(normalizedHashtagSearch),
+        searchUsersByUsername(query.trim()),
+      ]);
+
+      setSearchResults(hashtags);
+      setSearchUsers(users);
     };
 
     const debounceTimer = window.setTimeout(handleSearch, 300);
     return () => window.clearTimeout(debounceTimer);
-  }, [query, searchHashtags]);
+  }, [query, searchHashtags, searchUsersByUsername]);
 
   const showResults = query.trim().length > 0;
-  const displayedResults = showResults ? searchResults : [];
+  const totalResults = searchResults.length + searchUsers.length;
 
   return (
     <MobileShell>
@@ -74,29 +87,68 @@ export default function SearchPage() {
         {showResults ? (
           <>
             <p className="text-xs font-medium text-gray-400 px-1">
-              {displayedResults.length} result{displayedResults.length !== 1 ? 's' : ''} for "{query}"
+              {totalResults} result{totalResults !== 1 ? 's' : ''} for "{query}"
             </p>
-            {displayedResults.length === 0 ? (
+            {totalResults === 0 ? (
               <div className="py-12 text-center">
                 <Search size={36} className="text-gray-200 mx-auto mb-3" />
-                <p className="text-gray-400 font-medium">No hashtags found</p>
-                <p className="text-gray-300 text-sm">Try different keywords</p>
+                <p className="text-gray-400 font-medium">No users or hashtags found</p>
+                <p className="text-gray-300 text-sm">Try a different username or hashtag</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
-                {displayedResults.map((hashtag) => (
-                  <button
-                    key={hashtag.id}
-                    onClick={() => navigate(`/hashtag/${hashtag.tag}`)}
-                    className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                  >
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-gray-900">#{hashtag.tag}</p>
-                      <p className="text-xs text-gray-400">{formatCount(hashtag.count)} posts</p>
+              <div className="space-y-4">
+                {searchUsers.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between px-1 mb-3">
+                      <h2 className="text-sm font-bold text-gray-900">Users</h2>
+                      <Badge variant="hashtag">{searchUsers.length}</Badge>
                     </div>
-                    <Badge variant="hashtag">Hashtag</Badge>
-                  </button>
-                ))}
+                    <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
+                      {searchUsers.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => navigate(`/profile/${user.id}`)}
+                          className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 min-w-0 text-left">
+                            <Avatar className="w-11 h-11 shrink-0">
+                              <AvatarFallback>{displayInitial(user)}</AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 truncate">{displayName(user)}</p>
+                              <p className="text-xs text-gray-400 truncate">@{user.username}</p>
+                            </div>
+                          </div>
+                          <Badge variant="hashtag">User</Badge>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {searchResults.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between px-1 mb-3">
+                      <h2 className="text-sm font-bold text-gray-900">Hashtags</h2>
+                      <Badge variant="hashtag">{searchResults.length}</Badge>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
+                      {searchResults.map((hashtag) => (
+                        <button
+                          key={hashtag.id}
+                          onClick={() => navigate(`/hashtag/${hashtag.tag}`)}
+                          className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                        >
+                          <div className="text-left">
+                            <p className="text-sm font-semibold text-gray-900">#{hashtag.tag}</p>
+                            <p className="text-xs text-gray-400">{formatCount(hashtag.count)} posts</p>
+                          </div>
+                          <Badge variant="hashtag">Hashtag</Badge>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </>
@@ -136,7 +188,7 @@ export default function SearchPage() {
         )}
       </div>
 
-      {/* Dialogs removed - Search now shows hashtags only */}
+      {/* Search now shows users and hashtags */}
     </MobileShell>
   );
 }

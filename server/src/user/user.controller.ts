@@ -10,13 +10,13 @@ import {
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
 import { FollowQueryDto } from "./dto/follow-query.dto";
 import { ActiveUser } from "src/auth/decorator/active-user.decorator";
+import { SearchUserQueryDto } from "./dto/search-user-query.dto";
 
 @Controller("user")
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   // FOLLOW
   @Get("/followers")
@@ -64,7 +64,7 @@ export class UserController {
   // ROOT
   @Get()
   public GetUsers(
-    @Query() pageQueryDto: PaginationQueryDto,
+    @Query() pageQueryDto: SearchUserQueryDto,
     @ActiveUser('sub') userId: string
   ) {
     return this.userService.findAll(pageQueryDto, userId);

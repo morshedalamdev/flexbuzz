@@ -16,9 +16,9 @@ exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const update_user_dto_1 = require("./dto/update-user.dto");
-const pagination_query_dto_1 = require("../common/pagination/dto/pagination-query.dto");
 const follow_query_dto_1 = require("./dto/follow-query.dto");
 const active_user_decorator_1 = require("../auth/decorator/active-user.decorator");
+const search_user_query_dto_1 = require("./dto/search-user-query.dto");
 let UserController = class UserController {
     userService;
     constructor(userService) {
@@ -112,7 +112,7 @@ __decorate([
     __param(0, (0, common_1.Query)()),
     __param(1, (0, active_user_decorator_1.ActiveUser)('sub')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto, String]),
+    __metadata("design:paramtypes", [search_user_query_dto_1.SearchUserQueryDto, String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUsers", null);
 __decorate([

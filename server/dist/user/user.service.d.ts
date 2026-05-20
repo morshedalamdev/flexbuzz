@@ -12,7 +12,9 @@ export declare class UserService {
     private readonly paginationProvider;
     private userRepository;
     constructor(followService: FollowService, paginationProvider: PaginationProvider, userRepository: Repository<User>);
-    findAll(paginationQueryDto: PaginationQueryDto, userId: string): Promise<PaginationInterface<User>>;
+    findAll(paginationQueryDto: PaginationQueryDto & {
+        search?: string;
+    }, userId: string): Promise<PaginationInterface<User>>;
     findBy(identifier: string, userId?: string): Promise<{
         followerCount: number;
         followingCount: number;

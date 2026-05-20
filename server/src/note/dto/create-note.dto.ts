@@ -3,7 +3,7 @@ import { IsArray, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validat
 export class CreateNoteDto {
   @IsNotEmpty()
   @IsString()
-  content: string;
+  content?: string;
 
   @IsOptional()
   @IsUUID("4", { each: true })

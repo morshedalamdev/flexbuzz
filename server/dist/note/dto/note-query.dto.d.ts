@@ -3,7 +3,7 @@ declare class NoteBaseDto {
     userId?: string;
     hashtag?: string;
 }
-declare const NoteQueryDto_base: import("@nestjs/mapped-types").MappedType<NoteBaseDto & PaginationQueryDto>;
+declare const NoteQueryDto_base: import("@nestjs/mapped-types").MappedType<PaginationQueryDto & NoteBaseDto>;
 export declare class NoteQueryDto extends NoteQueryDto_base {
 }
 export {};
