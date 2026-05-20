@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,7 +11,7 @@ import {
 import type { UserType } from '@/types/user';
 import { useUserStore } from '@/store/user-store';
 import { Spinner } from '../ui/spinner';
-import { ProfileEditSchema } from '@/lib/validation';
+import { PROFILE_MAX_AGE, ProfileEditSchema } from '@/lib/validation';
 import { showToast } from '@/lib/show-toast';
 import { StatusType } from '@/types';
 
@@ -28,9 +28,30 @@ const GENDER_OPTIONS = [
   { value: 'other', label: 'Other' },
 ];
 
+const toDateString = (value: string | Date) => {
+  const date = value instanceof Date ? value : new Date(value);
+  return date.toISOString().split('T')[0];
+};
+
 export default function EditProfileDialog({ user, open, onOpenChange }: EditProfileDialogProps) {
   const { isLoading, updateProfile } = useUserStore();
-  const normalizedDob = user.profile.dob ? user.profile.dob.split('T')[0] : '';
+  const normalizedDob = useMemo(
+    () => (user.profile.dob ? toDateString(user.profile.dob) : ''),
+    [user.profile.dob],
+  );
+  const { minDob, maxDob } = useMemo(() => {
+    const today = new Date();
+    return {
+      minDob: toDateString(
+        new Date(
+          today.getFullYear() - PROFILE_MAX_AGE,
+          today.getMonth(),
+          today.getDate(),
+        ),
+      ),
+      maxDob: toDateString(today),
+    };
+  }, []);
 
   const [form, setForm] = useState({
     username: user.username,
@@ -143,8 +164,8 @@ export default function EditProfileDialog({ user, open, onOpenChange }: EditProf
               type="date"
               value={form.dob}
               onChange={(e) => update('dob', e.target.value)}
-              min={new Date(new Date().getFullYear() - 120, new Date().getMonth(), new Date().getDate()).toISOString().split('T')[0]}
-              max={new Date().toISOString().split('T')[0]}
+              min={minDob}
+              max={maxDob}
             />
           </div>
 

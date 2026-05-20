@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const PROFILE_MIN_AGE = 12;
+export const PROFILE_MAX_AGE = 120;
+
+const getTodayNormalized = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
 export const SignupSchema = z
   .object({
     username: z
@@ -72,27 +81,34 @@ export const ProfileEditSchema = z.object({
     })
     .refine((dateStr) => {
       const dob = new Date(dateStr);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return dob <= today;
+      const todayNormalized = getTodayNormalized();
+      return dob <= todayNormalized;
     }, {
       message: "Date of birth cannot be in the future",
     })
     .refine((dateStr) => {
       const dob = new Date(dateStr);
-      const today = new Date();
-      const oldestAllowedDob = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
+      const today = getTodayNormalized();
+      const oldestAllowedDob = new Date(
+        today.getFullYear() - PROFILE_MAX_AGE,
+        today.getMonth(),
+        today.getDate(),
+      );
       return dob >= oldestAllowedDob;
     }, {
-      message: "Please enter a realistic date of birth (not more than 120 years ago)",
+      message: `Please enter a realistic date of birth (not more than ${PROFILE_MAX_AGE} years ago)`,
     })
     .refine((dateStr) => {
       const dob = new Date(dateStr);
-      const today = new Date();
-      const minimumAgeDob = new Date(today.getFullYear() - 12, today.getMonth(), today.getDate());
+      const today = getTodayNormalized();
+      const minimumAgeDob = new Date(
+        today.getFullYear() - PROFILE_MIN_AGE,
+        today.getMonth(),
+        today.getDate(),
+      );
       return dob <= minimumAgeDob;
     }, {
-      message: "You must be at least 12 years old",
+      message: `You must be at least ${PROFILE_MIN_AGE} years old`,
     }),
   bio: z
     .string()
