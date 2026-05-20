@@ -36,10 +36,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Joi = __importStar(require("joi"));
 exports.default = Joi.object({
     NODE_ENV: Joi.string().valid("development", "production", "test").default("development"),
+    DATABASE_URL: Joi.string().uri().optional(),
     DB_PORT: Joi.number().port().default(5432),
-    DB_HOST: Joi.string().required(),
-    DB_USER: Joi.string().required(),
-    DB_NAME: Joi.string().required(),
+    DB_HOST: Joi.string().optional(),
+    DB_USER: Joi.string().optional(),
+    DB_PASSWORD: Joi.string().allow("").optional(),
+    DB_NAME: Joi.string().optional(),
+    DB_SSL: Joi.boolean().default(false),
     JWT_ACCESS_SECRET: Joi.string().required(),
     JWT_REFRESH_SECRET: Joi.string().required(),
     JWT_ACCESS_EXPIRATION_TIME: Joi.number().integer().positive().default(3600),

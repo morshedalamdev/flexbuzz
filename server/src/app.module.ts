@@ -42,12 +42,17 @@ const ENV = process.env.NODE_ENV;
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: "postgres",
+        url: configService.get<string>("database.url"),
         autoLoadEntities: configService.get<boolean>("database.autoLoad"),
         synchronize: configService.get<boolean>("database.synchronize"), // Only for dev env **DO NOT USE IN PRODUCTION**
         host: configService.get<string>("database.host"),
         port: configService.get<number>("database.port"),
         username: configService.get<string>("database.user"),
+        password: configService.get<string>("database.password"),
         database: configService.get<string>("database.name"),
+        ssl: configService.get<boolean>("database.ssl")
+          ? { rejectUnauthorized: false }
+          : undefined,
       }),
     }),
     ConfigModule.forFeature(authConfig),
@@ -61,4 +66,4 @@ const ENV = process.env.NODE_ENV;
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
