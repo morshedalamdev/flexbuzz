@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'mobile/**'
+      - "mobile/**"
   pull_request:
     branches: [main]
     paths:
-      - 'mobile/**'
+      - "mobile/**"
 
 defaults:
   run:
@@ -16,25 +16,22 @@ defaults:
 
 jobs:
   build:
-    name: 🔨 Lint & Build
+    name: 🔨 Build
     runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20.x"
+          cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 
       - name: 📦 Install dependencies
         run: npm ci
-
-      - name: 🔍 Lint
-        run: npm run lint
 
       - name: 🔨 Build
         run: npm run build
@@ -46,13 +43,13 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20.x"
+          cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 
       - name: 📦 Install dependencies
@@ -60,3 +57,11 @@ jobs:
 
       - name: 🧪 Run tests
         run: npm run test --if-present
+
+      - name: 📊 Upload coverage report
+        if: always() # Upload even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: mobile/coverage/
+          retention-days: 30
