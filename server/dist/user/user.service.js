@@ -21,6 +21,7 @@ const user_exists_exception_1 = require("../common/customException/user-exists.e
 const class_validator_1 = require("class-validator");
 const pagination_provider_1 = require("../common/pagination/pagination.provider");
 const follow_service_1 = require("../follow/follow.service");
+const typeorm_3 = require("typeorm");
 let UserService = class UserService {
     followService;
     paginationProvider;
@@ -32,7 +33,8 @@ let UserService = class UserService {
     }
     async findAll(paginationQueryDto, userId) {
         try {
-            const users = await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository);
+            const search = paginationQueryDto.search?.trim().replace(/^@/, "");
+            const users = await this.paginationProvider.paginateQuery(paginationQueryDto, this.userRepository, search ? { username: (0, typeorm_3.ILike)(`%${search}%`) } : undefined);
             const usersWithCounts = await Promise.all(users.data.map(async (user) => {
                 const followerCount = await this.followService.followerCount(user.id);
                 const followingCount = await this.followService.followingCount(user.id);

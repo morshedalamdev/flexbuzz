@@ -1,5 +1,5 @@
 export declare class CreateNoteDto {
-    content: string;
+    content?: string;
     hashtags?: string[];
     existingHashtags?: string[];
 }

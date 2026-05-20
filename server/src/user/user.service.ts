@@ -15,6 +15,7 @@ import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.d
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { FollowQueryDto } from "./dto/follow-query.dto";
 import { FollowService } from "src/follow/follow.service";
+import { ILike } from "typeorm";
 
 @Injectable()
 export class UserService {
@@ -23,16 +24,19 @@ export class UserService {
     private readonly paginationProvider: PaginationProvider,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   public async findAll(
-    paginationQueryDto: PaginationQueryDto,
+    paginationQueryDto: PaginationQueryDto & { search?: string },
     userId: string,
   ): Promise<PaginationInterface<User>> {
     try {
+      const search = paginationQueryDto.search?.trim().replace(/^@/, "");
+
       const users = await this.paginationProvider.paginateQuery(
         paginationQueryDto,
         this.userRepository,
+        search ? { username: ILike(`%${search}%`) } : undefined,
       );
       const usersWithCounts = await Promise.all(
         users.data.map(async (user) => {

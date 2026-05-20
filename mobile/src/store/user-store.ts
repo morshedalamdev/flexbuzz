@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { showToast } from "@/lib/show-toast";
-import { StatusType } from "@/types";
+import { StatusType, type PaginationInterface } from "@/types";
 import type { UserType } from "@/types/user";
 import { create } from "zustand";
 
@@ -8,6 +8,7 @@ interface UserStateType {
   users: Map<string, UserType>;
   isLoading: boolean;
   getUserById: (userId: string) => Promise<UserType>;
+  searchUsers: (search: string) => Promise<UserType[]>;
   updateProfile: (profile: Partial<UserType>) => Promise<UserType>;
   followUser: (userId: string, isFollowed: boolean) => Promise<void>;
   clearCache: () => void;
@@ -44,6 +45,28 @@ export const useUserStore = create<UserStateType>((set, get) => ({
       throw error;
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  searchUsers: async (search: string) => {
+    const trimmedSearch = search.trim().replace(/^@/, "");
+
+    if (!trimmedSearch) return [];
+
+    const { fetcher } = api<PaginationInterface<UserType>>(
+      `/user?search=${encodeURIComponent(trimmedSearch)}&limit=10`,
+    );
+
+    try {
+      const res = await fetcher();
+      if (!res.success || !res.data) {
+        return [];
+      }
+
+      return res.data.data ?? [];
+    } catch (error) {
+      console.error("Error searching users:", error);
+      return [];
     }
   },
 
