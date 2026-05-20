@@ -146,6 +146,14 @@ export class UserService {
     return sanitize ? toPublicUser(userWithStats) : userWithStats;
   }
 
+  public async findForAuth(identifier: string): Promise<User> {
+    return (await this.findBy(identifier, undefined, {
+      includePassword: true,
+      includeStats: false,
+      sanitize: false,
+    })) as User;
+  }
+
   // CURRENT USER
   public async create(userDto: CreateUserDto) {
     const isUsernameExist = await this.userRepository.findOne({
