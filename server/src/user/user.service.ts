@@ -26,6 +26,27 @@ export class UserService {
     private userRepository: Repository<User>,
   ) { }
 
+  public toPublicUser(user: User) {
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      profile: user.profile
+        ? {
+          firstName: user.profile.firstName,
+          lastName: user.profile.lastName,
+          gender: user.profile.gender,
+          dob: user.profile.dob,
+          bio: user.profile.bio,
+        }
+        : {},
+      createdAt: user.createdAt,
+      followerCount: user.followerCount,
+      followingCount: user.followingCount,
+      isFollowed: user.isFollowed,
+    };
+  }
+
   public async findAll(
     paginationQueryDto: PaginationQueryDto & { search?: string },
     userId: string,
@@ -103,6 +124,28 @@ export class UserService {
     }
 
     return { ...user, followerCount, followingCount };
+  }
+
+  public async findByForAuth(identifier: string) {
+    try {
+      const qb = this.userRepository
+        .createQueryBuilder("user")
+        .addSelect("user.password");
+
+      if (isUUID(identifier)) {
+        qb.where("user.id = :identifier", { identifier });
+      } else {
+        qb.where("user.username = :identifier", { identifier }).orWhere(
+          "user.email = :identifier",
+          { identifier },
+        );
+      }
+
+      return await qb.getOne();
+    } catch (error) {
+      console.error("Error @user-findByForAuth:", error);
+      throw new RequestTimeoutException();
+    }
   }
 
   // CURRENT USER

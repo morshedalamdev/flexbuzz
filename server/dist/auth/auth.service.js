@@ -38,7 +38,7 @@ let AuthService = class AuthService {
         return await this.generateToken(newUser);
     }
     async login(loginDto) {
-        const user = await this.userService.findBy(loginDto.username);
+        const user = await this.userService.findByForAuth(loginDto.username);
         if (!user) {
             throw new common_1.NotFoundException("User not found");
         }

@@ -24,7 +24,10 @@ export class UserController {
     @Query() pageQueryDto: FollowQueryDto,
     @ActiveUser('sub') userId: string
   ) {
-    return this.userService.getFollowers(pageQueryDto, userId);
+    return this.userService.getFollowers(pageQueryDto, userId).then((res) => ({
+      ...res,
+      data: res.data.map((user) => this.userService.toPublicUser(user)),
+    }));
   }
 
   @Get("/following")
@@ -32,7 +35,10 @@ export class UserController {
     @Query() pageQueryDto: FollowQueryDto,
     @ActiveUser('sub') userId: string
   ) {
-    return this.userService.getFollowing(pageQueryDto, userId);
+    return this.userService.getFollowing(pageQueryDto, userId).then((res) => ({
+      ...res,
+      data: res.data.map((user) => this.userService.toPublicUser(user)),
+    }));
   }
 
   @Post(":id/follow")
@@ -48,12 +54,14 @@ export class UserController {
   // CURRENT USER
   @Get("/me")
   public GetCurrUser(@ActiveUser('sub') userId: string) {
-    return this.userService.current(userId);
+    return this.userService.current(userId).then((user) => this.userService.toPublicUser(user));
   }
 
   @Patch("/me")
   public UpdateCurrUser(@Body() updateDto: UpdateUserDto, @ActiveUser('sub') userId: string) {
-    return this.userService.update(updateDto, userId);
+    return this.userService
+      .update(updateDto, userId)
+      .then((user) => this.userService.toPublicUser(user));
   }
 
   @Delete("/me")
@@ -67,11 +75,14 @@ export class UserController {
     @Query() pageQueryDto: SearchUserQueryDto,
     @ActiveUser('sub') userId: string
   ) {
-    return this.userService.findAll(pageQueryDto, userId);
+    return this.userService.findAll(pageQueryDto, userId).then((res) => ({
+      ...res,
+      data: res.data.map((user) => this.userService.toPublicUser(user)),
+    }));
   }
 
   @Get(":id")
   public GetUserById(@Param("id") id: string, @ActiveUser('sub') userId: string) {
-    return this.userService.findBy(id, userId);
+    return this.userService.findBy(id, userId).then((user) => this.userService.toPublicUser(user));
   }
 }

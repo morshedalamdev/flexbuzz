@@ -7,22 +7,26 @@ export declare class UserController {
     constructor(userService: UserService);
     GetFollowers(pageQueryDto: FollowQueryDto, userId: string): Promise<{
         data: {
-            isFollowed: boolean;
             id: string;
             username: string;
             email: string;
-            password: string;
+            profile: {
+                firstName: string | undefined;
+                lastName: string | undefined;
+                gender: import("../profile/profile.entity").Gender | undefined;
+                dob: Date | undefined;
+                bio: string | undefined;
+            } | {
+                firstName?: undefined;
+                lastName?: undefined;
+                gender?: undefined;
+                dob?: undefined;
+                bio?: undefined;
+            };
             createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date;
-            followerCount?: number;
-            followingCount?: number;
-            profile: import("../profile/profile.entity").Profile;
-            followers: import("../follow/follow.entity").Follow[];
-            followings: import("../follow/follow.entity").Follow[];
-            notes: import("../note/note.entity").Note[];
-            likes: import("../like/like.entity").Like[];
-            comments: import("../comment/comment.entity").Comment[];
+            followerCount: number | undefined;
+            followingCount: number | undefined;
+            isFollowed: boolean | undefined;
         }[];
         meta: {
             itemsPerPage: number;
@@ -39,22 +43,26 @@ export declare class UserController {
     }>;
     GetFollowing(pageQueryDto: FollowQueryDto, userId: string): Promise<{
         data: {
-            isFollowed: boolean;
             id: string;
             username: string;
             email: string;
-            password: string;
+            profile: {
+                firstName: string | undefined;
+                lastName: string | undefined;
+                gender: import("../profile/profile.entity").Gender | undefined;
+                dob: Date | undefined;
+                bio: string | undefined;
+            } | {
+                firstName?: undefined;
+                lastName?: undefined;
+                gender?: undefined;
+                dob?: undefined;
+                bio?: undefined;
+            };
             createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date;
-            followerCount?: number;
-            followingCount?: number;
-            profile: import("../profile/profile.entity").Profile;
-            followers: import("../follow/follow.entity").Follow[];
-            followings: import("../follow/follow.entity").Follow[];
-            notes: import("../note/note.entity").Note[];
-            likes: import("../like/like.entity").Like[];
-            comments: import("../comment/comment.entity").Comment[];
+            followerCount: number | undefined;
+            followingCount: number | undefined;
+            isFollowed: boolean | undefined;
         }[];
         meta: {
             itemsPerPage: number;
@@ -74,44 +82,108 @@ export declare class UserController {
         deleted: boolean;
     }>;
     GetCurrUser(userId: string): Promise<{
-        followerCount: number;
-        followingCount: number;
         id: string;
         username: string;
         email: string;
-        password: string;
+        profile: {
+            firstName: string | undefined;
+            lastName: string | undefined;
+            gender: import("../profile/profile.entity").Gender | undefined;
+            dob: Date | undefined;
+            bio: string | undefined;
+        } | {
+            firstName?: undefined;
+            lastName?: undefined;
+            gender?: undefined;
+            dob?: undefined;
+            bio?: undefined;
+        };
         createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date;
-        isFollowed?: boolean;
-        profile: import("../profile/profile.entity").Profile;
-        followers: import("../follow/follow.entity").Follow[];
-        followings: import("../follow/follow.entity").Follow[];
-        notes: import("../note/note.entity").Note[];
-        likes: import("../like/like.entity").Like[];
-        comments: import("../comment/comment.entity").Comment[];
+        followerCount: number | undefined;
+        followingCount: number | undefined;
+        isFollowed: boolean | undefined;
     }>;
-    UpdateCurrUser(updateDto: UpdateUserDto, userId: string): Promise<import("./user.entity").User>;
+    UpdateCurrUser(updateDto: UpdateUserDto, userId: string): Promise<{
+        id: string;
+        username: string;
+        email: string;
+        profile: {
+            firstName: string | undefined;
+            lastName: string | undefined;
+            gender: import("../profile/profile.entity").Gender | undefined;
+            dob: Date | undefined;
+            bio: string | undefined;
+        } | {
+            firstName?: undefined;
+            lastName?: undefined;
+            gender?: undefined;
+            dob?: undefined;
+            bio?: undefined;
+        };
+        createdAt: Date;
+        followerCount: number | undefined;
+        followingCount: number | undefined;
+        isFollowed: boolean | undefined;
+    }>;
     DeleteCurrUser(userId: string): Promise<{
         deleted: boolean;
     }>;
-    GetUsers(pageQueryDto: SearchUserQueryDto, userId: string): Promise<import("../common/pagination/pagination.interface").PaginationInterface<import("./user.entity").User>>;
+    GetUsers(pageQueryDto: SearchUserQueryDto, userId: string): Promise<{
+        data: {
+            id: string;
+            username: string;
+            email: string;
+            profile: {
+                firstName: string | undefined;
+                lastName: string | undefined;
+                gender: import("../profile/profile.entity").Gender | undefined;
+                dob: Date | undefined;
+                bio: string | undefined;
+            } | {
+                firstName?: undefined;
+                lastName?: undefined;
+                gender?: undefined;
+                dob?: undefined;
+                bio?: undefined;
+            };
+            createdAt: Date;
+            followerCount: number | undefined;
+            followingCount: number | undefined;
+            isFollowed: boolean | undefined;
+        }[];
+        meta: {
+            itemsPerPage: number;
+            totalItems: number;
+            totalPages: number;
+            currentPage: number;
+        };
+        links: {
+            firstPage: string;
+            prevPage: string;
+            nextPage: string;
+            lastPage: string;
+        };
+    }>;
     GetUserById(id: string, userId: string): Promise<{
-        followerCount: number;
-        followingCount: number;
         id: string;
         username: string;
         email: string;
-        password: string;
+        profile: {
+            firstName: string | undefined;
+            lastName: string | undefined;
+            gender: import("../profile/profile.entity").Gender | undefined;
+            dob: Date | undefined;
+            bio: string | undefined;
+        } | {
+            firstName?: undefined;
+            lastName?: undefined;
+            gender?: undefined;
+            dob?: undefined;
+            bio?: undefined;
+        };
         createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date;
-        isFollowed?: boolean;
-        profile: import("../profile/profile.entity").Profile;
-        followers: import("../follow/follow.entity").Follow[];
-        followings: import("../follow/follow.entity").Follow[];
-        notes: import("../note/note.entity").Note[];
-        likes: import("../like/like.entity").Like[];
-        comments: import("../comment/comment.entity").Comment[];
+        followerCount: number | undefined;
+        followingCount: number | undefined;
+        isFollowed: boolean | undefined;
     }>;
 }

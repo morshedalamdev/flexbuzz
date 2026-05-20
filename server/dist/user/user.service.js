@@ -31,6 +31,26 @@ let UserService = class UserService {
         this.paginationProvider = paginationProvider;
         this.userRepository = userRepository;
     }
+    toPublicUser(user) {
+        return {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            profile: user.profile
+                ? {
+                    firstName: user.profile.firstName,
+                    lastName: user.profile.lastName,
+                    gender: user.profile.gender,
+                    dob: user.profile.dob,
+                    bio: user.profile.bio,
+                }
+                : {},
+            createdAt: user.createdAt,
+            followerCount: user.followerCount,
+            followingCount: user.followingCount,
+            isFollowed: user.isFollowed,
+        };
+    }
     async findAll(paginationQueryDto, userId) {
         try {
             const search = paginationQueryDto.search?.trim().replace(/^@/, "");
@@ -91,6 +111,24 @@ let UserService = class UserService {
             };
         }
         return { ...user, followerCount, followingCount };
+    }
+    async findByForAuth(identifier) {
+        try {
+            const qb = this.userRepository
+                .createQueryBuilder("user")
+                .addSelect("user.password");
+            if ((0, class_validator_1.isUUID)(identifier)) {
+                qb.where("user.id = :identifier", { identifier });
+            }
+            else {
+                qb.where("user.username = :identifier", { identifier }).orWhere("user.email = :identifier", { identifier });
+            }
+            return await qb.getOne();
+        }
+        catch (error) {
+            console.error("Error @user-findByForAuth:", error);
+            throw new common_1.RequestTimeoutException();
+        }
     }
     async create(userDto) {
         const isUsernameExist = await this.userRepository.findOne({

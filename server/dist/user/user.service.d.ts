@@ -12,6 +12,28 @@ export declare class UserService {
     private readonly paginationProvider;
     private userRepository;
     constructor(followService: FollowService, paginationProvider: PaginationProvider, userRepository: Repository<User>);
+    toPublicUser(user: User): {
+        id: string;
+        username: string;
+        email: string;
+        profile: {
+            firstName: string | undefined;
+            lastName: string | undefined;
+            gender: import("../profile/profile.entity").Gender | undefined;
+            dob: Date | undefined;
+            bio: string | undefined;
+        } | {
+            firstName?: undefined;
+            lastName?: undefined;
+            gender?: undefined;
+            dob?: undefined;
+            bio?: undefined;
+        };
+        createdAt: Date;
+        followerCount: number | undefined;
+        followingCount: number | undefined;
+        isFollowed: boolean | undefined;
+    };
     findAll(paginationQueryDto: PaginationQueryDto & {
         search?: string;
     }, userId: string): Promise<PaginationInterface<User>>;
@@ -33,6 +55,7 @@ export declare class UserService {
         likes: import("../like/like.entity").Like[];
         comments: import("../comment/comment.entity").Comment[];
     }>;
+    findByForAuth(identifier: string): Promise<User | null>;
     create(userDto: CreateUserDto): Promise<User>;
     current(userId: string): Promise<{
         followerCount: number;

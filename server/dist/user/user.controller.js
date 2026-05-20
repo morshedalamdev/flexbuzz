@@ -25,10 +25,16 @@ let UserController = class UserController {
         this.userService = userService;
     }
     GetFollowers(pageQueryDto, userId) {
-        return this.userService.getFollowers(pageQueryDto, userId);
+        return this.userService.getFollowers(pageQueryDto, userId).then((res) => ({
+            ...res,
+            data: res.data.map((user) => this.userService.toPublicUser(user)),
+        }));
     }
     GetFollowing(pageQueryDto, userId) {
-        return this.userService.getFollowing(pageQueryDto, userId);
+        return this.userService.getFollowing(pageQueryDto, userId).then((res) => ({
+            ...res,
+            data: res.data.map((user) => this.userService.toPublicUser(user)),
+        }));
     }
     FollowUser(id, userId) {
         return this.userService.follow(id, userId);
@@ -37,19 +43,24 @@ let UserController = class UserController {
         return this.userService.unfollow(id, userId);
     }
     GetCurrUser(userId) {
-        return this.userService.current(userId);
+        return this.userService.current(userId).then((user) => this.userService.toPublicUser(user));
     }
     UpdateCurrUser(updateDto, userId) {
-        return this.userService.update(updateDto, userId);
+        return this.userService
+            .update(updateDto, userId)
+            .then((user) => this.userService.toPublicUser(user));
     }
     DeleteCurrUser(userId) {
         return this.userService.delete(userId);
     }
     GetUsers(pageQueryDto, userId) {
-        return this.userService.findAll(pageQueryDto, userId);
+        return this.userService.findAll(pageQueryDto, userId).then((res) => ({
+            ...res,
+            data: res.data.map((user) => this.userService.toPublicUser(user)),
+        }));
     }
     GetUserById(id, userId) {
-        return this.userService.findBy(id, userId);
+        return this.userService.findBy(id, userId).then((user) => this.userService.toPublicUser(user));
     }
 };
 exports.UserController = UserController;
