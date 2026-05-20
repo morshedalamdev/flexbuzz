@@ -20,6 +20,7 @@ import { ForgotPasswordResetDto } from "./dto/forgot-password-reset.dto";
 type ForgotPasswordTokenPayload = {
   purpose: "forgot-password";
 };
+const FORGOT_PASSWORD_TOKEN_EXPIRY_SECONDS = 10 * 60;
 
 @Injectable()
 export class AuthService {
@@ -101,7 +102,7 @@ export class AuthService {
     const resetToken = await this.signInToken<ForgotPasswordTokenPayload>(
       user.id,
       this.authConfiguration.accessTokenSecret!,
-      10 * 60,
+      FORGOT_PASSWORD_TOKEN_EXPIRY_SECONDS,
       {
         purpose: "forgot-password",
       },

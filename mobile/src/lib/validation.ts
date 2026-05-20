@@ -16,9 +16,9 @@ export const SignupSchema = z
       .string()
       .min(8, "Password must be at least 8 characters long")
       .max(24, "Password must be at most 24 characters long")
-      .regex(/[a-zA-Z]/, "Contain at least one letter")
-      .regex(/[0-9]/, "Contain at least one number")
-      .regex(/[^a-zA-Z0-9]/, "Contain at least one special character")
+      .regex(/[a-zA-Z]/, "Must contain at least one letter")
+      .regex(/[0-9]/, "Must contain at least one number")
+      .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character")
       .trim(),
     confirmPassword: z.string().trim(),
   })
@@ -26,7 +26,7 @@ export const SignupSchema = z
     if (val.password !== val.confirmPassword) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Password and confirm password do not match",
+        message: "Passwords do not match",
         path: ["confirmPassword"],
       });
     }
