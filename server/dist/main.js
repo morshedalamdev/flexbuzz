@@ -5,7 +5,7 @@ const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    const defaultOrigins = ["http://localhost:3000", "http://localhost:5173"];
+    const defaultOrigins = ["http://localhost:3000", "http://localhost:5173", "https://flexbuzz.vercel.app"];
     const allowedOrigins = process.env.CORS_ORIGIN
         ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean)
         : defaultOrigins;
