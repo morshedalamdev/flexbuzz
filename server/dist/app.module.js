@@ -57,12 +57,17 @@ exports.AppModule = AppModule = __decorate([
                 inject: [config_1.ConfigService],
                 useFactory: (configService) => ({
                     type: "postgres",
+                    url: configService.get("database.url"),
                     autoLoadEntities: configService.get("database.autoLoad"),
                     synchronize: configService.get("database.synchronize"),
                     host: configService.get("database.host"),
                     port: configService.get("database.port"),
                     username: configService.get("database.user"),
+                    password: configService.get("database.password"),
                     database: configService.get("database.name"),
+                    ssl: configService.get("database.ssl")
+                        ? { rejectUnauthorized: false }
+                        : undefined,
                 }),
             }),
             config_1.ConfigModule.forFeature(auth_config_1.default),
