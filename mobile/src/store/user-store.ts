@@ -4,11 +4,6 @@ import { StatusType, type PaginationInterface } from "@/types";
 import type { UserType } from "@/types/user";
 import { create } from "zustand";
 
-type FollowRelationType = {
-  follower?: UserType;
-  following?: UserType;
-};
-
 interface UserStateType {
   users: Map<string, UserType>;
   isLoading: boolean;
@@ -83,7 +78,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
     query.set("page", String(page));
     query.set("limit", String(limit));
 
-    const { fetcher } = api<PaginationInterface<FollowRelationType>>(
+    const { fetcher } = api<PaginationInterface<UserType>>(
       `/user/followers?${query.toString()}`,
     );
 
@@ -92,10 +87,8 @@ export const useUserStore = create<UserStateType>((set, get) => ({
       if (!res.success || !res.data) {
         return [];
       }
-
-      return (res.data.data ?? [])
-        .map((follow) => follow.follower)
-        .filter((user): user is UserType => Boolean(user));
+      // Server returns plain users with isFollowed already included
+      return (res.data.data ?? []).filter((user): user is UserType => Boolean(user));
     } catch (error) {
       console.error("Error fetching followers:", error);
       return [];
@@ -108,7 +101,7 @@ export const useUserStore = create<UserStateType>((set, get) => ({
     query.set("page", String(page));
     query.set("limit", String(limit));
 
-    const { fetcher } = api<PaginationInterface<FollowRelationType>>(
+    const { fetcher } = api<PaginationInterface<UserType>>(
       `/user/following?${query.toString()}`,
     );
 
@@ -118,9 +111,8 @@ export const useUserStore = create<UserStateType>((set, get) => ({
         return [];
       }
 
-      return (res.data.data ?? [])
-        .map((follow) => follow.following)
-        .filter((user): user is UserType => Boolean(user));
+      // Server returns plain users with isFollowed already included
+      return (res.data.data ?? []).filter((user): user is UserType => Boolean(user));
     } catch (error) {
       console.error("Error fetching following:", error);
       return [];

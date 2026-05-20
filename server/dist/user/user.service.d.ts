@@ -60,6 +60,68 @@ export declare class UserService {
     unfollow(id: string, userId: string): Promise<{
         deleted: boolean;
     }>;
-    getFollowers(followDto: FollowQueryDto, userId: string): Promise<PaginationInterface<import("../follow/follow.entity").Follow>>;
-    getFollowing(followDto: FollowQueryDto, userId: string): Promise<PaginationInterface<import("../follow/follow.entity").Follow>>;
+    getFollowers(followDto: FollowQueryDto, userId: string): Promise<{
+        data: {
+            isFollowed: boolean;
+            id: string;
+            username: string;
+            email: string;
+            password: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date;
+            followerCount?: number;
+            followingCount?: number;
+            profile: import("../profile/profile.entity").Profile;
+            followers: import("../follow/follow.entity").Follow[];
+            followings: import("../follow/follow.entity").Follow[];
+            notes: import("../note/note.entity").Note[];
+            likes: import("../like/like.entity").Like[];
+            comments: import("../comment/comment.entity").Comment[];
+        }[];
+        meta: {
+            itemsPerPage: number;
+            totalItems: number;
+            totalPages: number;
+            currentPage: number;
+        };
+        links: {
+            firstPage: string;
+            prevPage: string;
+            nextPage: string;
+            lastPage: string;
+        };
+    }>;
+    getFollowing(followDto: FollowQueryDto, userId: string): Promise<{
+        data: {
+            isFollowed: boolean;
+            id: string;
+            username: string;
+            email: string;
+            password: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date;
+            followerCount?: number;
+            followingCount?: number;
+            profile: import("../profile/profile.entity").Profile;
+            followers: import("../follow/follow.entity").Follow[];
+            followings: import("../follow/follow.entity").Follow[];
+            notes: import("../note/note.entity").Note[];
+            likes: import("../like/like.entity").Like[];
+            comments: import("../comment/comment.entity").Comment[];
+        }[];
+        meta: {
+            itemsPerPage: number;
+            totalItems: number;
+            totalPages: number;
+            currentPage: number;
+        };
+        links: {
+            firstPage: string;
+            prevPage: string;
+            nextPage: string;
+            lastPage: string;
+        };
+    }>;
 }

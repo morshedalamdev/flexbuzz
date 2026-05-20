@@ -217,7 +217,15 @@ let UserService = class UserService {
             followDto.followingId = userId;
         }
         try {
-            return await this.followService.getFollows(followDto);
+            const res = await this.followService.getFollows(followDto);
+            const users = await Promise.all(res.data.map(async (f) => {
+                const u = f.follower;
+                if (!u)
+                    return null;
+                const isFollowed = await this.followService.isFollowed(u.id, userId);
+                return { ...u, isFollowed };
+            }));
+            return { ...res, data: users.filter((u) => u !== null) };
         }
         catch (error) {
             console.error("Error @user-getFollowers:", error);
@@ -229,7 +237,15 @@ let UserService = class UserService {
             followDto.followerId = userId;
         }
         try {
-            return await this.followService.getFollowing(followDto);
+            const res = await this.followService.getFollowing(followDto);
+            const users = await Promise.all(res.data.map(async (f) => {
+                const u = f.following;
+                if (!u)
+                    return null;
+                const isFollowed = await this.followService.isFollowed(u.id, userId);
+                return { ...u, isFollowed };
+            }));
+            return { ...res, data: users.filter((u) => u !== null) };
         }
         catch (error) {
             console.error("Error @user-getFollowing:", error);
