@@ -1,9 +1,7 @@
 import { User } from "../user.entity";
 
-export const toPublicUser = <T extends Partial<User>>(user: T) => {
-  const { password: _password, deletedAt: _deletedAt, ...safeUser } = user as T & {
-    password?: string;
-    deletedAt?: Date | null;
-  };
-  return safeUser;
-};
+export const toPublicUser = (user: User): User => ({
+  ...user,
+  password: undefined as unknown as string,
+  deletedAt: undefined as unknown as Date,
+});

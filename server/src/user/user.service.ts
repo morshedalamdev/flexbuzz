@@ -24,6 +24,16 @@ type FindUserOptions = {
   sanitize?: boolean;
 };
 
+const AUTH_USER_SELECT = {
+  id: true,
+  username: true,
+  email: true,
+  password: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+} as const;
+
 @Injectable()
 export class UserService {
   constructor(
@@ -92,30 +102,14 @@ export class UserService {
         user = await this.userRepository.findOne({
           where: { id: identifier },
           ...(includePassword && {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-              password: true,
-              createdAt: true,
-              updatedAt: true,
-              deletedAt: true,
-            },
+            select: AUTH_USER_SELECT,
           }),
         });
       } else {
         user = await this.userRepository.findOne({
           where: [{ username: identifier }, { email: identifier }],
           ...(includePassword && {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-              password: true,
-              createdAt: true,
-              updatedAt: true,
-              deletedAt: true,
-            },
+            select: AUTH_USER_SELECT,
           }),
         });
       }

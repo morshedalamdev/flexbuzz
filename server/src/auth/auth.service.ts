@@ -41,7 +41,7 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
     if (!user.password) {
-      throw new UnauthorizedException("Incorrect password");
+      throw new UnauthorizedException("Authentication failed");
     }
     const isPasswordValid = await this.hashingProvider.comparePassword(
       loginDto.password,
