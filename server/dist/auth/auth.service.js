@@ -21,6 +21,7 @@ const hashing_provider_1 = require("./provider/hashing.provider");
 const user_service_1 = require("../user/user.service");
 const auth_config_1 = __importDefault(require("./config/auth.config"));
 const jwt_1 = require("@nestjs/jwt");
+const FORGOT_PASSWORD_TOKEN_EXPIRY_SECONDS = 10 * 60;
 let AuthService = class AuthService {
     hashingProvider;
     userService;
@@ -38,9 +39,12 @@ let AuthService = class AuthService {
         return await this.generateToken(newUser);
     }
     async login(loginDto) {
-        const user = await this.userService.findBy(loginDto.username);
+        const user = await this.userService.findForAuth(loginDto.username);
         if (!user) {
             throw new common_1.NotFoundException("User not found");
+        }
+        if (!user.password) {
+            throw new common_1.UnauthorizedException("Authentication failed");
         }
         const isPasswordValid = await this.hashingProvider.comparePassword(loginDto.password, user.password);
         if (!isPasswordValid) {
@@ -55,7 +59,10 @@ let AuthService = class AuthService {
                 audience: this.authConfiguration.audience,
                 issuer: this.authConfiguration.issuer,
             });
-            const user = await this.userService.findBy(sub);
+            const user = await this.userService.findBy(sub, undefined, {
+                includeStats: false,
+                sanitize: false,
+            });
             if (!user) {
                 throw new common_1.NotFoundException("User not found");
             }
@@ -69,6 +76,53 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException(error);
         }
     }
+    async forgotPasswordVerify(forgotPasswordVerifyDto) {
+        let user;
+        try {
+            user = await this.userService.findForAuth(forgotPasswordVerifyDto.username);
+        }
+        catch {
+            throw new common_1.UnauthorizedException("Provided email and username do not match.");
+        }
+        if (user.email !== forgotPasswordVerifyDto.email) {
+            throw new common_1.UnauthorizedException("Provided email and username do not match.");
+        }
+        const resetToken = await this.signInToken(user.id, this.getAccessTokenSecret(), FORGOT_PASSWORD_TOKEN_EXPIRY_SECONDS, {
+            purpose: "forgot-password",
+        });
+        return {
+            resetToken,
+            message: "Identity verified. You can now reset your password.",
+        };
+    }
+    async forgotPasswordReset(forgotPasswordResetDto) {
+        try {
+            const payload = await this.jwtService.verifyAsync(forgotPasswordResetDto.resetToken, {
+                secret: this.getAccessTokenSecret(),
+                audience: this.authConfiguration.audience,
+                issuer: this.authConfiguration.issuer,
+            });
+            if (payload.purpose !== "forgot-password") {
+                throw new common_1.UnauthorizedException("Invalid password reset token.");
+            }
+            const user = await this.userService.findForAuth(payload.sub);
+            if (!user) {
+                throw new common_1.NotFoundException("User not found");
+            }
+            const hashedPassword = await this.hashingProvider.hashPassword(forgotPasswordResetDto.newPassword);
+            await this.userService.updatePassword(user.id, hashedPassword);
+            return { success: true, message: "Password updated successfully." };
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            if (error instanceof common_1.UnauthorizedException) {
+                throw error;
+            }
+            throw new common_1.UnauthorizedException("Invalid or expired password reset token.");
+        }
+    }
     async signInToken(sub, secret, expiresIn, payload) {
         return await this.jwtService.signAsync({
             sub,
@@ -80,11 +134,17 @@ let AuthService = class AuthService {
             issuer: this.authConfiguration.issuer,
         });
     }
+    getAccessTokenSecret() {
+        if (!this.authConfiguration.accessTokenSecret) {
+            throw new common_1.InternalServerErrorException("Access token secret is not configured.");
+        }
+        return this.authConfiguration.accessTokenSecret;
+    }
     async generateToken(user, refreshToken) {
         if (!refreshToken) {
             refreshToken = await this.signInToken(user.id, this.authConfiguration.refreshTokenSecret, this.authConfiguration.refreshTokenExpiresIn);
         }
-        const accessToken = await this.signInToken(user.id, this.authConfiguration.accessTokenSecret, this.authConfiguration.accessTokenExpiresIn, {
+        const accessToken = await this.signInToken(user.id, this.getAccessTokenSecret(), this.authConfiguration.accessTokenExpiresIn, {
             email: user.email,
             username: user.username,
         });

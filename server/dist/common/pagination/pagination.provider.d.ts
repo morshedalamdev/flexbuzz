@@ -5,5 +5,5 @@ import { PaginationInterface } from "./pagination.interface";
 export declare class PaginationProvider {
     private readonly request;
     constructor(request: Request);
-    paginateQuery<T extends ObjectLiteral>(paginationQueryDto: PaginationQueryDto, repository: Repository<T>, where?: FindOptionsWhere<T>, relations?: string[]): Promise<PaginationInterface<T>>;
+    paginateQuery<T extends ObjectLiteral>(paginationQueryDto: PaginationQueryDto, repository: Repository<T>, where?: FindOptionsWhere<T>, relations?: string[], orderDirection?: "ASC" | "DESC"): Promise<PaginationInterface<T>>;
 }

@@ -19,6 +19,8 @@ const create_user_dto_1 = require("../user/dto/create-user.dto");
 const login_dto_1 = require("./dto/login.dto");
 const allow_anonymous_decorator_1 = require("./decorator/allow-anonymous.decorator");
 const refresh_token_dto_1 = require("./dto/refresh-token.dto");
+const forgot_password_verify_dto_1 = require("./dto/forgot-password-verify.dto");
+const forgot_password_reset_dto_1 = require("./dto/forgot-password-reset.dto");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -32,6 +34,12 @@ let AuthController = class AuthController {
     }
     async RefreshToken(refreshTokenDto) {
         return await this.authService.refreshToken(refreshTokenDto);
+    }
+    async ForgotPasswordVerify(forgotPasswordVerifyDto) {
+        return await this.authService.forgotPasswordVerify(forgotPasswordVerifyDto);
+    }
+    async ForgotPasswordReset(forgotPasswordResetDto) {
+        return await this.authService.forgotPasswordReset(forgotPasswordResetDto);
     }
 };
 exports.AuthController = AuthController;
@@ -61,6 +69,24 @@ __decorate([
     __metadata("design:paramtypes", [refresh_token_dto_1.RefreshTokenDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "RefreshToken", null);
+__decorate([
+    (0, allow_anonymous_decorator_1.AllowAnonymous)(),
+    (0, common_1.Post)("forgot-password/verify"),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [forgot_password_verify_dto_1.ForgotPasswordVerifyDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "ForgotPasswordVerify", null);
+__decorate([
+    (0, allow_anonymous_decorator_1.AllowAnonymous)(),
+    (0, common_1.Post)("forgot-password/reset"),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [forgot_password_reset_dto_1.ForgotPasswordResetDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "ForgotPasswordReset", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)("auth"),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

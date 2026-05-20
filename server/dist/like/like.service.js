@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const like_entity_1 = require("./like.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const public_user_util_1 = require("../user/utils/public-user.util");
 let LikeService = class LikeService {
     likeRepository;
     constructor(likeRepository) {
@@ -55,7 +56,7 @@ let LikeService = class LikeService {
                 relations: ["user"],
                 order: { createdAt: "DESC" },
             });
-            return likes.map((like) => like.user);
+            return likes.map((like) => (0, public_user_util_1.toPublicUser)(like.user));
         }
         catch (error) {
             console.error("Error @like-getUsersWhoLiked:", error);

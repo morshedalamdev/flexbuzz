@@ -16,6 +16,7 @@ import { CommentService } from "src/comment/comment.service";
 import { NoteQueryDto } from "./dto/note-query.dto";
 import { PaginationInterface } from "src/common/pagination/pagination.interface";
 import { PaginationProvider } from "src/common/pagination/pagination.provider";
+import { toPublicUser } from "src/user/utils/public-user.util";
 
 @Injectable()
 export class NoteService {
@@ -29,9 +30,22 @@ export class NoteService {
     private readonly noteRepository: Repository<Note>,
   ) { }
 
+  private serializeNote(note: Note) {
+    if (!note.user) {
+      return note;
+    }
+    return {
+      ...note,
+      user: toPublicUser(note.user),
+    };
+  }
+
   public async create(noteDto: CreateNoteDto, userId: string) {
     try {
-      const user = await this.userService.findBy(userId);
+      const user = await this.userService.findBy(userId, undefined, {
+        includeStats: false,
+        sanitize: false,
+      });
       const hashtags = await this.hashtagService.getByIds(
         noteDto.hashtags || [],
       );
@@ -47,7 +61,7 @@ export class NoteService {
         await this.hashtagService.incrementCounts(noteDto.existingHashtags);
       }
 
-      return savedNote;
+      return this.serializeNote(savedNote);
     } catch (error) {
       console.error("Error @note-create:", error);
       throw new RequestTimeoutException();
@@ -82,7 +96,12 @@ export class NoteService {
             const likeCount = await this.likeService.likeCount(note.id);
             const commentCount = await this.commentService.commentCount(note.id);
             const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
-            return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+            return this.serializeNote({
+              ...note,
+              likeCount,
+              commentCount,
+              isLikedByCurrentUser,
+            });
           }),
         );
 
@@ -119,12 +138,17 @@ export class NoteService {
 
       const notesWithCounts = await Promise.all(
         notes.data.map(async (note) => {
-          const likeCount = await this.likeService.likeCount(note.id);
-          const commentCount = await this.commentService.commentCount(note.id);
-          const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
-          return { ...note, likeCount, commentCount, isLikedByCurrentUser };
-        }),
-      );
+            const likeCount = await this.likeService.likeCount(note.id);
+            const commentCount = await this.commentService.commentCount(note.id);
+            const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
+            return this.serializeNote({
+              ...note,
+              likeCount,
+              commentCount,
+              isLikedByCurrentUser,
+            });
+          }),
+        );
       return { ...notes, data: notesWithCounts };
     } catch (error) {
       if (error instanceof Error && "code" in error && (error as { code?: string }).code === "ECONNREFUSED") {
@@ -150,13 +174,18 @@ export class NoteService {
         throw new NotFoundException("Note not found");
       }
       if (!userId) {
-        return note;
+        return this.serializeNote(note);
       }
 
       const likeCount = await this.likeService.likeCount(id);
       const commentCount = await this.commentService.commentCount(id);
       const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id, userId,);
-      return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+      return this.serializeNote({
+        ...note,
+        likeCount,
+        commentCount,
+        isLikedByCurrentUser,
+      });
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -209,7 +238,10 @@ export class NoteService {
   public async like(id: string, userId: string) {
     try {
       const note = await this.getById(id);
-      const user = await this.userService.findBy(userId);
+      const user = await this.userService.findBy(userId, undefined, {
+        includeStats: false,
+        sanitize: false,
+      });
       if (!note || !user) {
         throw new NotFoundException();
       }
@@ -240,7 +272,10 @@ export class NoteService {
   public async addComment(commentDto: CommentDto, userId: string) {
     try {
       const note = await this.getById(commentDto.id);
-      const user = await this.userService.findBy(userId);
+      const user = await this.userService.findBy(userId, undefined, {
+        includeStats: false,
+        sanitize: false,
+      });
       if (!note || !user) {
         throw new NotFoundException();
       }

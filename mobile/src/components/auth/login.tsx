@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth-store';
 import { showToast } from '@/lib/show-toast';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { StatusType } from '@/types';
 import { Spinner } from '../ui/spinner';
 
@@ -72,6 +72,11 @@ export default function Login() {
             <Button type="submit" className="w-full h-12 text-base" disabled={isLoading}>
                 {isLoading ? <Spinner /> : ""}Login
             </Button>
+            <div className="text-right">
+                <Link to="/forgot-password" className="text-sm text-blue-500 font-medium">
+                    Forgot password?
+                </Link>
+            </div>
         </form>
     );
 }

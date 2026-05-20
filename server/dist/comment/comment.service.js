@@ -18,12 +18,22 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const comment_entity_1 = require("./comment.entity");
 const pagination_provider_1 = require("../common/pagination/pagination.provider");
+const public_user_util_1 = require("../user/utils/public-user.util");
 let CommentService = class CommentService {
     commentRepository;
     paginationProvider;
     constructor(commentRepository, paginationProvider) {
         this.commentRepository = commentRepository;
         this.paginationProvider = paginationProvider;
+    }
+    serializeComment(comment) {
+        if (!comment.user) {
+            return comment;
+        }
+        return {
+            ...comment,
+            user: (0, public_user_util_1.toPublicUser)(comment.user),
+        };
     }
     async create(props) {
         try {
@@ -32,7 +42,8 @@ let CommentService = class CommentService {
                 user: props.user,
                 note: props.note,
             });
-            return await this.commentRepository.save(comment);
+            const savedComment = await this.commentRepository.save(comment);
+            return this.serializeComment(savedComment);
         }
         catch (error) {
             console.error("Error @comment-create:", error);
@@ -66,7 +77,11 @@ let CommentService = class CommentService {
     }
     async getCommentsByNote(noteId, pageQueryDto) {
         try {
-            return await this.paginationProvider.paginateQuery(pageQueryDto, this.commentRepository, { noteId }, ["user"]);
+            const comments = await this.paginationProvider.paginateQuery(pageQueryDto, this.commentRepository, { noteId }, ["user"], "ASC");
+            return {
+                ...comments,
+                data: comments.data.map((comment) => this.serializeComment(comment)),
+            };
         }
         catch (error) {
             console.error("Error @comment-getByNote:", error);

@@ -19,6 +19,7 @@ export class PaginationProvider {
     repository: Repository<T>,
     where?: FindOptionsWhere<T>,
     relations?: string[],
+    orderDirection: "ASC" | "DESC" = "DESC",
   ): Promise<PaginationInterface<T>> {
     const currentPage = paginationQueryDto.page || 1;
     const itemsPerPage = paginationQueryDto.limit || 10;
@@ -27,7 +28,7 @@ export class PaginationProvider {
       ...(where && { where }),
       skip: (currentPage - 1) * itemsPerPage,
       take: itemsPerPage,
-      order: { createdAt: "DESC"} as any,
+      order: { createdAt: orderDirection } as any,
     }
 
     if(relations && relations.length > 0) {

@@ -18,6 +18,7 @@ export declare class NoteService {
     private readonly paginationProvider;
     private readonly noteRepository;
     constructor(userService: UserService, hashtagService: HashtagService, likeService: LikeService, commentService: CommentService, paginationProvider: PaginationProvider, noteRepository: Repository<Note>);
+    private serializeNote;
     create(noteDto: CreateNoteDto, userId: string): Promise<Note>;
     getAll(pageQueryDto: NoteQueryDto, userId: string): Promise<PaginationInterface<Note>>;
     getById(id: string, userId?: string): Promise<Note>;

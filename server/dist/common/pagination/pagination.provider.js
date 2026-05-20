@@ -20,14 +20,14 @@ let PaginationProvider = class PaginationProvider {
     constructor(request) {
         this.request = request;
     }
-    async paginateQuery(paginationQueryDto, repository, where, relations) {
+    async paginateQuery(paginationQueryDto, repository, where, relations, orderDirection = "DESC") {
         const currentPage = paginationQueryDto.page || 1;
         const itemsPerPage = paginationQueryDto.limit || 10;
         const options = {
             ...(where && { where }),
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
-            order: { createdAt: "DESC" },
+            order: { createdAt: orderDirection },
         };
         if (relations && relations.length > 0) {
             options.relations = relations.reduce((acc, rel) => {

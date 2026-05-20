@@ -1,6 +1,6 @@
 import {
-  forwardRef,
   Inject,
+  InternalServerErrorException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -15,6 +15,13 @@ import type { ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ActiveUserType } from "./interfaces/active-user-type.interface";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { ForgotPasswordVerifyDto } from "./dto/forgot-password-verify.dto";
+import { ForgotPasswordResetDto } from "./dto/forgot-password-reset.dto";
+
+type ForgotPasswordTokenPayload = {
+  purpose: "forgot-password";
+};
+const FORGOT_PASSWORD_TOKEN_EXPIRY_SECONDS = 10 * 60;
 
 @Injectable()
 export class AuthService {
@@ -36,9 +43,12 @@ export class AuthService {
   }
 
   public async login(loginDto: LoginDto) {
-    const user = await this.userService.findBy(loginDto.username);
+    const user = await this.userService.findForAuth(loginDto.username);
     if (!user) {
       throw new NotFoundException("User not found");
+    }
+    if (!user.password) {
+      throw new UnauthorizedException("Authentication failed");
     }
     const isPasswordValid = await this.hashingProvider.comparePassword(
       loginDto.password,
@@ -60,7 +70,10 @@ export class AuthService {
           issuer: this.authConfiguration.issuer,
         },
       );
-      const user = await this.userService.findBy(sub);
+      const user = await this.userService.findBy(sub, undefined, {
+        includeStats: false,
+        sanitize: false,
+      });
       if (!user) {
         throw new NotFoundException("User not found");
       }
@@ -71,6 +84,72 @@ export class AuthService {
       }
       console.error("Error @refresh-token:", error);
       throw new UnauthorizedException(error);
+    }
+  }
+
+  public async forgotPasswordVerify(
+    forgotPasswordVerifyDto: ForgotPasswordVerifyDto,
+  ) {
+    let user: User;
+    try {
+      user = await this.userService.findForAuth(forgotPasswordVerifyDto.username);
+    } catch {
+      throw new UnauthorizedException("Provided email and username do not match.");
+    }
+    if (user.email !== forgotPasswordVerifyDto.email) {
+      throw new UnauthorizedException("Provided email and username do not match.");
+    }
+
+    const resetToken = await this.signInToken<ForgotPasswordTokenPayload>(
+      user.id,
+      this.getAccessTokenSecret(),
+      FORGOT_PASSWORD_TOKEN_EXPIRY_SECONDS,
+      {
+        purpose: "forgot-password",
+      },
+    );
+
+    return {
+      resetToken,
+      message: "Identity verified. You can now reset your password.",
+    };
+  }
+
+  public async forgotPasswordReset(
+    forgotPasswordResetDto: ForgotPasswordResetDto,
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync<{
+        sub: string;
+        purpose?: string;
+      }>(forgotPasswordResetDto.resetToken, {
+        secret: this.getAccessTokenSecret(),
+        audience: this.authConfiguration.audience,
+        issuer: this.authConfiguration.issuer,
+      });
+
+      if (payload.purpose !== "forgot-password") {
+        throw new UnauthorizedException("Invalid password reset token.");
+      }
+
+      const user = await this.userService.findForAuth(payload.sub);
+      if (!user) {
+        throw new NotFoundException("User not found");
+      }
+
+      const hashedPassword = await this.hashingProvider.hashPassword(
+        forgotPasswordResetDto.newPassword,
+      );
+      await this.userService.updatePassword(user.id, hashedPassword);
+      return { success: true, message: "Password updated successfully." };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException("Invalid or expired password reset token.");
     }
   }
 
@@ -94,6 +173,13 @@ export class AuthService {
     );
   }
 
+  private getAccessTokenSecret(): string {
+    if (!this.authConfiguration.accessTokenSecret) {
+      throw new InternalServerErrorException("Access token secret is not configured.");
+    }
+    return this.authConfiguration.accessTokenSecret;
+  }
+
   private async generateToken(user: User, refreshToken?: unknown) {
     if (!refreshToken) {
       refreshToken = await this.signInToken(
@@ -104,7 +190,7 @@ export class AuthService {
     }
     const accessToken = await this.signInToken<Partial<ActiveUserType>>(
       user.id,
-      this.authConfiguration.accessTokenSecret!,
+      this.getAccessTokenSecret(),
       this.authConfiguration.accessTokenExpiresIn,
       {
         email: user.email,

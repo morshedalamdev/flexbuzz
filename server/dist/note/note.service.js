@@ -22,6 +22,7 @@ const hashtag_service_1 = require("../hashtag/hashtag.service");
 const like_service_1 = require("../like/like.service");
 const comment_service_1 = require("../comment/comment.service");
 const pagination_provider_1 = require("../common/pagination/pagination.provider");
+const public_user_util_1 = require("../user/utils/public-user.util");
 let NoteService = class NoteService {
     userService;
     hashtagService;
@@ -37,9 +38,21 @@ let NoteService = class NoteService {
         this.paginationProvider = paginationProvider;
         this.noteRepository = noteRepository;
     }
+    serializeNote(note) {
+        if (!note.user) {
+            return note;
+        }
+        return {
+            ...note,
+            user: (0, public_user_util_1.toPublicUser)(note.user),
+        };
+    }
     async create(noteDto, userId) {
         try {
-            const user = await this.userService.findBy(userId);
+            const user = await this.userService.findBy(userId, undefined, {
+                includeStats: false,
+                sanitize: false,
+            });
             const hashtags = await this.hashtagService.getByIds(noteDto.hashtags || []);
             const newNote = this.noteRepository.create({
                 ...noteDto,
@@ -50,7 +63,7 @@ let NoteService = class NoteService {
             if (noteDto.existingHashtags?.length) {
                 await this.hashtagService.incrementCounts(noteDto.existingHashtags);
             }
-            return savedNote;
+            return this.serializeNote(savedNote);
         }
         catch (error) {
             console.error("Error @note-create:", error);
@@ -76,7 +89,12 @@ let NoteService = class NoteService {
                     const likeCount = await this.likeService.likeCount(note.id);
                     const commentCount = await this.commentService.commentCount(note.id);
                     const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
-                    return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+                    return this.serializeNote({
+                        ...note,
+                        likeCount,
+                        commentCount,
+                        isLikedByCurrentUser,
+                    });
                 }));
                 const nextPage = page < totalPages ? page + 1 : null;
                 const prevPage = page > 1 ? page - 1 : null;
@@ -103,7 +121,12 @@ let NoteService = class NoteService {
                 const likeCount = await this.likeService.likeCount(note.id);
                 const commentCount = await this.commentService.commentCount(note.id);
                 const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(note.id, userId);
-                return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+                return this.serializeNote({
+                    ...note,
+                    likeCount,
+                    commentCount,
+                    isLikedByCurrentUser,
+                });
             }));
             return { ...notes, data: notesWithCounts };
         }
@@ -127,12 +150,17 @@ let NoteService = class NoteService {
                 throw new common_1.NotFoundException("Note not found");
             }
             if (!userId) {
-                return note;
+                return this.serializeNote(note);
             }
             const likeCount = await this.likeService.likeCount(id);
             const commentCount = await this.commentService.commentCount(id);
             const isLikedByCurrentUser = await this.likeService.isLikedByCurrentUser(id, userId);
-            return { ...note, likeCount, commentCount, isLikedByCurrentUser };
+            return this.serializeNote({
+                ...note,
+                likeCount,
+                commentCount,
+                isLikedByCurrentUser,
+            });
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
@@ -179,7 +207,10 @@ let NoteService = class NoteService {
     async like(id, userId) {
         try {
             const note = await this.getById(id);
-            const user = await this.userService.findBy(userId);
+            const user = await this.userService.findBy(userId, undefined, {
+                includeStats: false,
+                sanitize: false,
+            });
             if (!note || !user) {
                 throw new common_1.NotFoundException();
             }
@@ -208,7 +239,10 @@ let NoteService = class NoteService {
     async addComment(commentDto, userId) {
         try {
             const note = await this.getById(commentDto.id);
-            const user = await this.userService.findBy(userId);
+            const user = await this.userService.findBy(userId, undefined, {
+                includeStats: false,
+                sanitize: false,
+            });
             if (!note || !user) {
                 throw new common_1.NotFoundException();
             }
