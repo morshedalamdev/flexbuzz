@@ -27,7 +27,7 @@ export default function RootLoadingIndicator() {
             <Zap className="h-14 w-14 fill-white text-white" strokeWidth={2.4} />
           </div>
 
-          <div className="mt-7 text-5xl font-extrabold tracking-tight text-[#0d1733]">Flex Buzz</div>
+          <h1 className="mt-7 text-5xl font-extrabold tracking-tight text-[#0d1733]">Flex Buzz</h1>
           <p className="mt-4 text-lg font-medium text-[#8a94aa]">Connect • Share • Inspire</p>
 
           <div className="mt-28 flex flex-col items-center">
@@ -35,7 +35,7 @@ export default function RootLoadingIndicator() {
               className="h-14 w-14 animate-spin rounded-full border-[5px] border-[#7fa6ff]/30 border-t-[#3f78ff] border-r-[#3f78ff]"
               aria-hidden="true"
             />
-            <span className="mt-5 text-2xl font-medium tracking-tight text-[#8a94aa]" role="status">Loading...</span>
+            <span className="mt-5 text-2xl font-medium tracking-tight text-[#8a94aa]" aria-live="polite" role="status">Loading...</span>
           </div>
         </div>
       </div>
