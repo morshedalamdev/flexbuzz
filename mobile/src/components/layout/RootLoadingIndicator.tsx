@@ -35,7 +35,7 @@ export default function RootLoadingIndicator() {
               className="h-14 w-14 animate-spin rounded-full border-[5px] border-[#7fa6ff]/30 border-t-[#3f78ff] border-r-[#3f78ff]"
               aria-hidden="true"
             />
-            <span className="mt-5 text-4xl font-medium tracking-tight text-[#8a94aa]">Loading...</span>
+            <span className="mt-5 text-2xl font-medium tracking-tight text-[#8a94aa]">Loading...</span>
           </div>
         </div>
       </div>
