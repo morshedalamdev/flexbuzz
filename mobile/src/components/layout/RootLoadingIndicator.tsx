@@ -23,7 +23,7 @@ export default function RootLoadingIndicator() {
         <div className="pointer-events-none absolute bottom-28 left-0 right-0 h-52 bg-[#e7edf7] opacity-85 [clip-path:ellipse(75%_100%_at_50%_100%)]" />
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-          <div className="flex h-36 w-36 items-center justify-center rounded-full bg-gradient-to-br from-[#3a95ff] to-[#3a5bff] shadow-[0_12px_35px_rgba(58,91,255,0.25)]">
+          <div className="flex h-36 w-36 items-center justify-center rounded-full bg-gradient-to-br from-[#3a95ff] to-[#3a5bff] shadow-[0_12px_35px_rgba(58,91,255,0.25)]" aria-label="Flex Buzz logo">
             <Zap className="h-14 w-14 fill-white text-white" strokeWidth={2.4} />
           </div>
 
@@ -35,7 +35,7 @@ export default function RootLoadingIndicator() {
               className="h-14 w-14 animate-spin rounded-full border-[5px] border-[#7fa6ff]/30 border-t-[#3f78ff] border-r-[#3f78ff]"
               aria-hidden="true"
             />
-            <span className="mt-5 text-2xl font-medium tracking-tight text-[#8a94aa]" aria-live="polite" role="status">Loading...</span>
+            <span className="mt-5 text-2xl font-medium tracking-tight text-[#8a94aa]" role="status">Loading...</span>
           </div>
         </div>
       </div>
